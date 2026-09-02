@@ -5,12 +5,12 @@ import { ROLE_LABELS } from '../types'
 import { Button } from './Button'
 
 const TABS = [
-  { to: '', label: 'Обзор', end: true },
-  { to: 'stages', label: 'Этапы', end: false },
-  { to: 'photos', label: 'Фото', end: false },
-  { to: 'tasks', label: 'Задачи', end: false },
-  { to: 'issues', label: 'Проблемы', end: false },
-  { to: 'settings', label: 'Настройки', end: false },
+  { to: '', label: 'Обзор', end: true, gcOnly: false },
+  { to: 'stages', label: 'Этапы', end: false, gcOnly: false },
+  { to: 'photos', label: 'Фото', end: false, gcOnly: false },
+  { to: 'tasks', label: 'Задачи', end: false, gcOnly: false },
+  { to: 'issues', label: 'Проблемы', end: false, gcOnly: false },
+  { to: 'settings', label: 'Настройки', end: false, gcOnly: true },
 ]
 
 /**
@@ -21,6 +21,8 @@ export function ProjectLayout() {
   const { id } = useParams<{ id: string }>()
   const { profile, user, signOut } = useAuth()
   const { project } = useProject(id)
+
+  const tabs = TABS.filter((tab) => !tab.gcOnly || profile?.role === 'gc')
 
   return (
     <div className="min-h-svh bg-slate-50">
@@ -49,7 +51,7 @@ export function ProjectLayout() {
         ) : null}
         <nav className="mx-auto max-w-5xl overflow-x-auto px-2">
           <ul className="flex min-w-max gap-1 pb-px">
-            {TABS.map((tab) => (
+            {tabs.map((tab) => (
               <li key={tab.to || 'overview'}>
                 <NavLink
                   to={tab.to ? `/project/${id}/${tab.to}` : `/project/${id}`}

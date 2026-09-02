@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { toErrorMessage } from '../lib/format'
+import { withTimeout } from '../lib/withTimeout'
 import { useAuth } from './useAuth'
 import type { Project } from '../types'
 
@@ -72,7 +73,7 @@ export function useProjects(): UseProjectsResult {
     // oxlint-disable-next-line react/set-state-in-effect
     setLoading(true)
     setError(null)
-    fetchProjects()
+    withTimeout(fetchProjects())
       .then((rows) => {
         if (!active) return
         setProjects(rows)

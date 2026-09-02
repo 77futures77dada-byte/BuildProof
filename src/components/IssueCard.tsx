@@ -67,7 +67,7 @@ export function IssueCard({ issue, canManage, onUpdateStatus }: IssueCardProps) 
             src={issue.photoUrl}
             alt={issue.title}
             loading="lazy"
-            className="max-h-48 rounded-lg object-cover"
+            className="max-h-48 w-auto max-w-full rounded-lg object-contain"
           />
         </button>
       ) : null}

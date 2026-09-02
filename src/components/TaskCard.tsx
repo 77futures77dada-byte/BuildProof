@@ -35,7 +35,9 @@ const STATUS_BADGE: Record<TaskStatus, string> = {
 }
 
 const controlClass =
-  'rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 disabled:opacity-60'
+  'w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 disabled:opacity-60 sm:w-auto'
+
+const controlLabelClass = 'flex flex-col gap-1 text-xs text-slate-500 sm:flex-row sm:items-center sm:gap-1.5'
 
 export function TaskCard({
   task,
@@ -97,7 +99,7 @@ export function TaskCard({
 
       {variant === 'manager' ? (
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-          <label className="flex items-center gap-1 text-xs text-slate-500">
+          <label className={controlLabelClass}>
             Исполнитель
             <select
               className={controlClass}
@@ -120,7 +122,7 @@ export function TaskCard({
             </select>
           </label>
 
-          <label className="flex items-center gap-1 text-xs text-slate-500">
+          <label className={controlLabelClass}>
             Статус
             <select
               className={controlClass}
@@ -136,7 +138,7 @@ export function TaskCard({
             </select>
           </label>
 
-          <label className="flex items-center gap-1 text-xs text-slate-500">
+          <label className={controlLabelClass}>
             Срок
             <input
               type="date"
@@ -147,7 +149,7 @@ export function TaskCard({
             />
           </label>
 
-          <label className="flex items-center gap-1 text-xs text-slate-500">
+          <label className={controlLabelClass}>
             Этап
             <select
               className={controlClass}

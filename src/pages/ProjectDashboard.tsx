@@ -50,11 +50,17 @@ export function ProjectDashboard() {
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-slate-700">Этапы</h2>
-        <ul className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          {stages.map((stage) => (
-            <StageRow key={stage.id} stage={stage} />
-          ))}
-        </ul>
+        {stages.length === 0 ? (
+          <p className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500 shadow-sm">
+            Этапы по объекту ещё не заведены.
+          </p>
+        ) : (
+          <ul className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            {stages.map((stage) => (
+              <StageRow key={stage.id} stage={stage} />
+            ))}
+          </ul>
+        )}
       </section>
 
       {photos.length > 0 ? (

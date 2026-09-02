@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { toErrorMessage } from '../lib/format'
+import { withTimeout } from '../lib/withTimeout'
 
 export interface StageHistoryEntry {
   id: string
@@ -67,7 +68,7 @@ export function useStageHistory(
     // oxlint-disable-next-line react/set-state-in-effect
     setLoading(true)
     setError(null)
-    load()
+    withTimeout(load())
       .then((rows) => {
         if (active) setEntries(rows)
       })

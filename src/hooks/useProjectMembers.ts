@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { toErrorMessage } from '../lib/format'
+import { withTimeout } from '../lib/withTimeout'
 import type { UserRole } from '../types'
 
 export interface ProjectMember {
@@ -57,7 +58,7 @@ export function useProjectMembers(projectId: string | undefined): UseProjectMemb
     // oxlint-disable-next-line react/set-state-in-effect
     setLoading(true)
     setError(null)
-    load()
+    withTimeout(load())
       .then((rows) => {
         if (active) setMembers(rows)
       })

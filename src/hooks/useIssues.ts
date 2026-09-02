@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { resolvePhotoUrls } from '../lib/storage'
 import { toErrorMessage } from '../lib/format'
+import { withTimeout } from '../lib/withTimeout'
 import type { IssuePriority, IssueStatus } from '../types'
 
 export interface IssueItem {
@@ -85,7 +86,7 @@ export function useIssues(projectId: string | undefined): UseIssuesResult {
     // oxlint-disable-next-line react/set-state-in-effect
     setLoading(true)
     setError(null)
-    fetchIssues()
+    withTimeout(fetchIssues())
       .then((rows) => {
         if (active) setIssues(rows)
       })

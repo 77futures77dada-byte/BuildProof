@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { updateStageProgress } from '../lib/stages'
 import { toErrorMessage } from '../lib/format'
+import { withTimeout } from '../lib/withTimeout'
 
 export interface EditableStage {
   /** project_stages.id */
@@ -66,7 +67,7 @@ export function useProjectStages(projectId: string | undefined): UseProjectStage
     // oxlint-disable-next-line react/set-state-in-effect
     setLoading(true)
     setError(null)
-    load()
+    withTimeout(load())
       .then((rows) => {
         if (!active) return
         confirmed.current = new Map(rows.map((r) => [r.id, r.progressPercent]))

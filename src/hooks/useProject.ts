@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { toErrorMessage } from '../lib/format'
+import { withTimeout } from '../lib/withTimeout'
 import type { Project } from '../types'
 
 interface UseProjectResult {
@@ -37,7 +38,7 @@ export function useProject(projectId: string | undefined): UseProjectResult {
     // oxlint-disable-next-line react/set-state-in-effect
     setLoading(true)
     setError(null)
-    load()
+    withTimeout(load())
       .then((row) => {
         if (active) setProject(row)
       })

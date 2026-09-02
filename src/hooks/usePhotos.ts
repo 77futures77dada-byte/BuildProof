@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { resolvePhotoUrls } from '../lib/storage'
 import { toErrorMessage } from '../lib/format'
+import { withTimeout } from '../lib/withTimeout'
 
 export interface FeedPhoto {
   id: string
@@ -81,7 +82,7 @@ export function usePhotos(
     // oxlint-disable-next-line react/set-state-in-effect
     setLoading(true)
     setError(null)
-    load()
+    withTimeout(load())
       .then((rows) => {
         if (active) setPhotos(rows)
       })

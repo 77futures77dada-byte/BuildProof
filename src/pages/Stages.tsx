@@ -32,17 +32,23 @@ export function Stages() {
         ) : null}
       </div>
 
-      <ul className="space-y-3">
-        {stages.map((stage) => (
-          <StageCard
-            key={stage.id}
-            stage={stage}
-            canEdit={canEdit}
-            onCommit={commitPercent}
-            historyToken={historyToken}
-          />
-        ))}
-      </ul>
+      {stages.length === 0 ? (
+        <p className="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm">
+          Этапы по объекту ещё не заведены.
+        </p>
+      ) : (
+        <ul className="space-y-3">
+          {stages.map((stage) => (
+            <StageCard
+              key={stage.id}
+              stage={stage}
+              canEdit={canEdit}
+              onCommit={commitPercent}
+              historyToken={historyToken}
+            />
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

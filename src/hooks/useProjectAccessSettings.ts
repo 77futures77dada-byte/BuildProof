@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { toErrorMessage } from '../lib/format'
+import { withTimeout } from '../lib/withTimeout'
 import type { UserRole } from '../types'
 
 export interface AccessRow {
@@ -74,7 +75,7 @@ export function useProjectAccessSettings(
     // oxlint-disable-next-line react/set-state-in-effect
     setLoading(true)
     setError(null)
-    fetchRows()
+    withTimeout(fetchRows())
       .then((next) => {
         if (active) setRows(next)
       })
