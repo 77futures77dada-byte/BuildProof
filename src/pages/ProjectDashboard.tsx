@@ -281,10 +281,10 @@ function StageRow({
   onAction: (kind: StageActionKind) => void
 }) {
   return (
-    <li className="group -mx-1 space-y-1.5 rounded-lg px-1 py-1.5 transition-colors hover:bg-slate-50 sm:px-2">
+    <li className="group -mx-2 space-y-1.5 rounded-lg px-2 py-2 transition-colors hover:bg-slate-50">
       <div className="flex items-center justify-between gap-3 text-sm">
         <span className="min-w-0 text-slate-700">{stage.name}</span>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2.5">
           <span className="tabular-nums text-slate-500">
             {Math.round(stage.progressPercent)}%
           </span>

@@ -16,7 +16,9 @@ export function ProgressBar({ value, className = '' }: ProgressBarProps) {
     >
       <div
         className="h-full rounded-full bg-sky-600 transition-[width] duration-300"
-        style={{ width: `${pct}%` }}
+        // Keep a visible sliver of the "head" for any non-zero progress;
+        // only a true 0% shows a fully empty bar.
+        style={{ width: `${pct}%`, minWidth: pct > 0 ? '3px' : undefined }}
       />
     </div>
   )
