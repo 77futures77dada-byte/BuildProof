@@ -1,4 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { AuthProvider } from './components/AuthProvider'
+import { ProtectedRoute } from './components/ProtectedRoute'
 import { ProjectLayout } from './components/ProjectLayout'
 import { Login } from './pages/Login'
 import { Dashboard } from './pages/Dashboard'
@@ -13,22 +15,39 @@ import { NotFound } from './pages/NotFound'
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/login" element={<Login />} />
 
-        <Route path="/project/:id" element={<ProjectLayout />}>
-          <Route index element={<ProjectDashboard />} />
-          <Route path="stages" element={<Stages />} />
-          <Route path="photos" element={<Photos />} />
-          <Route path="tasks" element={<Tasks />} />
-          <Route path="issues" element={<Issues />} />
-          <Route path="settings" element={<Settings />} />
-        </Route>
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          <Route
+            path="/project/:id"
+            element={
+              <ProtectedRoute>
+                <ProjectLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<ProjectDashboard />} />
+            <Route path="stages" element={<Stages />} />
+            <Route path="photos" element={<Photos />} />
+            <Route path="tasks" element={<Tasks />} />
+            <Route path="issues" element={<Issues />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   )
 }

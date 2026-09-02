@@ -1,4 +1,7 @@
 import { NavLink, Outlet, useParams } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
+import { ROLE_LABELS } from '../types'
+import { Button } from './Button'
 
 const TABS = [
   { to: '', label: 'Обзор', end: true },
@@ -15,6 +18,7 @@ const TABS = [
  */
 export function ProjectLayout() {
   const { id } = useParams<{ id: string }>()
+  const { profile, user, signOut } = useAuth()
 
   return (
     <div className="min-h-svh bg-slate-50">
@@ -23,6 +27,15 @@ export function ProjectLayout() {
           <NavLink to="/dashboard" className="text-sm font-semibold text-slate-900">
             BuildProof
           </NavLink>
+          <div className="flex items-center gap-3">
+            <span className="hidden text-xs text-slate-500 sm:inline">
+              {profile?.full_name ?? user?.email}
+              {profile ? ` · ${ROLE_LABELS[profile.role]}` : ''}
+            </span>
+            <Button variant="ghost" onClick={() => void signOut()}>
+              Выйти
+            </Button>
+          </div>
         </div>
         <nav className="mx-auto max-w-5xl overflow-x-auto px-2">
           <ul className="flex min-w-max gap-1 pb-px">
