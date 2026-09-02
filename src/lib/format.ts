@@ -106,6 +106,36 @@ export function getUpdateFreshness(iso: string | null | undefined): Freshness {
   return { level: 'old', label: `не обновлялось ${diffDays} ${pluralDays(diffDays)}` }
 }
 
+export interface ReportFreshness {
+  /** true → risk signal (amber text), false → neutral. */
+  stale: boolean
+  label: string
+}
+
+/**
+ * Compact "last field report" label for the dashboard project card:
+ * `обновлён сегодня` / `обновлён вчера` / `обновлён 4 дня назад`,
+ * and — as a risk signal — `нет отчётов 9 дней` past a week or
+ * `отчётов пока нет` when nothing has ever been reported.
+ */
+export function getReportFreshness(iso: string | null | undefined): ReportFreshness {
+  if (!iso) return { stale: true, label: 'отчётов пока нет' }
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return { stale: true, label: 'отчётов пока нет' }
+
+  const now = new Date()
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const startOfUpdateDay = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+  const daysAgo = Math.round(
+    (startOfToday.getTime() - startOfUpdateDay.getTime()) / DAY_MS,
+  )
+
+  if (daysAgo <= 0) return { stale: false, label: 'обновлён сегодня' }
+  if (daysAgo === 1) return { stale: false, label: 'обновлён вчера' }
+  if (daysAgo <= 7) return { stale: false, label: `обновлён ${daysAgo} ${pluralDays(daysAgo)} назад` }
+  return { stale: true, label: `нет отчётов ${daysAgo} ${pluralDays(daysAgo)}` }
+}
+
 /** Turn an unknown thrown value into a user-facing message. */
 export function toErrorMessage(err: unknown): string {
   if (err instanceof Error) return err.message

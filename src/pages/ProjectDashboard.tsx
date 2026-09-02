@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 import { useProjectOverview } from '../hooks/useProjectOverview'
 import type {
   ActiveIssue,
@@ -8,12 +10,18 @@ import type {
   StageProgress,
 } from '../hooks/useProjectOverview'
 import { ISSUE_PRIORITY_LABELS } from '../types'
-import type { IssuePriority } from '../types'
+import type { IssuePriority, UserRole } from '../types'
 import type { FreshnessLevel } from '../lib/format'
 import { formatDate, getUpdateFreshness } from '../lib/format'
 import { ProgressBar } from '../components/ProgressBar'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { Spinner } from '../components/Spinner'
+import { Modal } from '../components/Modal'
+import { PhotoUploadForm } from '../components/PhotoUploadForm'
+import { TaskForm } from '../components/TaskForm'
+import { IssueForm } from '../components/IssueForm'
+import { StageActionButtons } from '../components/StageActionButtons'
+import type { StageActionCapabilities, StageActionKind } from '../components/StageActionButtons'
 
 const PRIORITY_BADGE: Record<IssuePriority, string> = {
   high: 'bg-red-100 text-red-800',
@@ -30,8 +38,17 @@ const FRESHNESS_DOT: Record<FreshnessLevel, string> = {
 const linkButtonClass =
   'inline-flex items-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-sky-700'
 
+function capabilitiesFor(role: UserRole | undefined): StageActionCapabilities {
+  return {
+    photo: role === 'gc' || role === 'foreman' || role === 'worker',
+    task: role === 'gc' || role === 'foreman',
+    issue: role === 'gc' || role === 'foreman',
+  }
+}
+
 export function ProjectDashboard() {
   const { id } = useParams<{ id: string }>()
+  const { profile } = useAuth()
   const { data, loading, error, reload } = useProjectOverview(id)
 
   if (loading) {
@@ -42,15 +59,32 @@ export function ProjectDashboard() {
     return <ErrorMessage message={error ?? 'Не удалось загрузить объект.'} onRetry={reload} />
   }
 
-  return <ProjectDashboardView data={data} projectId={id ?? ''} />
+  return (
+    <ProjectDashboardView
+      data={data}
+      projectId={id ?? ''}
+      role={profile?.role}
+      onChanged={reload}
+    />
+  )
+}
+
+interface StageAction {
+  kind: StageActionKind
+  stageId: string
+  stageName: string
 }
 
 export function ProjectDashboardView({
   data,
   projectId,
+  role,
+  onChanged,
 }: {
   data: ProjectOverview
   projectId: string
+  role?: UserRole
+  onChanged?: () => void
 }) {
   const {
     overallPercent,
@@ -64,6 +98,18 @@ export function ProjectDashboardView({
 
   const freshness = getUpdateFreshness(lastUpdatedAt)
   const stagesExist = stages.length > 0
+
+  const capabilities = capabilitiesFor(role)
+  const rowActionsEnabled = capabilities.photo || capabilities.task || capabilities.issue
+  const [action, setAction] = useState<StageAction | null>(null)
+
+  function closeAction() {
+    setAction(null)
+  }
+  function completeAction() {
+    setAction(null)
+    onChanged?.()
+  }
 
   return (
     <div className="space-y-8">
@@ -120,9 +166,16 @@ export function ProjectDashboardView({
       {stagesExist ? (
         <section className="space-y-3">
           <h2 className="text-sm font-semibold text-slate-700">Этапы</h2>
-          <ul className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <ul className="space-y-2 rounded-xl border border-slate-200 bg-white p-2 shadow-sm sm:p-3">
             {stages.map((stage) => (
-              <StageRow key={stage.id} stage={stage} />
+              <StageRow
+                key={stage.id}
+                stage={stage}
+                capabilities={rowActionsEnabled ? capabilities : null}
+                onAction={(kind) =>
+                  setAction({ kind, stageId: stage.id, stageName: stage.name })
+                }
+              />
             ))}
           </ul>
         </section>
@@ -153,6 +206,39 @@ export function ProjectDashboardView({
           </ul>
         )}
       </section>
+
+      <Modal
+        open={action !== null}
+        onClose={closeAction}
+        label={
+          action?.kind === 'photo'
+            ? 'Добавить фото'
+            : action?.kind === 'task'
+              ? 'Создать задачу'
+              : 'Отметить проблему'
+        }
+      >
+        {action?.kind === 'photo' ? (
+          <PhotoUploadForm
+            projectId={projectId}
+            fixedStageId={action.stageId}
+            heading={`Фото · ${action.stageName}`}
+            onUploaded={completeAction}
+            onCancel={closeAction}
+          />
+        ) : null}
+        {action?.kind === 'task' ? (
+          <TaskForm
+            projectId={projectId}
+            defaultStageId={action.stageId}
+            onCreated={completeAction}
+            onCancel={closeAction}
+          />
+        ) : null}
+        {action?.kind === 'issue' ? (
+          <IssueForm projectId={projectId} onCreated={completeAction} onCancel={closeAction} />
+        ) : null}
+      </Modal>
     </div>
   )
 }
@@ -185,12 +271,31 @@ function StatTile({
   )
 }
 
-function StageRow({ stage }: { stage: StageProgress }) {
+function StageRow({
+  stage,
+  capabilities,
+  onAction,
+}: {
+  stage: StageProgress
+  capabilities: StageActionCapabilities | null
+  onAction: (kind: StageActionKind) => void
+}) {
   return (
-    <li className="space-y-1">
+    <li className="group -mx-1 space-y-1.5 rounded-lg px-1 py-1.5 transition-colors hover:bg-slate-50 sm:px-2">
       <div className="flex items-center justify-between gap-3 text-sm">
-        <span className="text-slate-700">{stage.name}</span>
-        <span className="tabular-nums text-slate-500">{Math.round(stage.progressPercent)}%</span>
+        <span className="min-w-0 text-slate-700">{stage.name}</span>
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="tabular-nums text-slate-500">
+            {Math.round(stage.progressPercent)}%
+          </span>
+          {capabilities ? (
+            <StageActionButtons
+              stageName={stage.name}
+              capabilities={capabilities}
+              onAction={onAction}
+            />
+          ) : null}
+        </div>
       </div>
       <ProgressBar value={stage.progressPercent} />
     </li>

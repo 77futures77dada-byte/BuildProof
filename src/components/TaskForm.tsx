@@ -11,6 +11,8 @@ import { ErrorMessage } from './ErrorMessage'
 
 interface TaskFormProps {
   projectId: string
+  /** Preselect this stage in the dropdown (still changeable). */
+  defaultStageId?: string
   onCreated: () => void
   onCancel: () => void
 }
@@ -18,7 +20,7 @@ interface TaskFormProps {
 const selectClass =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 disabled:opacity-60'
 
-export function TaskForm({ projectId, onCreated, onCancel }: TaskFormProps) {
+export function TaskForm({ projectId, defaultStageId, onCreated, onCancel }: TaskFormProps) {
   const { user } = useAuth()
   const { members, loading: membersLoading, error: membersError } = useProjectMembers(projectId)
   const { options: stages, loading: stagesLoading } = useStageOptions(projectId)
@@ -26,7 +28,7 @@ export function TaskForm({ projectId, onCreated, onCancel }: TaskFormProps) {
   const [title, setTitle] = useState('')
   const [assignedTo, setAssignedTo] = useState('')
   const [deadline, setDeadline] = useState('')
-  const [stageId, setStageId] = useState('')
+  const [stageId, setStageId] = useState(defaultStageId ?? '')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 

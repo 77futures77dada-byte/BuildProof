@@ -1,14 +1,14 @@
 import { useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useProjects } from '../hooks/useProjects'
-import { PROJECT_STATUS_LABELS, ROLE_LABELS } from '../types'
-import { formatDate } from '../lib/format'
+import { ROLE_LABELS } from '../types'
 import { isProfileConfigured } from '../lib/profile'
 import { Button } from '../components/Button'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { FullPageSpinner, Spinner } from '../components/Spinner'
 import { CreateProjectForm } from '../components/CreateProjectForm'
+import { ProjectListCard } from '../components/ProjectListCard'
 import { ProfileNotConfigured } from './ProfileNotConfigured'
 
 export function Dashboard() {
@@ -76,24 +76,10 @@ export function Dashboard() {
               : 'Вам ещё не выдан доступ ни к одному объекту.'}
           </p>
         ) : (
-          <ul className="grid gap-3 sm:grid-cols-2">
+          <ul className="space-y-3">
             {projects.map((project) => (
               <li key={project.id}>
-                <Link
-                  to={`/project/${project.id}`}
-                  className="block rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:border-sky-300"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="font-medium text-slate-900">{project.name}</span>
-                    <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
-                      {PROJECT_STATUS_LABELS[project.status]}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-sm text-slate-500">{project.address ?? 'Адрес не указан'}</p>
-                  <p className="mt-2 text-xs text-slate-400">
-                    Дедлайн: {formatDate(project.deadline)}
-                  </p>
-                </Link>
+                <ProjectListCard project={project} />
               </li>
             ))}
           </ul>
