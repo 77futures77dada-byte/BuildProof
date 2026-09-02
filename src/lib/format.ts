@@ -24,6 +24,39 @@ export function formatMoney(value: number | null | undefined): string {
   }).format(value)
 }
 
+const timeFmt = new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit' })
+const dayMonthFmt = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long' })
+const dayMonthYearFmt = new Intl.DateTimeFormat('ru-RU', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+})
+
+/**
+ * Format a timestamp for an "last updated" label:
+ * `сегодня в 14:32` for today, otherwise `23 августа в 14:32`
+ * (the year is added only when it differs from the current one).
+ */
+export function formatDateTimeSmart(iso: string | null | undefined): string {
+  if (!iso) return '—'
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return '—'
+
+  const now = new Date()
+  const time = timeFmt.format(d)
+  const sameDay =
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate()
+  if (sameDay) return `сегодня в ${time}`
+
+  const datePart =
+    d.getFullYear() === now.getFullYear()
+      ? dayMonthFmt.format(d)
+      : dayMonthYearFmt.format(d)
+  return `${datePart} в ${time}`
+}
+
 /** Turn an unknown thrown value into a user-facing message. */
 export function toErrorMessage(err: unknown): string {
   if (err instanceof Error) return err.message
