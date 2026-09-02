@@ -1,9 +1,16 @@
-import { useParams } from 'react-router-dom'
+import type { ReactNode } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import { useProjectOverview } from '../hooks/useProjectOverview'
-import type { ActiveIssue, OverviewPhoto, StageProgress } from '../hooks/useProjectOverview'
+import type {
+  ActiveIssue,
+  OverviewPhoto,
+  ProjectOverview,
+  StageProgress,
+} from '../hooks/useProjectOverview'
 import { ISSUE_PRIORITY_LABELS } from '../types'
 import type { IssuePriority } from '../types'
-import { formatDate, formatDateTimeSmart } from '../lib/format'
+import type { FreshnessLevel } from '../lib/format'
+import { formatDate, getUpdateFreshness } from '../lib/format'
 import { ProgressBar } from '../components/ProgressBar'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { Spinner } from '../components/Spinner'
@@ -14,6 +21,15 @@ const PRIORITY_BADGE: Record<IssuePriority, string> = {
   low: 'bg-slate-100 text-slate-600',
 }
 
+const FRESHNESS_DOT: Record<FreshnessLevel, string> = {
+  fresh: 'bg-green-500',
+  stale: 'bg-amber-500',
+  old: 'bg-red-500',
+}
+
+const linkButtonClass =
+  'inline-flex items-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-sky-700'
+
 export function ProjectDashboard() {
   const { id } = useParams<{ id: string }>()
   const { data, loading, error, reload } = useProjectOverview(id)
@@ -23,45 +39,94 @@ export function ProjectDashboard() {
   }
 
   if (error || !data) {
-    return (
-      <ErrorMessage
-        message={error ?? 'Не удалось загрузить объект.'}
-        onRetry={reload}
-      />
-    )
+    return <ErrorMessage message={error ?? 'Не удалось загрузить объект.'} onRetry={reload} />
   }
 
-  const { overallPercent, stages, lastUpdatedAt, photos, activeIssues } = data
+  return <ProjectDashboardView data={data} projectId={id ?? ''} />
+}
+
+export function ProjectDashboardView({
+  data,
+  projectId,
+}: {
+  data: ProjectOverview
+  projectId: string
+}) {
+  const {
+    overallPercent,
+    stages,
+    completedStageCount,
+    lastUpdatedAt,
+    hasStageHistory,
+    photos,
+    activeIssues,
+  } = data
+
+  const freshness = getUpdateFreshness(lastUpdatedAt)
+  const stagesExist = stages.length > 0
 
   return (
     <div className="space-y-8">
-      <section className="space-y-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex items-baseline justify-between gap-3">
-            <span className="text-sm text-slate-500">Общая готовность</span>
-            <span className="text-2xl font-semibold text-slate-900">{overallPercent}%</span>
+      {stagesExist ? (
+        <section className="space-y-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <StatTile label="Готовность" value={`${overallPercent}%`} />
+            <StatTile
+              label="Этапы"
+              value={`${completedStageCount} / ${stages.length}`}
+              hint="завершено"
+            />
+            <StatTile
+              label="Проблемы"
+              value={String(activeIssues.length)}
+              hint={activeIssues.length === 1 ? 'открытая' : 'открытых'}
+            />
+            <StatTile label="Обновлено">
+              <span className="flex items-center gap-1.5">
+                <span
+                  aria-hidden="true"
+                  className={`size-2 shrink-0 rounded-full ${FRESHNESS_DOT[freshness.level]}`}
+                />
+                <span className="text-xs font-medium text-slate-900">{freshness.label}</span>
+              </span>
+            </StatTile>
           </div>
-          <ProgressBar value={overallPercent} className="mt-2" />
-          <p className="mt-3 text-xs text-slate-400">
-            Последнее обновление: {formatDateTimeSmart(lastUpdatedAt)}
-          </p>
-        </div>
-      </section>
 
-      <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-slate-700">Этапы</h2>
-        {stages.length === 0 ? (
-          <p className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500 shadow-sm">
-            Этапы по объекту ещё не заведены.
-          </p>
-        ) : (
+          {!hasStageHistory ? (
+            <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <ProgressBar value={overallPercent} />
+              <p className="text-sm text-slate-600">
+                Отслеживание прогресса ещё не начато. Отметьте выполнение первого этапа,
+                чтобы начать отслеживание.
+              </p>
+              <Link to={`/project/${projectId}/stages`} className={linkButtonClass}>
+                Перейти к этапам
+              </Link>
+            </div>
+          ) : null}
+        </section>
+      ) : (
+        <section className="space-y-3">
+          <h2 className="text-sm font-semibold text-slate-700">Этапы</h2>
+          <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p className="text-sm text-slate-600">Этапы по объекту ещё не заведены.</p>
+            <Link to={`/project/${projectId}/stages`} className={linkButtonClass}>
+              Перейти к этапам
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {stagesExist ? (
+        <section className="space-y-3">
+          <h2 className="text-sm font-semibold text-slate-700">Этапы</h2>
           <ul className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             {stages.map((stage) => (
               <StageRow key={stage.id} stage={stage} />
             ))}
           </ul>
-        )}
-      </section>
+        </section>
+      ) : null}
 
       {photos.length > 0 ? (
         <section className="space-y-3">
@@ -88,6 +153,34 @@ export function ProjectDashboard() {
           </ul>
         )}
       </section>
+    </div>
+  )
+}
+
+function StatTile({
+  label,
+  value,
+  hint,
+  children,
+}: {
+  label: string
+  value?: string
+  hint?: string
+  children?: ReactNode
+}) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+      <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">{label}</p>
+      <div className="mt-1">
+        {children ?? (
+          <p className="text-lg font-semibold text-slate-900">
+            {value}
+            {hint ? (
+              <span className="ml-1 text-xs font-normal text-slate-400">{hint}</span>
+            ) : null}
+          </p>
+        )}
+      </div>
     </div>
   )
 }

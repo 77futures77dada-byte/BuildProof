@@ -57,6 +57,55 @@ export function formatDateTimeSmart(iso: string | null | undefined): string {
   return `${datePart} в ${time}`
 }
 
+function pluralDays(n: number): string {
+  const mod10 = n % 10
+  const mod100 = n % 100
+  if (mod10 === 1 && mod100 !== 11) return 'день'
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return 'дня'
+  return 'дней'
+}
+
+export type FreshnessLevel = 'fresh' | 'stale' | 'old'
+
+export interface Freshness {
+  /** fresh → green dot, stale → yellow dot, old → red dot. */
+  level: FreshnessLevel
+  label: string
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000
+
+/**
+ * "Last updated" freshness for the project overview:
+ * - within 24h  → fresh,  `сегодня, 14:32` / `вчера, 14:32`
+ * - 1–7 days    → stale,  `3 дня назад`
+ * - > 7 days    → old,    `не обновлялось 8 дней`
+ * - null/invalid → old,   `ещё не обновлялось`
+ */
+export function getUpdateFreshness(iso: string | null | undefined): Freshness {
+  if (!iso) return { level: 'old', label: 'ещё не обновлялось' }
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return { level: 'old', label: 'ещё не обновлялось' }
+
+  const now = new Date()
+  const diffMs = now.getTime() - d.getTime()
+
+  if (diffMs < DAY_MS) {
+    const time = timeFmt.format(d)
+    const sameDay =
+      d.getFullYear() === now.getFullYear() &&
+      d.getMonth() === now.getMonth() &&
+      d.getDate() === now.getDate()
+    return { level: 'fresh', label: `${sameDay ? 'сегодня' : 'вчера'}, ${time}` }
+  }
+
+  const diffDays = Math.floor(diffMs / DAY_MS)
+  if (diffDays <= 7) {
+    return { level: 'stale', label: `${diffDays} ${pluralDays(diffDays)} назад` }
+  }
+  return { level: 'old', label: `не обновлялось ${diffDays} ${pluralDays(diffDays)}` }
+}
+
 /** Turn an unknown thrown value into a user-facing message. */
 export function toErrorMessage(err: unknown): string {
   if (err instanceof Error) return err.message

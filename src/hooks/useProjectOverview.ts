@@ -34,8 +34,12 @@ export interface ProjectOverview {
   /** Mean of every stage's progress_percent, rounded to a whole number. */
   overallPercent: number
   stages: StageProgress[]
+  /** Number of stages at 100%. */
+  completedStageCount: number
   /** max(project_stages.updated_at), or null when there are no stages. */
   lastUpdatedAt: string | null
+  /** True if any stage of this project has at least one stage_history row. */
+  hasStageHistory: boolean
   photos: OverviewPhoto[]
   activeIssues: ActiveIssue[]
 }
@@ -87,7 +91,7 @@ export function useProjectOverview(projectId: string | undefined): UseProjectOve
     let active = true
 
     async function load(): Promise<ProjectOverview> {
-      const [projectRes, stagesRes, photosRes, issuesRes] = await Promise.all([
+      const [projectRes, stagesRes, photosRes, issuesRes, historyRes] = await Promise.all([
         supabase
           .from('projects')
           .select('id, company_id, name, address, deadline, budget, status')
@@ -108,12 +112,19 @@ export function useProjectOverview(projectId: string | undefined): UseProjectOve
           .select('id, title, priority, status, due_date')
           .eq('project_id', projectId)
           .neq('status', 'resolved'),
+        // Exists-check only: has anyone ever moved a stage's %?
+        supabase
+          .from('stage_history')
+          .select('id, project_stages!inner(project_id)')
+          .eq('project_stages.project_id', projectId)
+          .limit(1),
       ])
 
       if (projectRes.error) throw projectRes.error
       if (stagesRes.error) throw stagesRes.error
       if (photosRes.error) throw photosRes.error
       if (issuesRes.error) throw issuesRes.error
+      if (historyRes.error) throw historyRes.error
 
       const stageRows = (stagesRes.data ?? []) as unknown as StageRow[]
       const stages: StageProgress[] = stageRows
@@ -131,6 +142,10 @@ export function useProjectOverview(projectId: string | undefined): UseProjectOve
           : Math.round(
               stages.reduce((sum, s) => sum + s.progressPercent, 0) / stages.length,
             )
+
+      const completedStageCount = stages.filter((s) => s.progressPercent >= 100).length
+
+      const hasStageHistory = ((historyRes.data ?? []) as unknown[]).length > 0
 
       const lastUpdatedAt =
         stageRows.length === 0
@@ -171,7 +186,9 @@ export function useProjectOverview(projectId: string | undefined): UseProjectOve
         project: projectRes.data as Project,
         overallPercent,
         stages,
+        completedStageCount,
         lastUpdatedAt,
+        hasStageHistory,
         photos,
         activeIssues,
       }
