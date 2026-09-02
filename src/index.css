@@ -21,3 +21,31 @@ body {
     font-size: 16px;
   }
 }
+
+/* Landing page — blueprint grid texture for the hero background */
+.blueprint-grid {
+  background-image:
+    linear-gradient(to right, rgba(2, 132, 199, 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(2, 132, 199, 0.09) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Landing page — fade/slide in when scrolled into view (see components/Reveal.tsx) */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
