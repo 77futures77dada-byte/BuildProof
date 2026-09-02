@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useProject } from '../hooks/useProject'
 import { ROLE_LABELS } from '../types'
 import { Button } from './Button'
+import { ProjectStatusBadge } from './ProjectStatusBadge'
 
 const TABS = [
   { to: '', label: 'Обзор', end: true, gcOnly: false },
@@ -43,7 +44,10 @@ export function ProjectLayout() {
         </div>
         {project ? (
           <div className="mx-auto max-w-5xl px-4 pb-3">
-            <h1 className="text-lg font-semibold text-slate-900">{project.name}</h1>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <h1 className="text-lg font-semibold text-slate-900">{project.name}</h1>
+              <ProjectStatusBadge status={project.status} />
+            </div>
             {project.address ? (
               <p className="text-sm text-slate-500">{project.address}</p>
             ) : null}

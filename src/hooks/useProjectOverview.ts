@@ -40,6 +40,11 @@ export interface ProjectOverview {
   lastUpdatedAt: string | null
   /** True if any stage of this project has at least one stage_history row. */
   hasStageHistory: boolean
+  /**
+   * Change in overall % over the last 7 days (percentage points), or null when
+   * the project has no stage_history older than a week (too new to trend).
+   */
+  weeklyTrend: number | null
   photos: OverviewPhoto[]
   activeIssues: ActiveIssue[]
 }
@@ -74,6 +79,14 @@ interface IssueRow {
   status: IssueStatus
   due_date: string | null
 }
+
+interface HistoryRow {
+  project_stage_id: string
+  new_percent: number
+  changed_at: string
+}
+
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000
 
 /**
  * Loads everything the customer overview screen (/project/:id) needs:
@@ -112,12 +125,13 @@ export function useProjectOverview(projectId: string | undefined): UseProjectOve
           .select('id, title, priority, status, due_date')
           .eq('project_id', projectId)
           .neq('status', 'resolved'),
-        // Exists-check only: has anyone ever moved a stage's %?
+        // Every change to this project's stages — used for the "tracking not
+        // started" check and the 7-day trend.
         supabase
           .from('stage_history')
-          .select('id, project_stages!inner(project_id)')
+          .select('project_stage_id, new_percent, changed_at, project_stages!inner(project_id)')
           .eq('project_stages.project_id', projectId)
-          .limit(1),
+          .order('changed_at', { ascending: true }),
       ])
 
       if (projectRes.error) throw projectRes.error
@@ -145,7 +159,30 @@ export function useProjectOverview(projectId: string | undefined): UseProjectOve
 
       const completedStageCount = stages.filter((s) => s.progressPercent >= 100).length
 
-      const hasStageHistory = ((historyRes.data ?? []) as unknown[]).length > 0
+      const historyRows = (historyRes.data ?? []) as unknown as HistoryRow[]
+      const hasStageHistory = historyRows.length > 0
+
+      // 7-day trend: the % of each stage as of a week ago is the last recorded
+      // value before that cut-off; a stage with no history that old counts as
+      // unchanged (use its current value).
+      const cutoff = Date.now() - WEEK_MS
+      const percentThen = new Map<string, number>()
+      let hasHistoryBeforeCutoff = false
+      for (const row of historyRows) {
+        if (new Date(row.changed_at).getTime() < cutoff) {
+          percentThen.set(row.project_stage_id, row.new_percent)
+          hasHistoryBeforeCutoff = true
+        }
+      }
+
+      let weeklyTrend: number | null = null
+      if (hasHistoryBeforeCutoff && stages.length > 0) {
+        const overallThen = Math.round(
+          stages.reduce((sum, s) => sum + (percentThen.get(s.id) ?? s.progressPercent), 0) /
+            stages.length,
+        )
+        weeklyTrend = overallPercent - overallThen
+      }
 
       const lastUpdatedAt =
         stageRows.length === 0
@@ -189,6 +226,7 @@ export function useProjectOverview(projectId: string | undefined): UseProjectOve
         completedStageCount,
         lastUpdatedAt,
         hasStageHistory,
+        weeklyTrend,
         photos,
         activeIssues,
       }

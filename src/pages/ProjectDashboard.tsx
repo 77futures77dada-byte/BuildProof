@@ -29,6 +29,12 @@ const PRIORITY_BADGE: Record<IssuePriority, string> = {
   low: 'bg-slate-100 text-slate-600',
 }
 
+const PRIORITY_BORDER: Record<IssuePriority, string> = {
+  high: 'border-l-red-500',
+  medium: 'border-l-amber-500',
+  low: 'border-l-slate-300',
+}
+
 const FRESHNESS_DOT: Record<FreshnessLevel, string> = {
   fresh: 'bg-green-500',
   stale: 'bg-amber-500',
@@ -92,6 +98,7 @@ export function ProjectDashboardView({
     completedStageCount,
     lastUpdatedAt,
     hasStageHistory,
+    weeklyTrend,
     photos,
     activeIssues,
   } = data
@@ -116,7 +123,10 @@ export function ProjectDashboardView({
       {stagesExist ? (
         <section className="space-y-3">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatTile label="Готовность" value={`${overallPercent}%`} />
+            <StatTile label="Готовность">
+              <p className="text-lg font-semibold text-slate-900">{overallPercent}%</p>
+              {weeklyTrend !== null ? <WeeklyTrend delta={weeklyTrend} /> : null}
+            </StatTile>
             <StatTile
               label="Этапы"
               value={`${completedStageCount} / ${stages.length}`}
@@ -199,7 +209,7 @@ export function ProjectDashboardView({
             Активных проблем нет.
           </p>
         ) : (
-          <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white shadow-sm">
+          <ul className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             {activeIssues.map((issue) => (
               <IssueRow key={issue.id} issue={issue} />
             ))}
@@ -271,6 +281,19 @@ function StatTile({
   )
 }
 
+function WeeklyTrend({ delta }: { delta: number }) {
+  if (delta === 0) {
+    return <p className="text-[11px] text-slate-400">без изменений за неделю</p>
+  }
+  const up = delta > 0
+  return (
+    <p className={`text-[11px] font-medium ${up ? 'text-green-600' : 'text-red-600'}`}>
+      {up ? '+' : ''}
+      {delta}% за неделю
+    </p>
+  )
+}
+
 function StageRow({
   stage,
   capabilities,
@@ -323,7 +346,9 @@ function PhotoTile({ photo }: { photo: OverviewPhoto }) {
 
 function IssueRow({ issue }: { issue: ActiveIssue }) {
   return (
-    <li className="flex items-start justify-between gap-3 p-3">
+    <li
+      className={`flex items-start justify-between gap-3 border-l-4 p-3 ${PRIORITY_BORDER[issue.priority]}`}
+    >
       <div className="min-w-0">
         <p className="truncate text-sm text-slate-800">{issue.title}</p>
         {issue.dueDate ? (

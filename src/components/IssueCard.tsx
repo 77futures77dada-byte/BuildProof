@@ -19,6 +19,12 @@ const PRIORITY_BADGE: Record<IssuePriority, string> = {
   low: 'bg-slate-100 text-slate-600',
 }
 
+const PRIORITY_BORDER: Record<IssuePriority, string> = {
+  high: 'border-l-red-500',
+  medium: 'border-l-amber-500',
+  low: 'border-l-slate-300',
+}
+
 const STATUS_BADGE: Record<IssueStatus, string> = {
   open: 'bg-red-100 text-red-800',
   in_progress: 'bg-sky-100 text-sky-800',
@@ -51,7 +57,9 @@ export function IssueCard({ issue, canManage, onUpdateStatus }: IssueCardProps) 
   }
 
   return (
-    <li className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <li
+      className={`space-y-2 rounded-xl border border-l-4 border-slate-200 bg-white p-4 shadow-sm ${PRIORITY_BORDER[issue.priority]}`}
+    >
       <div className="flex items-start justify-between gap-3">
         <p className="font-medium text-slate-900">{issue.title}</p>
         <span
