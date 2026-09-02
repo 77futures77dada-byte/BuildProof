@@ -4,7 +4,6 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useProjects } from '../hooks/useProjects'
 import { PROJECT_STATUS_LABELS, ROLE_LABELS } from '../types'
-import type { Project } from '../types'
 import { formatDate } from '../lib/format'
 import { Button } from '../components/Button'
 import { ErrorMessage } from '../components/ErrorMessage'
@@ -66,9 +65,9 @@ export function Dashboard() {
           <CreateProjectForm
             companyId={profile.company_id ?? ''}
             onCancel={() => setCreating(false)}
-            onCreated={(project: Project) => {
+            onCreated={(projectId) => {
               setCreating(false)
-              navigate(`/project/${project.id}`)
+              navigate(`/project/${projectId}`)
             }}
           />
         ) : null}

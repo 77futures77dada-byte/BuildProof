@@ -1,5 +1,4 @@
 import { supabase } from './supabaseClient'
-import type { Project } from '../types'
 
 export interface NewProjectInput {
   name: string
@@ -10,58 +9,29 @@ export interface NewProjectInput {
 
 /**
  * Creates a project and seeds one `project_stages` row per `stage_templates`
- * entry (progress 0).
+ * entry (progress 0) in a single transaction.
  *
- * NOTE: this is two round-trips and is therefore not atomic. The durable fix is
- * a Postgres trigger on `projects` (or a SECURITY DEFINER RPC) that inserts the
- * stage rows in the same transaction. Until that exists, if stage seeding fails
- * we surface the error so the operator can retry / clean up rather than leaving
- * a silently half-created project.
+ * Backed by the Postgres function `create_project_with_stages`, so this is one
+ * round-trip with one point of failure — either the whole project (with its 7
+ * stages) is created, or nothing is.
+ *
+ * @returns the new project's id
  */
 export async function createProjectWithStages(
   input: NewProjectInput,
   companyId: string,
-): Promise<Project> {
-  const { data: project, error: projectError } = await supabase
-    .from('projects')
-    .insert({
-      company_id: companyId,
-      name: input.name.trim(),
-      address: input.address.trim() || null,
-      deadline: input.deadline || null,
-      status: 'active',
-    })
-    .select('id, company_id, name, address, deadline, budget, status')
-    .single()
+): Promise<string> {
+  const { data, error } = await supabase.rpc('create_project_with_stages', {
+    p_company_id: companyId,
+    p_name: input.name.trim(),
+    p_address: input.address.trim() || null,
+    p_deadline: input.deadline || null,
+    p_budget: null,
+  })
 
-  if (projectError) throw projectError
-
-  const { data: templates, error: templatesError } = await supabase
-    .from('stage_templates')
-    .select('id')
-    .order('sort_order')
-
-  if (templatesError) throw templatesError
-  if (!templates || templates.length === 0) {
-    throw new Error(
-      'Объект создан, но не найден список этапов (stage_templates). Заполните справочник этапов.',
-    )
+  if (error) throw error
+  if (typeof data !== 'string') {
+    throw new Error('Не удалось создать объект: сервер не вернул идентификатор.')
   }
-
-  const { error: stagesError } = await supabase.from('project_stages').insert(
-    templates.map((t) => ({
-      project_id: project.id,
-      stage_template_id: t.id,
-      progress_percent: 0,
-    })),
-  )
-
-  if (stagesError) {
-    throw new Error(
-      `Объект «${project.name}» создан, но не удалось создать этапы: ${stagesError.message}. ` +
-        'Откройте объект и повторите инициализацию этапов.',
-    )
-  }
-
-  return project as Project
+  return data
 }

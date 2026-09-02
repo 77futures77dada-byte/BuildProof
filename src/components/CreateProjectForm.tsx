@@ -2,14 +2,13 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { createProjectWithStages } from '../lib/projects'
 import { toErrorMessage } from '../lib/format'
-import type { Project } from '../types'
 import { Button } from './Button'
 import { TextField } from './TextField'
 import { ErrorMessage } from './ErrorMessage'
 
 interface CreateProjectFormProps {
   companyId: string
-  onCreated: (project: Project) => void
+  onCreated: (projectId: string) => void
   onCancel: () => void
 }
 
@@ -29,8 +28,8 @@ export function CreateProjectForm({ companyId, onCreated, onCancel }: CreateProj
     setError(null)
     setSubmitting(true)
     try {
-      const project = await createProjectWithStages({ name, address, deadline }, companyId)
-      onCreated(project)
+      const projectId = await createProjectWithStages({ name, address, deadline }, companyId)
+      onCreated(projectId)
     } catch (err) {
       setError(toErrorMessage(err))
     } finally {
