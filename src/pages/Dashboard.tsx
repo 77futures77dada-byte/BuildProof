@@ -1,14 +1,15 @@
 import { useState } from 'react'
-import type { ReactNode } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useProjects } from '../hooks/useProjects'
 import { PROJECT_STATUS_LABELS, ROLE_LABELS } from '../types'
 import { formatDate } from '../lib/format'
+import { isProfileConfigured } from '../lib/profile'
 import { Button } from '../components/Button'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { FullPageSpinner, Spinner } from '../components/Spinner'
 import { CreateProjectForm } from '../components/CreateProjectForm'
+import { ProfileNotConfigured } from './ProfileNotConfigured'
 
 export function Dashboard() {
   const { profile, user, loading: authLoading, signOut } = useAuth()
@@ -18,17 +19,9 @@ export function Dashboard() {
 
   if (authLoading) return <FullPageSpinner />
 
-  // A signed-in user with no profile row yet — can't route by role.
-  if (!profile) {
-    return (
-      <CenteredCard>
-        <ErrorMessage message="Профиль не найден. Обратитесь к администратору вашей компании." />
-        <Button variant="secondary" onClick={() => void signOut()}>
-          Выйти
-        </Button>
-      </CenteredCard>
-    )
-  }
+  // ProtectedRoute already enforces this; the guard keeps `profile` narrowed
+  // and stays correct if the page is ever rendered outside that gate.
+  if (!isProfileConfigured(profile)) return <ProfileNotConfigured />
 
   const isGc = profile.role === 'gc'
 
@@ -110,12 +103,3 @@ export function Dashboard() {
   )
 }
 
-function CenteredCard({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex min-h-svh items-center justify-center p-4">
-      <div className="w-full max-w-sm space-y-3 rounded-xl border border-slate-200 bg-white p-6 text-center shadow-sm">
-        {children}
-      </div>
-    </div>
-  )
-}
