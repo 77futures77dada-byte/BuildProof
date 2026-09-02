@@ -9,11 +9,20 @@ import { ErrorMessage } from './ErrorMessage'
 
 interface PhotoUploadFormProps {
   projectId: string
+  /** When set, the stage is fixed (no picker) — e.g. a photo attached to a task. */
+  fixedStageId?: string
+  heading?: string
   onUploaded: () => void
   onCancel: () => void
 }
 
-export function PhotoUploadForm({ projectId, onUploaded, onCancel }: PhotoUploadFormProps) {
+export function PhotoUploadForm({
+  projectId,
+  fixedStageId,
+  heading = 'Новое фото',
+  onUploaded,
+  onCancel,
+}: PhotoUploadFormProps) {
   const { user } = useAuth()
   const { options, loading: stagesLoading, error: stagesError } = useStageOptions(projectId)
 
@@ -54,7 +63,8 @@ export function PhotoUploadForm({ projectId, onUploaded, onCancel }: PhotoUpload
       setError('Выберите фото.')
       return
     }
-    if (!stageId) {
+    const effectiveStageId = fixedStageId ?? stageId
+    if (!effectiveStageId) {
       setError('Выберите этап.')
       return
     }
@@ -68,7 +78,7 @@ export function PhotoUploadForm({ projectId, onUploaded, onCancel }: PhotoUpload
     try {
       await uploadProjectPhoto({
         projectId,
-        projectStageId: stageId,
+        projectStageId: effectiveStageId,
         caption,
         file: selected.file,
         uploadedBy: user.id,
@@ -86,7 +96,7 @@ export function PhotoUploadForm({ projectId, onUploaded, onCancel }: PhotoUpload
       onSubmit={handleSubmit}
       className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
     >
-      <h2 className="text-base font-semibold text-slate-900">Новое фото</h2>
+      <h2 className="text-base font-semibold text-slate-900">{heading}</h2>
 
       <div className="space-y-2">
         <input
@@ -123,28 +133,32 @@ export function PhotoUploadForm({ projectId, onUploaded, onCancel }: PhotoUpload
         )}
       </div>
 
-      <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">
-          Этап <span className="text-red-600">*</span>
-        </span>
-        <select
-          required
-          value={stageId}
-          disabled={busy || stagesLoading}
-          onChange={(e) => setStageId(e.target.value)}
-          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
-        >
-          <option value="" disabled>
-            {stagesLoading ? 'Загрузка этапов…' : 'Выберите этап'}
-          </option>
-          {options.map((opt) => (
-            <option key={opt.id} value={opt.id}>
-              {opt.name}
-            </option>
-          ))}
-        </select>
-      </label>
-      <ErrorMessage message={stagesError} />
+      {fixedStageId ? null : (
+        <>
+          <label className="block space-y-1">
+            <span className="text-sm font-medium text-slate-700">
+              Этап <span className="text-red-600">*</span>
+            </span>
+            <select
+              required
+              value={stageId}
+              disabled={busy || stagesLoading}
+              onChange={(e) => setStageId(e.target.value)}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
+            >
+              <option value="" disabled>
+                {stagesLoading ? 'Загрузка этапов…' : 'Выберите этап'}
+              </option>
+              {options.map((opt) => (
+                <option key={opt.id} value={opt.id}>
+                  {opt.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <ErrorMessage message={stagesError} />
+        </>
+      )}
 
       <label className="block space-y-1">
         <span className="text-sm font-medium text-slate-700">Подпись</span>
