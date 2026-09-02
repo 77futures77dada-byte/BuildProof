@@ -2,12 +2,8 @@ import { supabase } from './supabaseClient'
 import { PHOTOS_BUCKET } from './storage'
 import { resizeImageToJpeg } from './image'
 
-/** Build a stable storage key: `{project}/{stage}/{timestamp}-{name}.jpg`. */
-export function buildStoragePath(
-  projectId: string,
-  projectStageId: string,
-  originalName: string,
-): string {
+/** ASCII-safe, length-capped base name for a storage key (no extension). */
+export function sanitizeImageBaseName(originalName: string): string {
   const base = originalName
     .replace(/\.[^.]+$/, '')
     .normalize('NFKD')
@@ -15,8 +11,16 @@ export function buildStoragePath(
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '')
     .slice(0, 60)
-  const safe = base || 'photo'
-  return `${projectId}/${projectStageId}/${Date.now()}-${safe}.jpg`
+  return base || 'photo'
+}
+
+/** Build a stable storage key: `{project}/{stage}/{timestamp}-{name}.jpg`. */
+export function buildStoragePath(
+  projectId: string,
+  projectStageId: string,
+  originalName: string,
+): string {
+  return `${projectId}/${projectStageId}/${Date.now()}-${sanitizeImageBaseName(originalName)}.jpg`
 }
 
 export interface UploadPhotoInput {

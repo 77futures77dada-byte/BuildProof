@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useStageOptions } from '../hooks/useStageOptions'
@@ -6,6 +6,7 @@ import { uploadProjectPhoto } from '../lib/photos'
 import { toErrorMessage } from '../lib/format'
 import { Button } from './Button'
 import { ErrorMessage } from './ErrorMessage'
+import { ImagePicker } from './ImagePicker'
 
 interface PhotoUploadFormProps {
   projectId: string
@@ -15,6 +16,9 @@ interface PhotoUploadFormProps {
   onUploaded: () => void
   onCancel: () => void
 }
+
+const selectClass =
+  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200'
 
 export function PhotoUploadForm({
   projectId,
@@ -26,40 +30,15 @@ export function PhotoUploadForm({
   const { user } = useAuth()
   const { options, loading: stagesLoading, error: stagesError } = useStageOptions(projectId)
 
-  const [selected, setSelected] = useState<{ file: File; url: string } | null>(null)
+  const [file, setFile] = useState<File | null>(null)
   const [stageId, setStageId] = useState('')
   const [caption, setCaption] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const urlRef = useRef<string | null>(null)
-
-  // Revoke the last preview URL when the form unmounts.
-  useEffect(() => {
-    return () => {
-      if (urlRef.current) URL.revokeObjectURL(urlRef.current)
-    }
-  }, [])
-
-  function pickFile(next: File | null) {
-    setSelected((prev) => {
-      if (prev) URL.revokeObjectURL(prev.url)
-      if (!next) {
-        urlRef.current = null
-        return null
-      }
-      const url = URL.createObjectURL(next)
-      urlRef.current = url
-      return { file: next, url }
-    })
-    setError(null)
-  }
-
-  const previewUrl = selected?.url ?? null
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!selected) {
+    if (!file) {
       setError('Выберите фото.')
       return
     }
@@ -80,7 +59,7 @@ export function PhotoUploadForm({
         projectId,
         projectStageId: effectiveStageId,
         caption,
-        file: selected.file,
+        file,
         uploadedBy: user.id,
       })
       onUploaded()
@@ -98,40 +77,7 @@ export function PhotoUploadForm({
     >
       <h2 className="text-base font-semibold text-slate-900">{heading}</h2>
 
-      <div className="space-y-2">
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          disabled={busy}
-          onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
-        />
-        {previewUrl ? (
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            disabled={busy}
-            className="block w-full"
-          >
-            <img
-              src={previewUrl}
-              alt="Предпросмотр"
-              className="max-h-64 w-full rounded-lg object-contain bg-slate-100"
-            />
-            <span className="mt-1 block text-xs text-slate-500">Нажмите, чтобы выбрать другое фото</span>
-          </button>
-        ) : (
-          <Button
-            variant="secondary"
-            className="w-full"
-            disabled={busy}
-            onClick={() => inputRef.current?.click()}
-          >
-            Выбрать фото
-          </Button>
-        )}
-      </div>
+      <ImagePicker onChange={setFile} disabled={busy} />
 
       {fixedStageId ? null : (
         <>
@@ -144,7 +90,7 @@ export function PhotoUploadForm({
               value={stageId}
               disabled={busy || stagesLoading}
               onChange={(e) => setStageId(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
+              className={selectClass}
             >
               <option value="" disabled>
                 {stagesLoading ? 'Загрузка этапов…' : 'Выберите этап'}
@@ -168,7 +114,7 @@ export function PhotoUploadForm({
           disabled={busy}
           onChange={(e) => setCaption(e.target.value)}
           placeholder="Необязательно"
-          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
+          className={selectClass}
         />
       </label>
 
