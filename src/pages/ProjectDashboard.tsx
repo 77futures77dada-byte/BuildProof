@@ -31,18 +31,11 @@ export function ProjectDashboard() {
     )
   }
 
-  const { project, overallPercent, stages, lastUpdatedAt, photos, activeIssues } = data
+  const { overallPercent, stages, lastUpdatedAt, photos, activeIssues } = data
 
   return (
     <div className="space-y-8">
       <section className="space-y-3">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-900">{project.name}</h1>
-          {project.address ? (
-            <p className="mt-0.5 text-sm text-slate-500">{project.address}</p>
-          ) : null}
-        </div>
-
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex items-baseline justify-between gap-3">
             <span className="text-sm text-slate-500">Общая готовность</span>

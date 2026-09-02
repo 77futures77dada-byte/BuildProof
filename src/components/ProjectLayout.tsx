@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { useProject } from '../hooks/useProject'
 import { ROLE_LABELS } from '../types'
 import { Button } from './Button'
 
@@ -19,6 +20,7 @@ const TABS = [
 export function ProjectLayout() {
   const { id } = useParams<{ id: string }>()
   const { profile, user, signOut } = useAuth()
+  const { project } = useProject(id)
 
   return (
     <div className="min-h-svh bg-slate-50">
@@ -37,6 +39,14 @@ export function ProjectLayout() {
             </Button>
           </div>
         </div>
+        {project ? (
+          <div className="mx-auto max-w-5xl px-4 pb-3">
+            <h1 className="text-lg font-semibold text-slate-900">{project.name}</h1>
+            {project.address ? (
+              <p className="text-sm text-slate-500">{project.address}</p>
+            ) : null}
+          </div>
+        ) : null}
         <nav className="mx-auto max-w-5xl overflow-x-auto px-2">
           <ul className="flex min-w-max gap-1 pb-px">
             {TABS.map((tab) => (

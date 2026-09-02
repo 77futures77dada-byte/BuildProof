@@ -3,11 +3,8 @@ import { supabase } from './supabaseClient'
 /**
  * Storage bucket holding project photos. `photos.storage_path` values are keys
  * within this bucket.
- *
- * TODO(storage): confirm the bucket name against the Supabase project once the
- * photo upload flow is built.
  */
-export const PHOTOS_BUCKET = 'photos'
+export const PHOTOS_BUCKET = 'project-photos'
 
 const SIGNED_URL_TTL_SECONDS = 60 * 60
 
