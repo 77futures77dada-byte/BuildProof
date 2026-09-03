@@ -1,11 +1,15 @@
 import { useParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useProjectStages } from '../hooks/useProjectStages'
+import type { EditableStage } from '../hooks/useProjectStages'
 import { StageCard } from '../components/StageCard'
 import { Spinner } from '../components/Spinner'
 import { ErrorMessage } from '../components/ErrorMessage'
 
-const EDITOR_ROLES = new Set(['gc', 'foreman'])
+// Everyone on site can report stage progress; only the client is read-only.
+// (RLS enforces the same: stages_write / stage_history_insert allow
+// gc, foreman and worker.)
+const EDITOR_ROLES = new Set(['gc', 'foreman', 'worker'])
 
 export function Stages() {
   const { id } = useParams<{ id: string }>()
@@ -23,6 +27,27 @@ export function Stages() {
     return <ErrorMessage message={error} onRetry={reload} />
   }
 
+  return (
+    <StagesView
+      stages={stages}
+      canEdit={canEdit}
+      onCommit={commitPercent}
+      historyToken={historyToken}
+    />
+  )
+}
+
+export function StagesView({
+  stages,
+  canEdit,
+  onCommit,
+  historyToken,
+}: {
+  stages: EditableStage[]
+  canEdit: boolean
+  onCommit: (stageId: string, newPercent: number) => Promise<void>
+  historyToken: number
+}) {
   return (
     <div className="space-y-4">
       <div className="flex items-baseline justify-between gap-3">
@@ -43,7 +68,7 @@ export function Stages() {
               key={stage.id}
               stage={stage}
               canEdit={canEdit}
-              onCommit={commitPercent}
+              onCommit={onCommit}
               historyToken={historyToken}
             />
           ))}
