@@ -45,10 +45,13 @@ const linkButtonClass =
   'inline-flex items-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-sky-700'
 
 function capabilitiesFor(role: UserRole | undefined): StageActionCapabilities {
+  const onSite = role === 'gc' || role === 'foreman' || role === 'worker'
   return {
-    photo: role === 'gc' || role === 'foreman' || role === 'worker',
+    // Everyone on site can add a photo or raise a problem; only gc/foreman
+    // create tasks. Issue status changes are gated separately, on the card.
+    photo: onSite,
     task: role === 'gc' || role === 'foreman',
-    issue: role === 'gc' || role === 'foreman',
+    issue: onSite,
   }
 }
 

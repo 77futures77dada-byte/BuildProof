@@ -10,6 +10,9 @@ import { ErrorMessage } from '../components/ErrorMessage'
 import { IssueForm } from '../components/IssueForm'
 import { IssueCard } from '../components/IssueCard'
 
+// Raise an issue: anyone on site. Move it through statuses: gc/foreman only.
+// (RLS matches: issues_insert allows worker, issues_update does not.)
+const CREATE_ROLES = new Set(['gc', 'foreman', 'worker'])
 const MANAGER_ROLES = new Set(['gc', 'foreman'])
 
 const PRIORITY_RANK: Record<IssuePriority, number> = { high: 0, medium: 1, low: 2 }
@@ -27,9 +30,44 @@ function byStatusThenPriority(a: IssueItem, b: IssueItem): number {
 export function Issues() {
   const { id } = useParams<{ id: string }>()
   const { profile } = useAuth()
+  const canCreate = profile ? CREATE_ROLES.has(profile.role) : false
   const canManage = profile ? MANAGER_ROLES.has(profile.role) : false
 
   const { issues, loading, error, reload, updateStatus } = useIssues(id)
+
+  return (
+    <IssuesView
+      projectId={id ?? ''}
+      issues={issues}
+      loading={loading}
+      error={error}
+      reload={reload}
+      updateStatus={updateStatus}
+      canCreate={canCreate}
+      canManage={canManage}
+    />
+  )
+}
+
+export function IssuesView({
+  projectId,
+  issues,
+  loading,
+  error,
+  reload,
+  updateStatus,
+  canCreate,
+  canManage,
+}: {
+  projectId: string
+  issues: IssueItem[]
+  loading: boolean
+  error: string | null
+  reload: () => void
+  updateStatus: (id: string, status: IssueStatus) => Promise<void>
+  canCreate: boolean
+  canManage: boolean
+}) {
   const [showForm, setShowForm] = useState(false)
   const [resolvedOpen, setResolvedOpen] = useState(false)
 
@@ -44,14 +82,14 @@ export function Issues() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-sm font-semibold text-slate-700">Проблемы</h2>
-        {canManage && !showForm ? (
+        {canCreate && !showForm ? (
           <Button onClick={() => setShowForm(true)}>Создать замечание</Button>
         ) : null}
       </div>
 
-      {canManage && showForm && id ? (
+      {canCreate && showForm && projectId ? (
         <IssueForm
-          projectId={id}
+          projectId={projectId}
           onCancel={() => setShowForm(false)}
           onCreated={() => {
             setShowForm(false)
