@@ -11,7 +11,7 @@
 
 export type UserRole = 'client' | 'gc' | 'foreman' | 'worker'
 
-export type ProjectStatus = 'active' | 'on_hold' | 'completed' | 'archived'
+export type ProjectStatus = 'active' | 'paused' | 'completed'
 
 export type TaskStatus = 'todo' | 'in_progress' | 'done'
 
@@ -122,9 +122,8 @@ export const ROLE_LABELS: Record<UserRole, string> = {
 
 export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
   active: 'В работе',
-  on_hold: 'Приостановлен',
+  paused: 'Приостановлен',
   completed: 'Завершён',
-  archived: 'В архиве',
 }
 
 export const TASK_STATUS_LABELS: Record<TaskStatus, string> = {
