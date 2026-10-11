@@ -9,6 +9,7 @@ import { ErrorMessage } from '../components/ErrorMessage'
 import { FullPageSpinner, Spinner } from '../components/Spinner'
 import { CreateProjectForm } from '../components/CreateProjectForm'
 import { ProjectListCard } from '../components/ProjectListCard'
+import { WorkerProjectCard } from '../components/WorkerProjectCard'
 import { ProfileNotConfigured } from './ProfileNotConfigured'
 
 export function Dashboard() {
@@ -24,10 +25,13 @@ export function Dashboard() {
   if (!isProfileConfigured(profile)) return <ProfileNotConfigured />
 
   const isGc = profile.role === 'gc'
+  const isWorker = profile.role === 'worker'
 
-  // Non-GC roles with exactly one accessible project go straight to it.
+  // Non-GC roles with exactly one accessible project go straight to it —
+  // workers to their "Сегодня" screen, so the app opens where they act.
   if (!isGc && !loading && !error && projects.length === 1) {
-    return <Navigate to={`/project/${projects[0].id}`} replace />
+    const target = `/project/${projects[0].id}${isWorker ? '/today' : ''}`
+    return <Navigate to={target} replace />
   }
 
   return (
@@ -48,7 +52,9 @@ export function Dashboard() {
 
       <main className="mx-auto max-w-4xl space-y-4 px-4 py-6">
         <div className="flex items-center justify-between gap-3">
-          <h1 className="text-xl font-semibold text-slate-900">Объекты</h1>
+          <h1 className="text-xl font-semibold text-slate-900">
+            {isWorker ? 'Выберите объект' : 'Объекты'}
+          </h1>
           {isGc && !creating ? (
             <Button onClick={() => setCreating(true)}>Создать объект</Button>
           ) : null}
@@ -79,7 +85,11 @@ export function Dashboard() {
           <ul className="space-y-3">
             {projects.map((project) => (
               <li key={project.id}>
-                <ProjectListCard project={project} />
+                {isWorker ? (
+                  <WorkerProjectCard project={project} />
+                ) : (
+                  <ProjectListCard project={project} />
+                )}
               </li>
             ))}
           </ul>

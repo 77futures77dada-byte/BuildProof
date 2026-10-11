@@ -5,7 +5,8 @@ import { ProjectLayout } from './components/ProjectLayout'
 import { Landing } from './pages/Landing'
 import { Login } from './pages/Login'
 import { Dashboard } from './pages/Dashboard'
-import { ProjectDashboard } from './pages/ProjectDashboard'
+import { ProjectHome } from './pages/ProjectHome'
+import { Today } from './pages/Today'
 import { Stages } from './pages/Stages'
 import { Photos } from './pages/Photos'
 import { Tasks } from './pages/Tasks'
@@ -38,7 +39,8 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<ProjectDashboard />} />
+            <Route index element={<ProjectHome />} />
+            <Route path="today" element={<Today />} />
             <Route path="stages" element={<Stages />} />
             <Route path="photos" element={<Photos />} />
             <Route path="tasks" element={<Tasks />} />
