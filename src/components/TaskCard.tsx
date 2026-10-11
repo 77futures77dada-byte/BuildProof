@@ -72,7 +72,9 @@ export function TaskCard({
   return (
     <li className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
-        <p className="font-medium text-slate-900">{task.title}</p>
+        <p className={`font-medium text-slate-900 ${variant === 'worker' ? 'text-base' : ''}`}>
+          {task.title}
+        </p>
         <span
           className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[task.status]}`}
         >
@@ -83,14 +85,23 @@ export function TaskCard({
       <p className="text-xs text-slate-500">{metaLine(task, variant)}</p>
 
       {variant === 'worker' ? (
+        // Workers tap these on a phone on site — keep them ≥56px tall, full width.
         <div className="flex gap-2">
           {task.status === 'todo' ? (
-            <Button loading={busy} onClick={() => void apply({ status: 'in_progress' })}>
+            <Button
+              loading={busy}
+              className="min-h-14 w-full text-base"
+              onClick={() => void apply({ status: 'in_progress' })}
+            >
               Начать
             </Button>
           ) : null}
           {task.status === 'in_progress' ? (
-            <Button loading={busy} onClick={() => void complete()}>
+            <Button
+              loading={busy}
+              className="min-h-14 w-full text-base"
+              onClick={() => void complete()}
+            >
               Завершить
             </Button>
           ) : null}
