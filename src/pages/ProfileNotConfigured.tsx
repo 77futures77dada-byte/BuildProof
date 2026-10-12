@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { CenteredCard } from '../components/CenteredCard'
 import { Button } from '../components/Button'
@@ -9,18 +10,19 @@ import { Button } from '../components/Button'
  */
 export function ProfileNotConfigured() {
   const { user, signOut } = useAuth()
+  const { t } = useTranslation()
 
   return (
     <CenteredCard>
-      <h1 className="text-lg font-semibold text-slate-900">Профиль не настроен</h1>
+      <h1 className="text-lg font-semibold text-slate-900">{t('auth.notConfiguredTitle')}</h1>
       <p className="text-sm text-slate-600">
-        Аккаунт создан, но профиль ещё не настроен. Обратитесь к администратору.
+        {t('auth.notConfiguredText')}
       </p>
       {user?.email ? (
-        <p className="text-xs text-slate-400">Вы вошли как {user.email}</p>
+        <p className="text-xs text-slate-400">{t('auth.signedInAs', { email: user.email })}</p>
       ) : null}
       <Button variant="secondary" className="w-full" onClick={() => void signOut()}>
-        Выйти
+        {t('common.signOut')}
       </Button>
     </CenteredCard>
   )

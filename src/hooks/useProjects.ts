@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import i18n from '../i18n'
 import { supabase } from '../lib/supabaseClient'
 import { toErrorMessage } from '../lib/format'
 import { withTimeout } from '../lib/withTimeout'
@@ -54,9 +55,7 @@ export function useProjects(): UseProjectsResult {
     async function fetchBaseProjects(): Promise<Project[]> {
       if (role === 'gc') {
         if (!companyId) {
-          throw new Error(
-            'У вашего профиля не указана компания. Обратитесь к администратору.',
-          )
+          throw new Error(i18n.t('common.noCompany'))
         }
         const { data, error: qErr } = await supabase
           .from('projects')

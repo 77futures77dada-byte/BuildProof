@@ -1,5 +1,6 @@
 import { Camera, ClipboardList, TriangleAlert } from 'lucide-react'
 
+import { useTranslation } from 'react-i18next'
 export type StageActionKind = 'photo' | 'task' | 'issue'
 
 export interface StageActionCapabilities {
@@ -32,13 +33,14 @@ export function StageActionButtons({
   capabilities,
   onAction,
 }: StageActionButtonsProps) {
+  const { t } = useTranslation()
   return (
     <div className="flex shrink-0 gap-1.5 lg:invisible lg:group-hover:visible lg:group-focus-within:visible">
       {capabilities.photo ? (
         <button
           type="button"
           onClick={() => onAction('photo')}
-          aria-label={`Добавить фото: ${stageName}`}
+          aria-label={t('overview.addPhotoFor', { stage: stageName })}
           className={BTN_ACCENT}
         >
           <Camera className="size-[18px]" aria-hidden="true" />
@@ -48,7 +50,7 @@ export function StageActionButtons({
         <button
           type="button"
           onClick={() => onAction('task')}
-          aria-label={`Создать задачу: ${stageName}`}
+          aria-label={t('overview.createTaskFor', { stage: stageName })}
           className={`${BTN_NEUTRAL} hover:text-sky-600`}
         >
           <ClipboardList className="size-[18px]" aria-hidden="true" />
@@ -58,7 +60,7 @@ export function StageActionButtons({
         <button
           type="button"
           onClick={() => onAction('issue')}
-          aria-label={`Отметить проблему: ${stageName}`}
+          aria-label={t('overview.reportIssueFor', { stage: stageName })}
           className={`${BTN_NEUTRAL} hover:text-red-600`}
         >
           <TriangleAlert className="size-[18px]" aria-hidden="true" />

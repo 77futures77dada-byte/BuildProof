@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { supabase } from '../lib/supabaseClient'
 import { toErrorMessage } from '../lib/format'
 import { useAuth } from '../hooks/useAuth'
@@ -15,6 +17,7 @@ interface LocationState {
 
 export function Login() {
   const { session, loading: authLoading } = useAuth()
+  const { t } = useTranslation()
   const location = useLocation()
   const redirectTo = (location.state as LocationState | null)?.from?.pathname ?? '/dashboard'
 
@@ -38,7 +41,7 @@ export function Login() {
       if (signInError) {
         setError(
           signInError.message === 'Invalid login credentials'
-            ? 'Неверный email или пароль.'
+            ? t('auth.invalidCredentials')
             : toErrorMessage(signInError),
         )
         return
@@ -55,14 +58,17 @@ export function Login() {
   return (
     <div className="flex min-h-svh items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-sm space-y-6">
+        <div className="flex justify-end">
+          <LanguageSwitcher />
+        </div>
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-slate-900">BuildProof</h1>
-          <p className="mt-1 text-sm text-slate-500">Вход в личный кабинет</p>
+          <p className="mt-1 text-sm text-slate-500">{t('auth.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <TextField
-            label="Email"
+            label={t('auth.email')}
             type="email"
             autoComplete="email"
             required
@@ -71,7 +77,7 @@ export function Login() {
             disabled={submitting}
           />
           <TextField
-            label="Пароль"
+            label={t('auth.password')}
             type="password"
             autoComplete="current-password"
             required
@@ -83,7 +89,7 @@ export function Login() {
           <ErrorMessage message={error} />
 
           <Button type="submit" loading={submitting} className="w-full">
-            Войти
+            {t('common.signIn')}
           </Button>
         </form>
       </div>

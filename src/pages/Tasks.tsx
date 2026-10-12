@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { useTasks } from '../hooks/useTasks'
 import type { TaskItem } from '../hooks/useTasks'
@@ -26,6 +27,7 @@ function byDeadline(a: TaskItem, b: TaskItem): number {
 export function Tasks() {
   const { id } = useParams<{ id: string }>()
   const { profile, user } = useAuth()
+  const { t } = useTranslation()
 
   const role = profile?.role
   const isManager = role ? MANAGER_ROLES.has(role) : false
@@ -51,10 +53,10 @@ export function Tasks() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-sm font-semibold text-slate-700">
-          {isWorker ? 'Мои задачи' : 'Задачи'}
+          {isWorker ? t('tasks.myTitle') : t('tasks.title')}
         </h2>
         {isManager && !showForm ? (
-          <Button onClick={() => setShowForm(true)}>Создать задачу</Button>
+          <Button onClick={() => setShowForm(true)}>{t('tasks.create')}</Button>
         ) : null}
       </div>
 
@@ -70,12 +72,12 @@ export function Tasks() {
       ) : null}
 
       {loading ? (
-        <Spinner label="Загрузка задач…" />
+        <Spinner label={t('tasks.loading')} />
       ) : error ? (
         <ErrorMessage message={error} onRetry={reload} />
       ) : tasks.length === 0 ? (
         <p className="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm">
-          {isWorker ? 'На вас пока нет задач.' : 'Задач по объекту пока нет.'}
+          {isWorker ? t('tasks.emptyWorker') : t('tasks.empty')}
         </p>
       ) : (
         <>
@@ -94,7 +96,7 @@ export function Tasks() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-500">Активных задач нет.</p>
+            <p className="text-sm text-slate-500">{t('tasks.noActive')}</p>
           )}
 
           {done.length > 0 ? (
@@ -106,7 +108,7 @@ export function Tasks() {
                 className="flex w-full items-center gap-1 px-4 py-3 text-sm font-medium text-slate-600"
               >
                 <span aria-hidden="true">{doneOpen ? '▾' : '▸'}</span>
-                Завершённые ({done.length})
+                {t('tasks.completed', { count: done.length })}
               </button>
               {doneOpen ? (
                 <ul className="space-y-3 border-t border-slate-100 p-3">
@@ -131,13 +133,13 @@ export function Tasks() {
       <Modal
         open={photoTask !== null}
         onClose={() => setPhotoTask(null)}
-        label="Прикрепить фото к задаче"
+        label={t('tasks.attachPhoto')}
       >
         {photoTask?.projectStageId && id ? (
           <PhotoUploadForm
             projectId={id}
             fixedStageId={photoTask.projectStageId}
-            heading="Фото к задаче"
+            heading={t('tasks.photoHeading')}
             onCancel={() => setPhotoTask(null)}
             onUploaded={() => setPhotoTask(null)}
           />

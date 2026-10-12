@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 interface ErrorMessageProps {
   /** When null/undefined, nothing renders. */
   message?: string | null
@@ -7,6 +8,7 @@ interface ErrorMessageProps {
 
 /** Inline error banner for forms and data-fetching screens. */
 export function ErrorMessage({ message, onRetry, className = '' }: ErrorMessageProps) {
+  const { t } = useTranslation()
   if (!message) return null
   return (
     <div
@@ -20,7 +22,7 @@ export function ErrorMessage({ message, onRetry, className = '' }: ErrorMessageP
           onClick={onRetry}
           className="shrink-0 font-medium text-red-900 underline underline-offset-2 hover:no-underline"
         >
-          Повторить
+          {t('common.retry')}
         </button>
       ) : null}
     </div>

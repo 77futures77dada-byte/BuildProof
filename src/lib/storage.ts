@@ -28,7 +28,7 @@ export async function resolvePhotoUrls(paths: string[]): Promise<Map<string, str
       if (entry.path && entry.signedUrl) urls.set(entry.path, entry.signedUrl)
     }
   } catch (err) {
-    console.warn('Не удалось получить ссылки на фото:', err)
+    console.warn('Could not create signed photo URLs:', err)
   }
   return urls
 }

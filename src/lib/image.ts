@@ -1,3 +1,4 @@
+import i18n from '../i18n'
 /** Client-side image downscale + re-encode before upload. */
 
 export const PHOTO_MAX_EDGE = 1600
@@ -22,7 +23,7 @@ export async function resizeImageToJpeg(
   quality = PHOTO_QUALITY,
 ): Promise<ResizedImage> {
   if (!file.type.startsWith('image/')) {
-    throw new Error('Выбранный файл не является изображением.')
+    throw new Error(i18n.t('image.notImage'))
   }
 
   const source = await loadImage(file)
@@ -37,14 +38,14 @@ export async function resizeImageToJpeg(
   canvas.width = width
   canvas.height = height
   const ctx = canvas.getContext('2d')
-  if (!ctx) throw new Error('Не удалось обработать изображение (canvas недоступен).')
+  if (!ctx) throw new Error(i18n.t('image.canvasUnavailable'))
   ctx.drawImage(source, 0, 0, width, height)
   if ('close' in source) source.close()
 
   const blob = await new Promise<Blob | null>((resolve) => {
     canvas.toBlob(resolve, 'image/jpeg', quality)
   })
-  if (!blob) throw new Error('Не удалось сжать изображение.')
+  if (!blob) throw new Error(i18n.t('image.compressFailed'))
 
   return { blob, width, height }
 }
@@ -63,7 +64,7 @@ async function loadImage(file: File): Promise<ImageBitmap | HTMLImageElement> {
     return await new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image()
       img.onload = () => resolve(img)
-      img.onerror = () => reject(new Error('Не удалось открыть изображение.'))
+      img.onerror = () => reject(new Error(i18n.t('image.openFailed')))
       img.src = url
     })
   } finally {

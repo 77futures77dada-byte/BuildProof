@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { stageLabel } from '../i18n/stageLabel'
 import { useAuth } from '../hooks/useAuth'
 import { useProjectOverview } from '../hooks/useProjectOverview'
 import type {
@@ -9,7 +11,6 @@ import type {
   ProjectOverview,
   StageProgress,
 } from '../hooks/useProjectOverview'
-import { ISSUE_PRIORITY_LABELS } from '../types'
 import type { IssuePriority, UserRole } from '../types'
 import type { FreshnessLevel } from '../lib/format'
 import { formatDate, getUpdateFreshness } from '../lib/format'
@@ -60,13 +61,14 @@ export function ProjectDashboard() {
   const { id } = useParams<{ id: string }>()
   const { profile } = useAuth()
   const { data, loading, error, reload } = useProjectOverview(id)
+  const { t } = useTranslation()
 
   if (loading) {
-    return <Spinner label="Загрузка объекта…" />
+    return <Spinner label={t('overview.loading')} />
   }
 
   if (error || !data) {
-    return <ErrorMessage message={error ?? 'Не удалось загрузить объект.'} onRetry={reload} />
+    return <ErrorMessage message={error ?? t('overview.loadFailed')} onRetry={reload} />
   }
 
   return (
@@ -96,6 +98,7 @@ export function ProjectDashboardView({
   role?: UserRole
   onChanged?: () => void
 }) {
+  const { t } = useTranslation()
   const {
     overallPercent,
     stages,
@@ -127,21 +130,21 @@ export function ProjectDashboardView({
       {stagesExist ? (
         <section className="space-y-3">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatTile label="Готовность">
+            <StatTile label={t('overview.readiness')}>
               <p className="text-lg font-semibold text-slate-900">{overallPercent}%</p>
               {weeklyTrend !== null ? <WeeklyTrend delta={weeklyTrend} /> : null}
             </StatTile>
             <StatTile
-              label="Этапы"
+              label={t('overview.stages')}
               value={`${completedStageCount} / ${stages.length}`}
-              hint="завершено"
+              hint={t('overview.stagesCompleted')}
             />
             <StatTile
-              label="Проблемы"
+              label={t('overview.issues')}
               value={String(activeIssues.length)}
-              hint={activeIssues.length === 1 ? 'открытая' : 'открытых'}
+              hint={t('overview.issuesOpen', { count: activeIssues.length })}
             />
-            <StatTile label="Обновлено">
+            <StatTile label={t('overview.updated')}>
               <span className="flex items-center gap-1.5">
                 <span
                   aria-hidden="true"
@@ -156,22 +159,21 @@ export function ProjectDashboardView({
             <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <ProgressBar value={overallPercent} />
               <p className="text-sm text-slate-600">
-                Отслеживание прогресса ещё не начато. Отметьте выполнение первого этапа,
-                чтобы начать отслеживание.
+                {t('overview.notStarted')}
               </p>
               <Link to={`/project/${projectId}/stages`} className={linkButtonClass}>
-                Перейти к этапам
+                {t('overview.goToStages')}
               </Link>
             </div>
           ) : null}
         </section>
       ) : (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-slate-700">Этапы</h2>
+          <h2 className="text-sm font-semibold text-slate-700">{t('overview.stages')}</h2>
           <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <p className="text-sm text-slate-600">Этапы по объекту ещё не заведены.</p>
+            <p className="text-sm text-slate-600">{t('overview.noStages')}</p>
             <Link to={`/project/${projectId}/stages`} className={linkButtonClass}>
-              Перейти к этапам
+              {t('overview.goToStages')}
             </Link>
           </div>
         </section>
@@ -186,7 +188,7 @@ export function ProjectDashboardView({
 
       {stagesExist ? (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-slate-700">Этапы</h2>
+          <h2 className="text-sm font-semibold text-slate-700">{t('overview.stages')}</h2>
           <ul className="space-y-2 rounded-xl border border-slate-200 bg-white p-2 shadow-sm sm:p-3">
             {stages.map((stage) => (
               <StageRow
@@ -204,7 +206,7 @@ export function ProjectDashboardView({
 
       {photos.length > 0 ? (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-slate-700">Последние фото</h2>
+          <h2 className="text-sm font-semibold text-slate-700">{t('overview.recentPhotos')}</h2>
           <ul className="grid grid-cols-3 gap-2 sm:grid-cols-6">
             {photos.map((photo) => (
               <PhotoTile key={photo.id} photo={photo} />
@@ -214,10 +216,10 @@ export function ProjectDashboardView({
       ) : null}
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-slate-700">Активные проблемы</h2>
+        <h2 className="text-sm font-semibold text-slate-700">{t('overview.activeIssues')}</h2>
         {activeIssues.length === 0 ? (
           <p className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500 shadow-sm">
-            Активных проблем нет.
+            {t('overview.noActiveIssues')}
           </p>
         ) : (
           <ul className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -233,17 +235,17 @@ export function ProjectDashboardView({
         onClose={closeAction}
         label={
           action?.kind === 'photo'
-            ? 'Добавить фото'
+            ? t('overview.addPhoto')
             : action?.kind === 'task'
-              ? 'Создать задачу'
-              : 'Отметить проблему'
+              ? t('overview.createTask')
+              : t('overview.reportIssue')
         }
       >
         {action?.kind === 'photo' ? (
           <PhotoUploadForm
             projectId={projectId}
             fixedStageId={action.stageId}
-            heading={`Фото · ${action.stageName}`}
+            heading={t('overview.photoHeading', { stage: stageLabel(action.stageName) })}
             onUploaded={completeAction}
             onCancel={closeAction}
           />
@@ -293,14 +295,14 @@ function StatTile({
 }
 
 function WeeklyTrend({ delta }: { delta: number }) {
+  const { t } = useTranslation()
   if (delta === 0) {
-    return <p className="text-[11px] text-slate-400">без изменений за неделю</p>
+    return <p className="text-[11px] text-slate-400">{t('overview.trendNone')}</p>
   }
   const up = delta > 0
   return (
     <p className={`text-[11px] font-medium ${up ? 'text-green-600' : 'text-red-600'}`}>
-      {up ? '+' : ''}
-      {delta}% за неделю
+      {t('overview.trendWeek', { delta: `${up ? '+' : ''}${delta}` })}
     </p>
   )
 }
@@ -317,14 +319,14 @@ function StageRow({
   return (
     <li className="group -mx-2 space-y-1.5 rounded-lg px-2 py-2 transition-colors hover:bg-slate-50">
       <div className="flex items-center justify-between gap-3 text-sm">
-        <span className="min-w-0 text-slate-700">{stage.name}</span>
+        <span className="min-w-0 text-slate-700">{stageLabel(stage.name)}</span>
         <div className="flex shrink-0 items-center gap-2.5">
           <span className="tabular-nums text-slate-500">
             {Math.round(stage.progressPercent)}%
           </span>
           {capabilities ? (
             <StageActionButtons
-              stageName={stage.name}
+              stageName={stageLabel(stage.name)}
               capabilities={capabilities}
               onAction={onAction}
             />
@@ -337,18 +339,19 @@ function StageRow({
 }
 
 function PhotoTile({ photo }: { photo: OverviewPhoto }) {
+  const { t } = useTranslation()
   return (
     <li>
       {photo.url ? (
         <img
           src={photo.url}
-          alt={photo.caption ?? 'Фото объекта'}
+          alt={photo.caption ?? t('common.projectPhoto')}
           loading="lazy"
           className="aspect-square w-full rounded-lg object-cover"
         />
       ) : (
         <div className="flex aspect-square w-full items-center justify-center rounded-lg bg-slate-100 text-xs text-slate-400">
-          нет превью
+          {t('common.noPreview')}
         </div>
       )}
     </li>
@@ -356,6 +359,7 @@ function PhotoTile({ photo }: { photo: OverviewPhoto }) {
 }
 
 function IssueRow({ issue }: { issue: ActiveIssue }) {
+  const { t } = useTranslation()
   return (
     <li
       className={`flex items-start justify-between gap-3 border-l-4 p-3 ${PRIORITY_BORDER[issue.priority]}`}
@@ -363,13 +367,13 @@ function IssueRow({ issue }: { issue: ActiveIssue }) {
       <div className="min-w-0">
         <p className="truncate text-sm text-slate-800">{issue.title}</p>
         {issue.dueDate ? (
-          <p className="mt-0.5 text-xs text-slate-400">Срок: {formatDate(issue.dueDate)}</p>
+          <p className="mt-0.5 text-xs text-slate-400">{t('common.due', { date: formatDate(issue.dueDate) })}</p>
         ) : null}
       </div>
       <span
         className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${PRIORITY_BADGE[issue.priority]}`}
       >
-        {ISSUE_PRIORITY_LABELS[issue.priority]}
+        {t(`issuePriority.${issue.priority}`)}
       </span>
     </li>
   )

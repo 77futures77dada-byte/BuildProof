@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
+import { stageLabel } from '../i18n/stageLabel'
 import { useAuth } from '../hooks/useAuth'
 import { useProjectMembers } from '../hooks/useProjectMembers'
 import { useStageOptions } from '../hooks/useStageOptions'
@@ -22,6 +24,7 @@ const selectClass =
 
 export function TaskForm({ projectId, defaultStageId, onCreated, onCancel }: TaskFormProps) {
   const { user } = useAuth()
+  const { t } = useTranslation()
   const { members, loading: membersLoading, error: membersError } = useProjectMembers(projectId)
   const { options: stages, loading: stagesLoading } = useStageOptions(projectId)
 
@@ -35,11 +38,11 @@ export function TaskForm({ projectId, defaultStageId, onCreated, onCancel }: Tas
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!title.trim()) {
-      setError('Укажите название задачи.')
+      setError(t('tasks.nameRequired'))
       return
     }
     if (!user) {
-      setError('Сессия не найдена. Войдите заново.')
+      setError(t('common.sessionMissing'))
       return
     }
     setError(null)
@@ -66,29 +69,29 @@ export function TaskForm({ projectId, defaultStageId, onCreated, onCancel }: Tas
       onSubmit={handleSubmit}
       className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
     >
-      <h2 className="text-base font-semibold text-slate-900">Новая задача</h2>
+      <h2 className="text-base font-semibold text-slate-900">{t('tasks.formHeading')}</h2>
 
       <TextField
-        label="Название"
+        label={t('tasks.name')}
         required
         value={title}
         disabled={busy}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="Например: смонтировать опалубку по оси 3"
+        placeholder={t('tasks.namePlaceholder')}
       />
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">Исполнитель</span>
+        <span className="text-sm font-medium text-slate-700">{t('tasks.assignee')}</span>
         <select
           value={assignedTo}
           disabled={busy || membersLoading}
           onChange={(e) => setAssignedTo(e.target.value)}
           className={selectClass}
         >
-          <option value="">Не назначен</option>
+          <option value="">{t('tasks.unassigned')}</option>
           {members.map((m) => (
             <option key={m.id} value={m.id}>
-              {m.name}
+              {m.name || t('common.noName')}
             </option>
           ))}
         </select>
@@ -96,7 +99,7 @@ export function TaskForm({ projectId, defaultStageId, onCreated, onCancel }: Tas
       <ErrorMessage message={membersError} />
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">Срок</span>
+        <span className="text-sm font-medium text-slate-700">{t('tasks.deadline')}</span>
         <input
           type="date"
           value={deadline}
@@ -107,17 +110,17 @@ export function TaskForm({ projectId, defaultStageId, onCreated, onCancel }: Tas
       </label>
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">Этап</span>
+        <span className="text-sm font-medium text-slate-700">{t('tasks.stage')}</span>
         <select
           value={stageId}
           disabled={busy || stagesLoading}
           onChange={(e) => setStageId(e.target.value)}
           className={selectClass}
         >
-          <option value="">Без этапа</option>
+          <option value="">{t('tasks.noStage')}</option>
           {stages.map((s) => (
             <option key={s.id} value={s.id}>
-              {s.name}
+              {stageLabel(s.name)}
             </option>
           ))}
         </select>
@@ -127,10 +130,10 @@ export function TaskForm({ projectId, defaultStageId, onCreated, onCancel }: Tas
 
       <div className="flex gap-2">
         <Button type="submit" loading={busy}>
-          Создать задачу
+          {t('tasks.create')}
         </Button>
         <Button type="button" variant="secondary" onClick={onCancel} disabled={busy}>
-          Отмена
+          {t('common.cancel')}
         </Button>
       </div>
     </form>

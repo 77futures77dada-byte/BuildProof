@@ -41,7 +41,7 @@ interface UseTasksResult {
 
 /**
  * Project tasks. When `assigneeId` is given, only that person's tasks load
- * (worker's "мои задачи"); otherwise every task in the project.
+ * (a worker's own list); otherwise every task in the project.
  */
 export function useTasks(
   projectId: string | undefined,

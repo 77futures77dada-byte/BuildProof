@@ -1,3 +1,4 @@
+import i18n from '../i18n'
 import { supabase } from './supabaseClient'
 import { PHOTOS_BUCKET } from './storage'
 import { resizeImageToJpeg } from './image'
@@ -59,7 +60,7 @@ export async function uploadProjectPhoto(input: UploadPhotoInput): Promise<void>
   try {
     ;({ blob } = await resizeImageToJpeg(file))
   } catch (err) {
-    throw new PhotoUploadError('resize', messageOf(err, 'Не удалось подготовить изображение.'))
+    throw new PhotoUploadError('resize', messageOf(err, i18n.t('photos.prepareFailed')))
   }
 
   const path = buildStoragePath(projectId, projectStageId, file.name)
@@ -70,7 +71,7 @@ export async function uploadProjectPhoto(input: UploadPhotoInput): Promise<void>
   if (storageError) {
     throw new PhotoUploadError(
       'storage',
-      `Не удалось загрузить файл: ${storageError.message}`,
+      i18n.t('photos.uploadFailed', { message: storageError.message }),
     )
   }
 
@@ -89,15 +90,12 @@ export async function uploadProjectPhoto(input: UploadPhotoInput): Promise<void>
     if (cleanupError) {
       throw new PhotoUploadError(
         'db',
-        `Файл загружен, но запись в базе не создана (${dbError.message}). ` +
-          `Удалить загруженный файл автоматически не удалось — он остался в хранилище: ` +
-          `${path}. Сообщите администратору.`,
+        i18n.t('photos.dbFailedOrphan', { message: dbError.message, path }),
       )
     }
     throw new PhotoUploadError(
       'db',
-      `Файл загружен, но запись в базе не создана (${dbError.message}). ` +
-        `Загруженный файл удалён из хранилища, повторите попытку.`,
+      i18n.t('photos.dbFailedCleaned', { message: dbError.message }),
     )
   }
 }

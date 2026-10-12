@@ -5,7 +5,7 @@ import { ProgressBar } from './ProgressBar'
 
 /**
  * Big, single-tap project tile for a worker with several sites. Goes straight
- * to that site's "Сегодня" screen.
+ * to that site's "Today" screen.
  */
 export function WorkerProjectCard({ project }: { project: DashboardProject }) {
   return (

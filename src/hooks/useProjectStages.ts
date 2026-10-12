@@ -57,7 +57,7 @@ export function useProjectStages(projectId: string | undefined): UseProjectStage
       return ((data ?? []) as unknown as StageRow[])
         .map((row) => ({
           id: row.id,
-          name: row.stage_templates?.name ?? 'Без названия',
+          name: row.stage_templates?.name ?? '',
           sortOrder: row.stage_templates?.sort_order ?? Number.MAX_SAFE_INTEGER,
           progressPercent: row.progress_percent,
         }))

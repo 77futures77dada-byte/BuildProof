@@ -5,6 +5,7 @@ import {
   PROGRESS_STEP,
   snapProgress,
 } from '../lib/stages'
+import { useTranslation } from 'react-i18next'
 import { toErrorMessage } from '../lib/format'
 import { ErrorMessage } from './ErrorMessage'
 
@@ -26,6 +27,7 @@ interface StageProgressControlProps {
  * away on pointer/key release.
  */
 export function StageProgressControl({ value, label, onCommit }: StageProgressControlProps) {
+  const { t } = useTranslation()
   // Non-null while an edit is in progress (before the commit settles).
   const [draft, setDraft] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
@@ -93,7 +95,7 @@ export function StageProgressControl({ value, label, onCommit }: StageProgressCo
           type="button"
           onClick={() => handleChange(shown - PROGRESS_STEP)}
           disabled={shown <= PROGRESS_MIN}
-          aria-label={`Уменьшить прогресс: ${label}`}
+          aria-label={t('stages.decrease', { stage: label })}
           className="size-8 shrink-0 rounded-lg border border-slate-300 bg-white text-slate-700 disabled:opacity-40"
         >
           −
@@ -109,7 +111,7 @@ export function StageProgressControl({ value, label, onCommit }: StageProgressCo
           onPointerUp={flush}
           onKeyUp={flush}
           onBlur={flush}
-          aria-label={`Прогресс: ${label}`}
+          aria-label={t('stages.progress', { stage: label })}
           className="h-2 w-full cursor-pointer accent-sky-600"
         />
 
@@ -117,7 +119,7 @@ export function StageProgressControl({ value, label, onCommit }: StageProgressCo
           type="button"
           onClick={() => handleChange(shown + PROGRESS_STEP)}
           disabled={shown >= PROGRESS_MAX}
-          aria-label={`Увеличить прогресс: ${label}`}
+          aria-label={t('stages.increase', { stage: label })}
           className="size-8 shrink-0 rounded-lg border border-slate-300 bg-white text-slate-700 disabled:opacity-40"
         >
           +

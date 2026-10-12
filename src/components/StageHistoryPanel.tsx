@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useStageHistory } from '../hooks/useStageHistory'
 import { formatDateTimeSmart } from '../lib/format'
 import { Spinner } from './Spinner'
@@ -12,6 +13,7 @@ interface StageHistoryPanelProps {
 
 /** Collapsible list of the last 5 changes to a stage. Fetches lazily on open. */
 export function StageHistoryPanel({ projectStageId, refreshToken }: StageHistoryPanelProps) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const { entries, loading, error } = useStageHistory(projectStageId, open, refreshToken)
 
@@ -24,17 +26,17 @@ export function StageHistoryPanel({ projectStageId, refreshToken }: StageHistory
         className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-700"
       >
         <span aria-hidden="true">{open ? '▾' : '▸'}</span>
-        История изменений
+        {t('stages.history')}
       </button>
 
       {open ? (
         <div className="mt-2">
           {loading ? (
-            <Spinner label="Загрузка истории…" />
+            <Spinner label={t('stages.historyLoading')} />
           ) : error ? (
             <ErrorMessage message={error} />
           ) : entries.length === 0 ? (
-            <p className="text-xs text-slate-400">Изменений пока не было.</p>
+            <p className="text-xs text-slate-400">{t('stages.historyEmpty')}</p>
           ) : (
             <ul className="space-y-1.5">
               {entries.map((entry) => (
@@ -43,7 +45,7 @@ export function StageHistoryPanel({ projectStageId, refreshToken }: StageHistory
                     {entry.oldPercent}% → {entry.newPercent}%
                   </span>
                   <span className="text-slate-500">
-                    {entry.changedByName ?? 'Неизвестно'}
+                    {entry.changedByName ?? t('stages.unknownUser')}
                   </span>
                   <span className="text-slate-400">
                     {formatDateTimeSmart(entry.changedAt)}

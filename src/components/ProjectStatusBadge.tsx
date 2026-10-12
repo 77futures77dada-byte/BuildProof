@@ -1,4 +1,4 @@
-import { PROJECT_STATUS_LABELS } from '../types'
+import { useTranslation } from 'react-i18next'
 import type { ProjectStatus } from '../types'
 
 const STATUS_STYLE: Record<ProjectStatus, string> = {
@@ -8,11 +8,12 @@ const STATUS_STYLE: Record<ProjectStatus, string> = {
 }
 
 export function ProjectStatusBadge({ status }: { status: ProjectStatus }) {
+  const { t } = useTranslation()
   return (
     <span
       className={`inline-block shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLE[status]}`}
     >
-      {PROJECT_STATUS_LABELS[status]}
+      {t(`projectStatus.${status}`)}
     </span>
   )
 }

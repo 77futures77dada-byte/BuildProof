@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
+import { stageLabel } from '../i18n/stageLabel'
 import type { ProjectMember } from '../hooks/useProjectMembers'
 import type { StageOption } from '../hooks/useStageOptions'
 import type { TaskItem, TaskPatch } from '../hooks/useTasks'
-import { TASK_STATUS_LABELS } from '../types'
 import type { TaskStatus } from '../types'
 import { formatDate, toErrorMessage } from '../lib/format'
 import { Button } from './Button'
@@ -20,11 +22,13 @@ interface TaskCardProps {
   onCompletedWithStage: (task: TaskItem) => void
 }
 
-function metaLine(task: TaskItem, variant: Variant): string {
-  const parts = [`Срок: ${formatDate(task.deadline)}`]
-  if (task.stageName) parts.push(task.stageName)
+const TASK_STATUSES: TaskStatus[] = ['todo', 'in_progress', 'done']
+
+function metaLine(task: TaskItem, variant: Variant, t: TFunction): string {
+  const parts = [t('common.due', { date: formatDate(task.deadline) })]
+  if (task.stageName) parts.push(stageLabel(task.stageName))
   // The manager view shows the assignee as an editable dropdown instead.
-  if (variant !== 'manager') parts.push(task.assigneeName ?? 'не назначена')
+  if (variant !== 'manager') parts.push(task.assigneeName ?? t('tasks.noAssignee'))
   return parts.join(' · ')
 }
 
@@ -47,6 +51,7 @@ export function TaskCard({
   onUpdate,
   onCompletedWithStage,
 }: TaskCardProps) {
+  const { t } = useTranslation()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -78,11 +83,11 @@ export function TaskCard({
         <span
           className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[task.status]}`}
         >
-          {TASK_STATUS_LABELS[task.status]}
+          {t(`taskStatus.${task.status}`)}
         </span>
       </div>
 
-      <p className="text-xs text-slate-500">{metaLine(task, variant)}</p>
+      <p className="text-xs text-slate-500">{metaLine(task, variant, t)}</p>
 
       {variant === 'worker' ? (
         // Workers tap these on a phone on site — keep them ≥56px tall, full width.
@@ -93,7 +98,7 @@ export function TaskCard({
               className="min-h-14 w-full text-base"
               onClick={() => void apply({ status: 'in_progress' })}
             >
-              Начать
+              {t('tasks.start')}
             </Button>
           ) : null}
           {task.status === 'in_progress' ? (
@@ -102,7 +107,7 @@ export function TaskCard({
               className="min-h-14 w-full text-base"
               onClick={() => void complete()}
             >
-              Завершить
+              {t('tasks.finish')}
             </Button>
           ) : null}
         </div>
@@ -111,7 +116,7 @@ export function TaskCard({
       {variant === 'manager' ? (
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <label className={controlLabelClass}>
-            Исполнитель
+            {t('tasks.assignee')}
             <select
               className={controlClass}
               disabled={busy}
@@ -120,37 +125,37 @@ export function TaskCard({
                 const id = e.target.value
                 void apply({
                   assignedTo: id || null,
-                  assigneeName: members.find((m) => m.id === id)?.name ?? null,
+                  assigneeName: members.find((m) => m.id === id)?.name || null,
                 })
               }}
             >
-              <option value="">Не назначен</option>
+              <option value="">{t('tasks.unassigned')}</option>
               {members.map((m) => (
                 <option key={m.id} value={m.id}>
-                  {m.name}
+                  {m.name || t('common.noName')}
                 </option>
               ))}
             </select>
           </label>
 
           <label className={controlLabelClass}>
-            Статус
+            {t('tasks.status')}
             <select
               className={controlClass}
               disabled={busy}
               value={task.status}
               onChange={(e) => void apply({ status: e.target.value as TaskStatus })}
             >
-              {(Object.keys(TASK_STATUS_LABELS) as TaskStatus[]).map((s) => (
+              {TASK_STATUSES.map((s) => (
                 <option key={s} value={s}>
-                  {TASK_STATUS_LABELS[s]}
+                  {t(`taskStatus.${s}`)}
                 </option>
               ))}
             </select>
           </label>
 
           <label className={controlLabelClass}>
-            Срок
+            {t('tasks.deadline')}
             <input
               type="date"
               className={controlClass}
@@ -161,7 +166,7 @@ export function TaskCard({
           </label>
 
           <label className={controlLabelClass}>
-            Этап
+            {t('tasks.stage')}
             <select
               className={controlClass}
               disabled={busy}
@@ -174,10 +179,10 @@ export function TaskCard({
                 })
               }}
             >
-              <option value="">Без этапа</option>
+              <option value="">{t('tasks.noStage')}</option>
               {stages.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.name}
+                  {stageLabel(s.name)}
                 </option>
               ))}
             </select>
