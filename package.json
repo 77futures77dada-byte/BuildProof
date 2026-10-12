@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
+    "typecheck": "tsc --noEmit -p tsconfig.check.json",
+    "test:api": "node --experimental-strip-types --test api/tests/invite.test.ts",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -33,6 +33,7 @@ export interface Profile {
   company_id: string | null
   full_name: string | null
   role: UserRole
+  locale: 'et' | 'ru' | 'en'
 }
 
 export interface Project {
@@ -73,6 +74,7 @@ export interface StageHistory {
   new_percent: number
   changed_by: string | null
   changed_at: string // ISO timestamp
+  report_id: string | null
 }
 
 export interface Photo {
@@ -83,6 +85,7 @@ export interface Photo {
   caption: string | null
   uploaded_by: string | null
   uploaded_at: string // ISO timestamp
+  report_id: string | null
 }
 
 export interface Task {
@@ -94,6 +97,8 @@ export interface Task {
   deadline: string | null // ISO date
   status: TaskStatus
   created_by: string | null
+  created_at: string
+  completed_at: string | null
 }
 
 export interface Issue {
@@ -107,6 +112,40 @@ export interface Issue {
   status: IssueStatus
   due_date: string | null // ISO date
   created_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface StageReport {
+  id: string
+  project_stage_id: string
+  project_id: string
+  reporter_id: string
+  old_percent: number
+  new_percent: number
+  comment: string | null
+  created_at: string
+}
+
+export interface ProjectActivity {
+  id: string
+  kind: 'stage_report' | 'task_done' | 'issue_created' | 'photo'
+  actor_id: string | null
+  actor_name: string | null
+  stage_name: string | null
+  title: string
+  detail: string | null
+  photo_path: string | null
+  created_at: string
+}
+
+export interface PilotMetrics {
+  reports_7d: number
+  reports_30d: number
+  active_workers_7d: number
+  median_delay: string | null
+  photo_report_share: number
+  last_report_at: string | null
 }
 
 // ---------------------------------------------------------------------------
