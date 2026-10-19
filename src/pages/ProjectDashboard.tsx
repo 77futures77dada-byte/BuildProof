@@ -22,6 +22,7 @@ import { TaskForm } from '../components/TaskForm'
 import { IssueForm } from '../components/IssueForm'
 import { StageActionButtons } from '../components/StageActionButtons'
 import type { StageActionCapabilities, StageActionKind } from '../components/StageActionButtons'
+import { HouseModelBlock } from '../features/house3d/HouseModelBlock'
 
 const PRIORITY_BADGE: Record<IssuePriority, string> = {
   high: 'bg-red-100 text-red-800',
@@ -175,6 +176,13 @@ export function ProjectDashboardView({
           </div>
         </section>
       )}
+
+      <HouseModelBlock stages={stages.map((stage) => ({
+        key: stage.id,
+        name: stage.name,
+        percent: stage.progressPercent,
+        sortOrder: stage.sortOrder,
+      }))} />
 
       {stagesExist ? (
         <section className="space-y-3">
