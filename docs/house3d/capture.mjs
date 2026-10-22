@@ -4,11 +4,7 @@ import { resolve } from 'node:path'
 
 const edgePath = process.env.EDGE_PATH ?? 'C:/Program Files (x86)/Microsoft/Edge/Application/155.0.4283.62/msedge.exe'
 const outputDir = resolve('docs/house3d')
-const browser = await chromium.launch({
-  executablePath: edgePath,
-  headless: true,
-  args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'],
-})
+const browser = await chromium.launch({ executablePath: edgePath, headless: true, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] })
 try {
   await mkdir(outputDir, { recursive: true })
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 })
@@ -18,41 +14,28 @@ try {
   page.on('pageerror', error => console.error('[pageerror]', error.message))
   await page.goto('http://127.0.0.1:5173/dev/house-3d', { waitUntil: 'networkidle' })
   await page.locator('canvas').waitFor({ state: 'visible', timeout: 15000 })
-  await page.waitForTimeout(1200)
-
-  for (const [label, filename] of [
-    ['Все этапы 0%', 'all-zero.png'],
-    ['Смешанный прогресс', 'mixed-progress.png'],
-    ['Все этапы 100%', 'all-complete.png'],
-  ]) {
-    await page.getByRole('button', { name: label }).click()
-    await page.waitForTimeout(900)
-    await page.screenshot({ path: resolve(outputDir, filename), fullPage: true })
-    console.log(`Saved ${filename}`)
+  await page.waitForTimeout(1000)
+  for (const [testId, filename] of [['preset-zero','all-zero.png'],['preset-mixed','mixed-roof-30.png'],['preset-complete','all-complete.png']]) {
+    await page.getByTestId(testId).click(); await page.waitForTimeout(500)
+    await page.screenshot({ path: resolve(outputDir, filename), fullPage: true }); console.log(`Saved ${filename}`)
   }
-
+  await page.getByTestId('view-end').click(); await page.waitForTimeout(500)
+  await page.screenshot({ path: resolve(outputDir, 'end-view.png'), fullPage: true }); console.log('Saved end-view.png')
   await page.close()
-  const diagnosticsPage = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 })
-  diagnosticsPage.on('request', request => { if (/supabase/i.test(request.url())) supabaseRequests.push(request.url()) })
-  diagnosticsPage.on('console', message => { if (message.text().includes('[house-3d dev]')) console.log(message.text()) })
-  await diagnosticsPage.goto('http://127.0.0.1:5173/dev/house-3d', { waitUntil: 'networkidle' })
-  await diagnosticsPage.locator('canvas').waitFor({ state: 'visible', timeout: 15000 })
-  await diagnosticsPage.waitForTimeout(500)
-  await diagnosticsPage.getByRole('button', { name: 'mount/unmount ×20' }).click()
-  await diagnosticsPage.waitForFunction(() => document.querySelectorAll('ol li').length === 20, { timeout: 30000 })
-  const diagnostics = await diagnosticsPage.locator('ol li').allTextContents()
-  if (diagnostics.length !== 20) throw new Error(`Expected 20 cycle rows, got ${diagnostics.length}`)
+  const diagnostic = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 })
+  diagnostic.on('request', request => { if (/supabase/i.test(request.url())) supabaseRequests.push(request.url()) })
+  diagnostic.on('console', message => { if (message.text().includes('[house-3d dev]')) console.log(message.text()) })
+  await diagnostic.goto('http://127.0.0.1:5173/dev/house-3d', { waitUntil: 'networkidle' })
+  await diagnostic.locator('canvas').waitFor({ state: 'visible', timeout: 15000 }); await diagnostic.waitForTimeout(500)
+  await diagnostic.getByTestId('cycles').click()
+  await diagnostic.waitForFunction(() => document.querySelectorAll('ol li').length === 20, { timeout: 30000 })
+  const diagnostics = await diagnostic.locator('ol li').allTextContents()
   const readings = diagnostics.map(line => line.match(/geometries=\d+, textures=\d+, programs=\d+, live WebGL contexts=\d+/)?.[0])
-  if (readings.some(reading => !reading) || new Set(readings).size !== 1) throw new Error('Renderer/context readings changed across cycles')
-  await diagnosticsPage.locator('details').evaluate(element => { element.open = true })
-  const contextSummary = await diagnosticsPage.locator('details p').innerText()
-  if (!contextSummary.includes('20; живые: 0')) throw new Error(`Expected 20 created and 0 live contexts, got: ${contextSummary}`)
-  console.log(await diagnosticsPage.locator('details').innerText())
-  console.log('LIFECYCLE_DIAGNOSTICS_BEGIN')
-  diagnostics.forEach((line, index) => console.log(`${index + 1}. ${line}`))
-  console.log('LIFECYCLE_DIAGNOSTICS_END')
+  if (diagnostics.length !== 20 || readings.some(reading => !reading) || new Set(readings).size !== 1) throw new Error('Renderer/context readings changed across cycles')
+  await diagnostic.locator('details').evaluate(element => { element.open = true })
+  const contextSummary = await diagnostic.locator('details p').innerText()
+  if (!contextSummary.includes('20; живых: 0')) throw new Error(`Expected 20 created and 0 live contexts, got: ${contextSummary}`)
+  console.log('LIFECYCLE_DIAGNOSTICS_BEGIN'); diagnostics.forEach((row, index) => console.log(`${index+1}. ${row}`)); console.log('LIFECYCLE_DIAGNOSTICS_END')
   if (supabaseRequests.length) throw new Error(`Dev page made Supabase requests: ${supabaseRequests.join(', ')}`)
   console.log('Supabase requests: 0')
-} finally {
-  await browser.close()
-}
+} finally { await browser.close() }

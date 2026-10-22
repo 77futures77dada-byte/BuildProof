@@ -1,33 +1,38 @@
 # House model browser checks
 
-Captured at 390 × 844 CSS pixels in headless Microsoft Edge Chromium 155 with Playwright Core 1.56.1 and SwiftShader (`--use-gl=swiftshader --enable-unsafe-swiftshader`). The `/dev/house-3d` page is development-only and uses a clearly labelled local fixture; it does not query Supabase.
+Captured at 390 × 844 CSS pixels in headless Microsoft Edge Chromium 155 with Playwright Core 1.56.1 and SwiftShader (`--use-gl=swiftshader --enable-unsafe-swiftshader`). The `/dev/house-3d` route is included only in dev builds and renders a local fixture without Supabase requests.
 
-## Screenshots
+## Geometry and screenshots
 
-- `all-zero.png` — all seven fixture stages are 0%; the house parts appear as faint blueprint ghosts.
-- `mixed-progress.png` — foundation 100%, frame 60%, windows 50%, other visible fixture stages 0%; completed foundation and windows are bright while the frame is partially raised.
-- `all-complete.png` — all fixture stages are 100%; completed edges are white and have a wider static additive glow layer.
+The wireframe body is 10 × 7 m with 6 m walls, a 10.6 × 0.4 × 7.6 m slab, two 3 m floors, and a gable roof with a 2.8 m ridge rise and 0.5 m eaves. Windows and the centered 1 × 2.1 m door are placed in the wall planes. The 25° camera is fitted to the full envelope and can switch to an end view.
+
+- `all-zero.png` — every stage is 0%. The body, roof, windows, and door remain visible as faint blueprint lines; the silhouette reads as a two-storey gable house.
+- `mixed-roof-30.png` — foundation 100%, frame 60%, roof 30%, windows 50%, remaining stages 0%. Completed details are white, unfinished details are amber, and untouched geometry stays faint blue.
+- `all-complete.png` — every stage is 100%. The exterior and gable are clear and bright, with static white additive edge glow. The combined interior frame, electrical routes, and finish seams make the completed wireframe intentionally dense.
+- `end-view.png` — all stages 100%, viewed from the gable end. The triangular roof and centered end-wall window are visible; the roof slopes meet the wall top at y=6.
+
+The new geometry tests check the overall dimensions, window and door bounds and wall planes, window and door sizes, electrical/roof bounds, and roof support points at y=6.
 
 ## Renderer lifecycle
 
-The dev page's **mount/unmount ×20** control was run in a fresh headless page. `renderer.info.memory` and the program count were sampled in cleanup; the canvas contexts were tracked and checked after `dispose()` and `forceContextLoss()`.
+The dev page's **mount/unmount ×20** control was run in headless Chromium. Each unmount samples `renderer.info.memory` and `renderer.info.programs`, calls `dispose()` and `forceContextLoss()`, and checks tracked contexts.
 
 | Cycles | Geometries | Textures | Programs | Live WebGL contexts after unmount |
 | --- | ---: | ---: | ---: | ---: |
-| 1–20 (each cycle) | 41 | 0 | 2 | 0 |
+| 1–20 (each cycle) | 9 | 0 | 2 | 0 |
 
-The harness observed 20 created context objects and 0 live contexts after the final cycle. All twenty renderer readings were identical. The headless page made zero Supabase requests.
+All 20 readings were identical. Twenty context objects were created, none remained live after unmount, and the dev page made zero Supabase requests.
 
-## Production bundle comparison
+## Production bundle
 
-Both builds used Vite 8.2.2 and the same project dependency lock for the comparison. The `main` build was made in a clean detached worktree at the base commit. The feature build's first-render path includes the Vite entry chunk and the public app-shell chunk triggered immediately by the root lazy import.
+Vite 8.2.2 with the same lockfile. The clean `main` baseline was measured in a detached worktree. The current feature build keeps Three.js in the separate lazy `HouseModel` chunk.
 
-| Build | Entry chunk gzip | App shell gzip | First-render JS gzip | Change vs main |
+| Build | Main entry gzip | App shell gzip | Initial path gzip | Main entry change vs `main` |
 | --- | ---: | ---: | ---: | ---: |
-| `main` | 75.02 KB | included | 75.02 KB | — |
-| `codex/house-3d` | 60.75 KB | 17.65 KB | 78.40 KB | +3.38 KB |
+| `main` baseline | 75.02 KB | included | 75.02 KB | — |
+| `codex/house-3d` after geometry fix | 60.75 KB | 17.64 KB | 78.39 KB | −14.27 KB |
 
-The increase is below the 10 KB limit. The authenticated routes (73.29 KB gzip) and HouseModel (129.99 KB gzip, including Three.js) are separate async chunks. The production output contains no dev-page chunk.
+The main entry is smaller than baseline. Including the separately loaded app shell, the initial path is +3.37 KB, within the 10 KB limit. The authenticated routes are a separate async chunk (73.28 KB gzip); `HouseModel` and Three.js are also async (130.02 KB gzip). The dev page is absent from production output.
 
 Recreate the screenshots and lifecycle log with the Vite dev server running:
 
