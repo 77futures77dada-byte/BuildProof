@@ -41,7 +41,7 @@ describe('house geometry in meters', () => {
   })
 
   it('keeps roof/electrical vertices within the envelope and roof supports at wall-top height', () => {
-    for (const part of ['roof','electric']) for (const [x,y,z] of vertices(part)) {
+    for (const part of ['roof','electric','plumbing']) for (const [x,y,z] of vertices(part)) {
       expect(x).toBeGreaterThanOrEqual(HOUSE_BOUNDS.min[0]); expect(x).toBeLessThanOrEqual(HOUSE_BOUNDS.max[0])
       expect(y).toBeGreaterThanOrEqual(HOUSE_BOUNDS.min[1]); expect(y).toBeLessThanOrEqual(HOUSE_BOUNDS.max[1])
       expect(z).toBeGreaterThanOrEqual(HOUSE_BOUNDS.min[2]); expect(z).toBeLessThanOrEqual(HOUSE_BOUNDS.max[2])
@@ -50,6 +50,8 @@ describe('house geometry in meters', () => {
     expect(roof.some(([x,y,z]) => x === -5 && y === 6 && z === -3.5)).toBe(true)
     expect(roof.some(([x,y,z]) => x === -5 && y === 6 && z === 3.5)).toBe(true)
     expect(vertices('electric').every(([x,y,z]) => Math.abs(x) <= 5 && y >= 0 && y <= 6 && Math.abs(z) <= 3.5)).toBe(true)
+    expect(parts('plumbing').length).toBeGreaterThan(0)
+    expect(vertices('plumbing').every(([x,y,z]) => Math.abs(x) <= 5 && y >= 0 && y <= 6 && Math.abs(z) <= 3.5)).toBe(true)
   })
 
   it('keeps every generated segment in the declared envelope and avoids detached contour posts', () => {

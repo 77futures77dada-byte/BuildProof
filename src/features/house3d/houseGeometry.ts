@@ -1,4 +1,4 @@
-export type HousePart = 'foundation' | 'frame' | 'roof' | 'windows' | 'door' | 'electric' | 'finish' | 'handover'
+export type HousePart = 'foundation' | 'frame' | 'roof' | 'windows' | 'door' | 'electric' | 'plumbing' | 'finish' | 'handover'
 export type Point3 = readonly [number, number, number]
 export interface HouseLine { part: HousePart; progressPart?: HousePart; points: Point3[] }
 
@@ -60,11 +60,22 @@ for (const y of [.4,1.2,3.4,4.2]) for (const z of [-3.48,3.48]) for (const x of 
   line('electric',[x-.04,y,z],[x+.04,y,z]); line('electric',[x,y-.04,z],[x,y+.04,z])
 }
 
+// Stacked bathroom/kitchen plumbing: two risers, floor branches and outlet marks.
+for (const x of [-2,2]) line('plumbing',[x,.2,-3.2],[x,5.8,-3.2])
+for (const y of [.6,1.4,3.6,4.4]) {
+  line('plumbing',[-2,y,-3.2],[-4.5,y,-3.2])
+  line('plumbing',[2,y,-3.2],[4.5,y,-3.2])
+  for (const x of [-4,3.5]) {
+    line('plumbing',[x-.1,y,-3.2],[x+.1,y,-3.2])
+    line('plumbing',[x,y-.1,-3.2],[x,y+.1,-3.2])
+  }
+}
+
 // Interior finish panel seams, placed on the room side of the exterior walls.
 for (const z of [-3.46,3.46]) for (const x of [-5,-2.5,0,2.5,5]) line('finish',[x,0,z],[x,6,z])
 for (const x of [-4.96,4.96]) for (const z of [-3.5,-1.75,0,1.75,3.5]) line('finish',[x,0,z],[x,6,z])
 
-// Handover highlights the full outer body and roof contour.
+// The contour geometry is shown only after all seven real stages complete.
 for (const z of [-zRoof,zRoof]) line('handover',[-xRoof,6,z],[xRoof,6,z])
 for (const x of [-xWall,xWall]) { line('handover',[x,0,-zWall],[x,6,-zWall]); line('handover',[x,0,zWall],[x,6,zWall]) }
 for (const x of [-xRoof,xRoof]) { line('handover',[x,6,-zWall],[x,8.8,0]); line('handover',[x,8.8,0],[x,6,zWall]) }

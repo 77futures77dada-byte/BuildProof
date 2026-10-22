@@ -2,26 +2,37 @@ import { describe, expect, it } from 'vitest'
 import { stagesToParts } from './stagesToParts'
 import type { HouseStage } from './types'
 
-const stage = (key: string, name: string, percent: number): HouseStage => ({ key, name, percent })
+const names = [
+  '\u0424\u0443\u043d\u0434\u0430\u043c\u0435\u043d\u0442',
+  '\u041a\u0430\u0440\u043a\u0430\u0441',
+  '\u041a\u0440\u043e\u0432\u043b\u044f',
+  '\u041e\u043a\u043d\u0430',
+  '\u042d\u043b\u0435\u043a\u0442\u0440\u0438\u043a\u0430',
+  '\u0421\u0430\u043d\u0442\u0435\u0445\u043d\u0438\u043a\u0430',
+  '\u041e\u0442\u0434\u0435\u043b\u043a\u0430',
+]
+const parts = ['foundation','frame','roof','windows','electric','plumbing','finish']
+const stage = (name: string, percent: number, sortOrder?: number): HouseStage => ({ key: name, name, percent, ...(sortOrder === undefined ? {} : { sortOrder }) })
 
 describe('stagesToParts', () => {
-  it('maps zero, partial, and complete progress to known parts', () => {
-    expect(stagesToParts([stage('a',' ФУНДАМЕНТ ',0),stage('b','Каркас',50),stage('c','Кровля',100)]))
-      .toMatchObject([{part:'foundation',percent:0},{part:'frame',percent:50},{part:'roof',percent:100}])
+  it('maps all seven catalogue names after case, whitespace and ё/е normalization', () => {
+    const mapped = stagesToParts(names.map(name => stage(`  ${name.toLocaleUpperCase('ru').replace(/Е/g, 'Ё')}  `, 100)))
+    expect(mapped.map(item => item.part)).toEqual(parts)
+    expect(mapped.map(item => item.percent)).toEqual([100,100,100,100,100,100,100])
   })
-  it('keeps unknown stages as other and handles empty input', () => {
-    expect(stagesToParts([stage('x','Неизвестный этап',40)])[0].part).toBe('other')
-    expect(stagesToParts([])).toEqual([])
+
+  it('uses the catalogue sort_order fallback when names are empty', () => {
+    expect(stagesToParts(parts.map((_part, index) => stage('', 0, index + 1))).map(item => item.part)).toEqual(parts)
   })
-  it('uses sort order when the stage name is not recognized', () => {
-    expect(stagesToParts([{...stage('x','Неизвестный этап',40),sortOrder:2}])[0].part).toBe('frame')
+
+  it('keeps unknown stages as other and retains their actual label', () => {
+    const [unknown] = stagesToParts([stage('Нестандартный этап', 40)])
+    expect(unknown.part).toBe('other')
+    expect(unknown.name).toBe('Нестандартный этап')
   })
-  it('normalizes the miscellaneous template name and maps its sort order', () => {
-    expect(stagesToParts([stage('misc',' \\u041f\\u0420\\u041e\\u0427\\u0415\\u0415 ',40)])[0].part).toBe('other')
-    expect(stagesToParts([stage('misc2','\\u041f\\u0440\\u043e\\u0447\\u0438\\u0435 \\u0440\\u0430\\u0431\\u043e\\u0442\\u044b',40)])[0].part).toBe('other')
-    expect(stagesToParts([{...stage('misc3','custom name',40),sortOrder:8}])[0].part).toBe('other')
-  })
-  it('clamps out-of-range percentages', () => {
-    expect(stagesToParts([stage('a','Фундамент',-4),stage('b','Каркас',120)]).map(s=>s.percent)).toEqual([0,100])
+
+  it('maps every 100% stage as complete and clamps percentages', () => {
+    expect(stagesToParts(names.map(name => stage(name, 100))).every(item => item.percent === 100)).toBe(true)
+    expect(stagesToParts([stage(names[0], -4), stage(names[1], 120)]).map(item => item.percent)).toEqual([0,100])
   })
 })

@@ -52,7 +52,7 @@ export default function House3DDevPage() {
     <header><p className="text-xs font-semibold uppercase tracking-wider text-sky-700">DEV · Локальная демонстрация</p><h1 className="mt-2 text-2xl font-bold text-slate-900">Проверка модели дома</h1><p className="mt-1 text-sm text-slate-600">Тестовые значения; страница не обращается к Supabase и отсутствует в production-сборке.</p></header>
     <section className="flex flex-wrap gap-2" aria-label="Наборы процентов">
       <button data-testid="preset-zero" className="rounded-lg bg-slate-800 px-3 py-2 text-sm text-white" onClick={() => preset(BASE_STAGES.map(() => 0))}>Все этапы 0%</button>
-      <button data-testid="preset-mixed" className="rounded-lg bg-slate-800 px-3 py-2 text-sm text-white" onClick={() => preset([100,60,30,50,0,0,0])}>Смешанный прогресс</button>
+      <button data-testid="preset-mixed" className="rounded-lg bg-slate-800 px-3 py-2 text-sm text-white" onClick={() => preset([100,60,30,50,0,50,0])}>Смешанный прогресс</button>
       <button data-testid="preset-complete" className="rounded-lg bg-slate-800 px-3 py-2 text-sm text-white" onClick={() => preset(BASE_STAGES.map(() => 100))}>Все этапы 100%</button>
       <button data-testid="view-end" className="rounded-lg border border-slate-600 px-3 py-2 text-sm" onClick={() => setAngle(90)}>Вид с торца</button>
       <button data-testid="view-front" className="rounded-lg border border-slate-600 px-3 py-2 text-sm" onClick={() => setAngle(35)}>Три четверти</button>

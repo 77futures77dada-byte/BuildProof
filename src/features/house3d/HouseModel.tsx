@@ -27,7 +27,9 @@ export function HouseModel({ stages, height, interactive = true, initialAngle = 
     const mats: THREE.Material[] = []
     const geometries: THREE.BufferGeometry[] = []
     const glowMaterials: LineMaterial[] = []
-    const percent = (part: HousePart) => stages.find(s => s.part === (part === 'door' ? 'windows' : part))?.percent ?? 0
+    const requiredStages: HousePart[] = ['foundation','frame','roof','windows','electric','plumbing','finish']
+    const contourComplete = requiredStages.every(part => stages.some(stage => stage.part === part && stage.percent >= 100))
+    const percent = (part: HousePart) => part === 'handover' ? (contourComplete ? 100 : 0) : stages.find(s => s.part === (part === 'door' ? 'windows' : part))?.percent ?? 0
     const byPart = new Map<HousePart, typeof HOUSE_LINES[number][]>()
     for (const item of HOUSE_LINES) byPart.set(item.part, [...(byPart.get(item.part) ?? []), item])
     for (const [part, entries] of byPart) {

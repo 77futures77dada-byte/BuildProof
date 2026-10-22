@@ -7,7 +7,7 @@ Captured at 390 × 844 CSS pixels in headless Microsoft Edge Chromium 155 with P
 The wireframe body is 10 × 7 m with 6 m walls, a 10.6 × 0.4 × 7.6 m slab, two 3 m floors, and a gable roof with a 2.8 m ridge rise and 0.5 m eaves. Windows and the centered 1 × 2.1 m door are placed in the wall planes. The 25° camera is fitted to the full envelope and can switch to an end view.
 
 - `all-zero.png` — every stage is 0%. The body, roof, windows, and door remain visible as faint blueprint lines; the silhouette reads as a two-storey gable house.
-- `mixed-roof-30.png` — foundation 100%, frame 60%, roof 30%, windows 50%, remaining stages 0%. Completed details are white, unfinished details are amber, and untouched geometry stays faint blue.
+- `mixed-roof-30.png` — foundation 100%, frame 60%, roof 30%, windows 50%, plumbing 50%, other stages 0%. Completed details are white, unfinished details are amber, and untouched geometry stays faint blue.
 - `all-complete.png` — every stage is 100%. The exterior and gable are clear and bright, with static white additive edge glow. The combined interior frame, electrical routes, and finish seams make the completed wireframe intentionally dense.
 - `end-view.png` — all stages 100%, viewed from the gable end. The triangular roof and centered end-wall window are visible; the roof slopes meet the wall top at y=6.
 
@@ -15,7 +15,7 @@ The new geometry tests check the overall dimensions, window and door bounds and 
 
 The model and legend share `HOUSE_COLORS`: completed is white with additive glow, in-progress is amber, and untouched geometry is pale blue at 0.12 opacity. At partial percentages, completed segments remain white while the rest of that part is amber. Geometry tests also enforce that every generated vertex stays inside the declared model bounds.
 
-The repository contains no `stage_templates` seed or migration, and this checkout has no database connection to query the live catalog. The mapper covers normalized `Прочее` / `Прочие работы` names and the fallback sort order 8; UI rows display the raw stage name supplied by the project. The exact live template name could not be independently verified from this checkout.
+The stage mapper follows the confirmed seven-stage catalogue (sort order 1–7). Unknown stages stay visible by their received name but do not drive any model geometry. Plumbing includes stacked risers, horizontal kitchen/bath branches, and outlet marks on both floors; the visible segment count follows the stage percentage.
 
 ## Renderer lifecycle
 
