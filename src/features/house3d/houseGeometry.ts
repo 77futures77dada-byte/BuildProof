@@ -16,7 +16,7 @@ for (const x of [-fx,fx]) for (const z of [-fz,fz]) line('foundation',[x,-.4,z],
 // Exterior wall envelope and timber frame: posts every 2.5 m on long walls,
 // floor beams and continuous perimeter plates at y=0, 3, and 6.
 for (const z of [-zWall,zWall]) for (const x of [-xWall,-xWall/2,0,xWall/2,xWall]) line('frame',[x,0,z],[x,6,z])
-for (const x of [-xWall,xWall]) for (const z of [-zWall,zWall]) line('frame',[x,0,z],[x,6,z])
+for (const x of [-xWall,xWall]) for (const z of [-zWall/2,0,zWall/2]) line('frame',[x,0,z],[x,6,z])
 for (const y of [0,3,6]) {
   for (const z of [-zWall,zWall]) line('frame',[-xWall,y,z],[xWall,y,z])
   for (const x of [-xWall,xWall]) line('frame',[x,y,-zWall],[x,y,zWall])
@@ -66,7 +66,7 @@ for (const x of [-4.96,4.96]) for (const z of [-3.5,-1.75,0,1.75,3.5]) line('fin
 
 // Handover highlights the full outer body and roof contour.
 for (const z of [-zRoof,zRoof]) line('handover',[-xRoof,6,z],[xRoof,6,z])
-for (const x of [-xRoof,xRoof]) { line('handover',[x,0,-zWall],[x,6,-zWall]); line('handover',[x,0,zWall],[x,6,zWall]) }
+for (const x of [-xWall,xWall]) { line('handover',[x,0,-zWall],[x,6,-zWall]); line('handover',[x,0,zWall],[x,6,zWall]) }
 for (const x of [-xRoof,xRoof]) { line('handover',[x,6,-zWall],[x,8.8,0]); line('handover',[x,8.8,0],[x,6,zWall]) }
 line('handover',[-xRoof,8.8,0],[xRoof,8.8,0])
 

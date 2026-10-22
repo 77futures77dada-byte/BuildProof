@@ -13,6 +13,10 @@ The wireframe body is 10 × 7 m with 6 m walls, a 10.6 × 0.4 × 7.6 m slab, two
 
 The new geometry tests check the overall dimensions, window and door bounds and wall planes, window and door sizes, electrical/roof bounds, and roof support points at y=6.
 
+The model and legend share `HOUSE_COLORS`: completed is white with additive glow, in-progress is amber, and untouched geometry is pale blue at 0.12 opacity. At partial percentages, completed segments remain white while the rest of that part is amber. Geometry tests also enforce that every generated vertex stays inside the declared model bounds.
+
+The repository contains no `stage_templates` seed or migration, and this checkout has no database connection to query the live catalog. The mapper covers normalized `Прочее` / `Прочие работы` names and the fallback sort order 8; UI rows display the raw stage name supplied by the project. The exact live template name could not be independently verified from this checkout.
+
 ## Renderer lifecycle
 
 The dev page's **mount/unmount ×20** control was run in headless Chromium. Each unmount samples `renderer.info.memory` and `renderer.info.programs`, calls `dispose()` and `forceContextLoss()`, and checks tracked contexts.

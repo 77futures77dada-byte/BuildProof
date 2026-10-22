@@ -5,6 +5,7 @@ import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js'
 import type { HouseRendererSnapshot, MappedStage } from './types'
 import { HOUSE, HOUSE_BOUNDS, HOUSE_LINES, type HousePart } from './houseGeometry'
+import { HOUSE_COLORS } from './colors'
 import { houseStrings as t } from './strings'
 
 export function HouseModel({ stages, height, interactive = true, initialAngle = 35, onRendererDispose }: { stages: MappedStage[]; height?: number; interactive?: boolean; initialAngle?: number; onRendererDispose?: (snapshot: HouseRendererSnapshot) => void }) {
@@ -42,12 +43,12 @@ export function HouseModel({ stages, height, interactive = true, initialAngle = 
         const material = new THREE.LineBasicMaterial({ color, transparent: opacity < 1, opacity, depthWrite: false }); mats.push(material)
         const object = new THREE.LineSegments(geometry, material); object.userData.key = part; group.add(object)
       }
-      addLines(completePositions, '#ffffff', 1)
-      addLines(workingPositions, '#fbbf24', .72)
-      addLines(ghostPositions, '#7dd3fc', .18)
+      addLines(completePositions, HOUSE_COLORS.ready, 1)
+      addLines(workingPositions, HOUSE_COLORS.working, HOUSE_COLORS.workingOpacity)
+      addLines(ghostPositions, HOUSE_COLORS.ghost, HOUSE_COLORS.ghostOpacity)
       if (completePositions.length) {
         const glowGeometry = new LineSegmentsGeometry(); glowGeometry.setPositions(completePositions); geometries.push(glowGeometry)
-        const material = new LineMaterial({ color: '#ffffff', transparent: true, opacity: .25, linewidth: 3, blending: THREE.AdditiveBlending, depthWrite: false })
+        const material = new LineMaterial({ color: HOUSE_COLORS.glow, transparent: true, opacity: HOUSE_COLORS.readyGlowOpacity, linewidth: HOUSE_COLORS.readyGlowWidth, blending: THREE.AdditiveBlending, depthWrite: false })
         material.resolution.set(root.clientWidth, root.clientHeight); glowMaterials.push(material); mats.push(material)
         const object = new LineSegments2(glowGeometry, material); object.userData.key = part; group.add(object)
       }
@@ -101,7 +102,7 @@ export function HouseModel({ stages, height, interactive = true, initialAngle = 
   const rows = stages.map(s => `${s.name}: ${Math.round(s.percent)}%`)
   return <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm" aria-label={t.title}>
     {!failed ? <div ref={host} className="house3d-canvas w-full" style={height ? { height } : undefined} role="img" aria-label={rows.join(', ')} /> : <p className="p-4 text-sm text-slate-600">{t.fallback}</p>}
-    <div className="space-y-3 p-4"><div className="flex flex-wrap gap-4 text-xs"><span className="text-sky-600">● {t.ready}</span><span className="text-amber-500">● {t.working}</span><span className="text-slate-400">● {t.notStarted}</span></div>
-      {active ? <p role="status">{active}</p> : null}<ul className="grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">{stages.map(s => <li key={s.key} className="flex justify-between gap-2"><span>{s.part === 'other' ? t.other : s.name}</span><span className="tabular-nums">{Math.round(s.percent)}%</span></li>)}</ul></div>
+    <div className="space-y-3 p-4"><div className="flex flex-wrap gap-4 text-xs"><span style={{ color: HOUSE_COLORS.ready, background: '#0b2a4a', padding: '3px 6px', textShadow: `0 0 5px ${HOUSE_COLORS.glow}` }}>━ {t.ready}</span><span style={{ color: HOUSE_COLORS.working }}>━ {t.working}</span><span style={{ color: HOUSE_COLORS.ghost }}>━ {t.notStarted}</span></div>
+      {active ? <p role="status">{active}</p> : null}<ul className="grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">{stages.map(s => <li key={s.key} className="flex justify-between gap-2"><span>{s.name}</span><span className="tabular-nums">{Math.round(s.percent)}%</span></li>)}</ul></div>
   </section>
 }

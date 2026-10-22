@@ -51,4 +51,14 @@ describe('house geometry in meters', () => {
     expect(roof.some(([x,y,z]) => x === -5 && y === 6 && z === 3.5)).toBe(true)
     expect(vertices('electric').every(([x,y,z]) => Math.abs(x) <= 5 && y >= 0 && y <= 6 && Math.abs(z) <= 3.5)).toBe(true)
   })
+
+  it('keeps every generated segment in the declared envelope and avoids detached contour posts', () => {
+    for (const line of HOUSE_LINES) for (const [x,y,z] of line.points) {
+      expect(x).toBeGreaterThanOrEqual(HOUSE_BOUNDS.min[0]); expect(x).toBeLessThanOrEqual(HOUSE_BOUNDS.max[0])
+      expect(y).toBeGreaterThanOrEqual(HOUSE_BOUNDS.min[1]); expect(y).toBeLessThanOrEqual(HOUSE_BOUNDS.max[1])
+      expect(z).toBeGreaterThanOrEqual(HOUSE_BOUNDS.min[2]); expect(z).toBeLessThanOrEqual(HOUSE_BOUNDS.max[2])
+    }
+    const contourPosts = parts('handover').filter(line => line.points.every(([, ,z]) => Math.abs(z) === 3.5) && line.points.every(([,y]) => y === 0 || y === 6))
+    expect(contourPosts.every(line => line.points.every(([x]) => Math.abs(x) === 5))).toBe(true)
+  })
 })
