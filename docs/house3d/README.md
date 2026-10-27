@@ -1,46 +1,37 @@
-# House model browser checks
+# House model: interactive checks
 
-Captured at 390 × 844 CSS pixels in headless Microsoft Edge Chromium 155 with Playwright Core 1.56.1 and SwiftShader (`--use-gl=swiftshader --enable-unsafe-swiftshader`). The `/dev/house-3d` route is included only in dev builds and renders a local fixture without Supabase requests.
+Captured with `node docs/house3d/capture.mjs` against the Vite dev server (`/dev/house-3d`, dev builds only, local fixture, zero Supabase requests). Headless Chromium from the Playwright cache, Playwright Core 1.56.1, WebGL via `--use-gl=angle --use-angle=swiftshader` (renderer reported: *ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero)))*). Fixture: Фундамент 100, Каркас 60, Кровля 30, Окна 50, Электрика 25, Сантехника 50, Отделка 0. Screenshots show only the model section.
 
-## Geometry and screenshots
+## Screenshots (390 × 844 and 1280 × 900)
 
-The wireframe body is 10 × 7 m with 6 m walls, a 10.6 × 0.4 × 7.6 m slab, two 3 m floors, and a gable roof with a 2.8 m ridge rise and 0.5 m eaves. Windows and the centered 1 × 2.1 m door are placed in the wall planes. The 25° camera is fitted to the full envelope and can switch to an end view.
+| File | State |
+| --- | --- |
+| `*-1-default.png` | Nothing selected: one colour per stage; finished parts bright with glow, the rest a ghost of the same colour |
+| `*-2-windows-mid.png` | Окна selected, ~330 ms in: camera turning, other stages dimming, windows growing |
+| `*-3-windows-end.png` | Окна after the transition: windows/door pushed 1.3 m out of their walls, card "окон и дверей: 8 из 17" |
+| `*-4-roof.png` | Кровля: view from above, roof lifted 1.3 m, 30% built from the eaves up |
+| `*-5-electric.png` | Электрика: interior view, 4 of 16 cable runs lit, nothing pulled out |
+| `*-6-all-complete.png` | All seven stages at 100%: white contour glow around the house |
+| `*-7-reduced-motion-windows.png` | System `prefers-reduced-motion: reduce`, Окна selected: dimming and camera applied instantly, no slide-out |
+| `desktop-8-playback.png` | "Проиграть стройку" at 2.6 s: caption shows the current stage |
 
-- `all-zero.png` — every stage is 0%. The body, roof, windows, and door remain visible as faint blueprint lines; the silhouette reads as a two-storey gable house.
-- `mixed-roof-30.png` — foundation 100%, frame 60%, roof 30%, windows 50%, plumbing 50%, other stages 0%. Completed details are white, unfinished details are amber, and untouched geometry stays faint blue.
-- `all-complete.png` — every stage is 100%. The exterior and gable are clear and bright, with static white additive edge glow. The combined interior frame, electrical routes, and finish seams make the completed wireframe intentionally dense.
-- `end-view.png` — all stages 100%, viewed from the gable end. The triangular roof and centered end-wall window are visible; the roof slopes meet the wall top at y=6.
+## Interaction checks (same script)
 
-The new geometry tests check the overall dimensions, window and door bounds and wall planes, window and door sizes, electrical/roof bounds, and roof support points at y=6.
-
-The model and legend share `HOUSE_COLORS`: completed is white with additive glow, in-progress is amber, and untouched geometry is pale blue at 0.12 opacity. At partial percentages, completed segments remain white while the rest of that part is amber. Geometry tests also enforce that every generated vertex stays inside the declared model bounds.
-
-The stage mapper follows the confirmed seven-stage catalogue (sort order 1–7). Unknown stages stay visible by their received name but do not drive any model geometry. Plumbing includes stacked risers, horizontal kitchen/bath branches, and outlet marks on both floors; the visible segment count follows the stage percentage.
+- tap in the middle of the house → Окна selected; tap in an empty corner → selection cleared
+- Enter on a focused list row selects it (`aria-pressed=true`), Enter again deselects, Esc clears
+- playback shows the stage caption; a click anywhere stops it and restores the final state
 
 ## Renderer lifecycle
 
-The dev page's **mount/unmount ×20** control was run in headless Chromium. Each unmount samples `renderer.info.memory` and `renderer.info.programs`, calls `dispose()` and `forceContextLoss()`, and checks tracked contexts.
+20 mount/unmount cycles: every reading `geometries=68, textures=0, programs=5`; 21 contexts created (20 cycles + the initial mount), 0 alive afterwards.
 
-| Cycles | Geometries | Textures | Programs | Live WebGL contexts after unmount |
-| --- | ---: | ---: | ---: | ---: |
-| 1–20 (each cycle) | 9 | 0 | 2 | 0 |
+## Bundle (gzip, `vite build`)
 
-All 20 readings were identical. Twenty context objects were created, none remained live after unmount, and the dev page made zero Supabase requests.
-
-## Production bundle
-
-Vite 8.2.2 with the same lockfile. The clean `main` baseline was measured in a detached worktree. The current feature build keeps Three.js in the separate lazy `HouseModel` chunk.
-
-| Build | Main entry gzip | App shell gzip | Initial path gzip | Main entry change vs `main` |
-| --- | ---: | ---: | ---: | ---: |
-| `main` baseline | 75.02 KB | included | 75.02 KB | — |
-| `codex/house-3d` after geometry fix | 60.75 KB | 17.64 KB | 78.39 KB | −14.27 KB |
-
-The main entry is smaller than baseline. Including the separately loaded app shell, the initial path is +3.37 KB, within the 10 KB limit. The authenticated routes are a separate async chunk (73.28 KB gzip); `HouseModel` and Three.js are also async (130.02 KB gzip). The dev page is absent from production output.
-
-Recreate the screenshots and lifecycle log with the Vite dev server running:
-
-```sh
-npm run dev -- --host 127.0.0.1
-node docs/house3d/capture.mjs
-```
+| Chunk | `codex/house-3d-polish` | this branch | Δ |
+| --- | ---: | ---: | ---: |
+| `index` (entry) | 60.75 KB | 60.75 KB | 0 |
+| `App` | 17.65 KB | 17.65 KB | 0 |
+| `AuthenticatedRoutes` (includes Обзор) | 73.30 KB | 74.50 KB | +1.20 KB |
+| CSS | 6.84 KB | 7.42 KB | +0.58 KB |
+| **Initial path for the Обзор page** | 158.54 KB | 160.32 KB | **+1.78 KB** |
+| `HouseModel` (lazy, Three.js) | 130.26 KB | 134.60 KB | +4.34 KB |
