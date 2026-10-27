@@ -1,110 +1,152 @@
-import { useEffect, useRef, useState } from 'react'
-import * as THREE from 'three'
-import { LineSegments2 } from 'three/addons/lines/LineSegments2.js'
-import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js'
-import { LineMaterial } from 'three/addons/lines/LineMaterial.js'
-import type { HouseRendererSnapshot, MappedStage } from './types'
-import { HOUSE, HOUSE_BOUNDS, HOUSE_LINES, type HousePart } from './houseGeometry'
-import { HOUSE_COLORS } from './colors'
+import { useEffect, useMemo, useReducer, useRef, useState, useSyncExternalStore, type Dispatch } from 'react'
+import { Play } from 'lucide-react'
+import { createHouseScene, type HouseScene } from './houseScene'
+import { STAGE_KIND, buildStageGroups, doneCount } from './stageElements'
+import { initialSelection, selectionReducer, type SelectionAction, type SelectionState } from './selection'
+import { HOUSE_BG, STAGE_COLORS } from './palette'
+import { StageRows } from './StageRows'
+import { StageCard } from './StageCard'
 import { houseStrings as t } from './strings'
+import { STAGE_PARTS, isStagePart, type HouseRendererSnapshot, type MappedStage, type StagePart } from './types'
 
-export function HouseModel({ stages, height, interactive = true, initialAngle = 35, onRendererDispose }: { stages: MappedStage[]; height?: number; interactive?: boolean; initialAngle?: number; onRendererDispose?: (snapshot: HouseRendererSnapshot) => void }) {
+const GROUPS = buildStageGroups()
+
+const REDUCED_QUERY = '(prefers-reduced-motion: reduce)'
+const subscribeReduced = (onChange: () => void) => {
+  const query = window.matchMedia(REDUCED_QUERY)
+  query.addEventListener('change', onChange)
+  return () => query.removeEventListener('change', onChange)
+}
+const usePrefersReducedMotion = () => useSyncExternalStore(subscribeReduced, () => window.matchMedia(REDUCED_QUERY).matches)
+
+interface HouseModelProps {
+  stages: MappedStage[]
+  height?: number
+  /** Drag to rotate and auto-rotation. Picking works either way. */
+  interactive?: boolean
+  initialAngle?: number
+  /** Overrides the system prefers-reduced-motion setting (dev page). */
+  reducedMotion?: boolean
+  /** Lifted selection state, for callers that drive the selection themselves. */
+  selection?: [SelectionState, Dispatch<SelectionAction>]
+  onRendererDispose?: (snapshot: HouseRendererSnapshot) => void
+}
+
+export function HouseModel({ stages, height, interactive = true, initialAngle = 35, reducedMotion, selection, onRendererDispose }: HouseModelProps) {
   const host = useRef<HTMLDivElement>(null)
-  const onRendererDisposeRef = useRef(onRendererDispose)
-  useEffect(() => { onRendererDisposeRef.current = onRendererDispose }, [onRendererDispose])
+  const sceneRef = useRef<HouseScene | null>(null)
+  const ownSelection = useReducer(selectionReducer, initialSelection)
+  const [{ selected }, dispatch] = selection ?? ownSelection
+  const systemReduced = usePrefersReducedMotion()
+  const reduced = reducedMotion ?? systemReduced
   const [failed, setFailed] = useState(false)
-  const [active, setActive] = useState<string | null>(null)
+  const [playingPart, setPlayingPart] = useState<StagePart | null>(null)
+
+  // One stage per model part (first wins), in catalogue order.
+  const modelStages = useMemo(() => {
+    const seen = new Set<StagePart>()
+    return stages.filter(stage => isStagePart(stage.part) && !seen.has(stage.part) && seen.add(stage.part))
+      .sort((a, b) => (a.sortOrder ?? STAGE_PARTS.indexOf(a.part as StagePart) + 1) - (b.sortOrder ?? STAGE_PARTS.indexOf(b.part as StagePart) + 1))
+  }, [stages])
+  const percents = useMemo(() => Object.fromEntries(modelStages.map(stage => [stage.part, stage.percent])) as Partial<Record<StagePart, number>>, [modelStages])
+
+  const live = useRef({ dispatch, onRendererDispose, reduced, percents, selected })
+  useEffect(() => { live.current = { dispatch, onRendererDispose, reduced, percents, selected } })
+
   useEffect(() => {
     const root = host.current
     if (!root) return
-    let renderer: THREE.WebGLRenderer
-    try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'low-power' }) } catch { queueMicrotask(() => setFailed(true)); return }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); renderer.setClearColor('#0b2a4a')
-    root.appendChild(renderer.domElement)
-    const scene = new THREE.Scene(); scene.background = new THREE.Color('#0b2a4a')
-    const camera = new THREE.OrthographicCamera(-8, 8, 8, -8, .1, 100)
-    const group = new THREE.Group(); group.position.y = -HOUSE.centerY; scene.add(group)
-    const mats: THREE.Material[] = []
-    const geometries: THREE.BufferGeometry[] = []
-    const glowMaterials: LineMaterial[] = []
-    const requiredStages: HousePart[] = ['foundation','frame','roof','windows','electric','plumbing','finish']
-    const contourComplete = requiredStages.every(part => stages.some(stage => stage.part === part && stage.percent >= 100))
-    const percent = (part: HousePart) => part === 'handover' ? (contourComplete ? 100 : 0) : stages.find(s => s.part === (part === 'door' ? 'windows' : part))?.percent ?? 0
-    const byPart = new Map<HousePart, typeof HOUSE_LINES[number][]>()
-    for (const item of HOUSE_LINES) byPart.set(item.part, [...(byPart.get(item.part) ?? []), item])
-    for (const [part, entries] of byPart) {
-      const p = percent(part), completePositions: number[] = [], workingPositions: number[] = [], ghostPositions: number[] = []
-      entries.forEach((entry, index) => {
-        const complete = p >= 100 || (p > 0 && index < Math.floor(entries.length * p / 100))
-        const target = complete ? completePositions : p > 0 ? workingPositions : ghostPositions
-        for (const point of entry.points) target.push(...point)
+    let scene: HouseScene
+    try {
+      scene = createHouseScene(root, {
+        interactive, initialAngle, reducedMotion: live.current.reduced,
+        onPick: part => live.current.dispatch(part ? { type: 'toggle', part } : { type: 'clear' }),
+        onPlaybackStage: setPlayingPart,
+        onContextLost: () => setFailed(true),
       })
-      const addLines = (positions: number[], color: string, opacity: number) => {
-        if (!positions.length) return
-        const geometry = new THREE.BufferGeometry(); geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3)); geometries.push(geometry)
-        const material = new THREE.LineBasicMaterial({ color, transparent: opacity < 1, opacity, depthWrite: false }); mats.push(material)
-        const object = new THREE.LineSegments(geometry, material); object.userData.key = part; group.add(object)
-      }
-      addLines(completePositions, HOUSE_COLORS.ready, 1)
-      addLines(workingPositions, HOUSE_COLORS.working, HOUSE_COLORS.workingOpacity)
-      addLines(ghostPositions, HOUSE_COLORS.ghost, HOUSE_COLORS.ghostOpacity)
-      if (completePositions.length) {
-        const glowGeometry = new LineSegmentsGeometry(); glowGeometry.setPositions(completePositions); geometries.push(glowGeometry)
-        const material = new LineMaterial({ color: HOUSE_COLORS.glow, transparent: true, opacity: HOUSE_COLORS.readyGlowOpacity, linewidth: HOUSE_COLORS.readyGlowWidth, blending: THREE.AdditiveBlending, depthWrite: false })
-        material.resolution.set(root.clientWidth, root.clientHeight); glowMaterials.push(material); mats.push(material)
-        const object = new LineSegments2(glowGeometry, material); object.userData.key = part; group.add(object)
-      }
+    } catch {
+      queueMicrotask(() => setFailed(true))
+      return
     }
-    const grid = new THREE.GridHelper(18, 36, '#24516f', '#173e5e'); grid.position.y = -.42 - HOUSE.centerY; scene.add(grid)
-    const aspectFit = (aspect: number) => {
-      const az = THREE.MathUtils.degToRad(initialAngle), el = THREE.MathUtils.degToRad(25)
-      const right = new THREE.Vector3(Math.cos(az), 0, -Math.sin(az))
-      const up = new THREE.Vector3(-Math.sin(az) * Math.sin(el), Math.cos(el), -Math.cos(az) * Math.sin(el))
-      let halfX = 0, halfY = 0
-      for (const x of [HOUSE_BOUNDS.min[0], HOUSE_BOUNDS.max[0]]) for (const y of [HOUSE_BOUNDS.min[1], HOUSE_BOUNDS.max[1]]) for (const z of [HOUSE_BOUNDS.min[2], HOUSE_BOUNDS.max[2]]) {
-        const point = new THREE.Vector3(x, y - HOUSE.centerY, z)
-        halfX = Math.max(halfX, Math.abs(point.dot(right))); halfY = Math.max(halfY, Math.abs(point.dot(up)))
-      }
-      const halfHeight = Math.max(halfY, halfX / aspect) * 1.1
-      camera.left = -halfHeight * aspect; camera.right = halfHeight * aspect; camera.top = halfHeight; camera.bottom = -halfHeight
-      camera.position.set(Math.sin(az) * Math.cos(el) * 20, Math.sin(el) * 20, Math.cos(az) * Math.cos(el) * 20)
-      camera.lookAt(0, 0, 0); camera.updateProjectionMatrix()
-    }
-    let visible = true, pageVisible = !document.hidden, dragging = false, pointerX = 0, resumeAt = 0, raf = 0
-    const resize = () => { const width = root.clientWidth, h = root.clientHeight; renderer.setSize(width, h, false); aspectFit(width / Math.max(h, 1)); glowMaterials.forEach(material => material.resolution.set(width, h)) }
-    resize()
-    const observer = new ResizeObserver(resize); observer.observe(root)
-    const intersection = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting }); intersection.observe(root)
-    const visibility = () => { pageVisible = !document.hidden }; document.addEventListener('visibilitychange', visibility)
-    const down = (e: PointerEvent) => { dragging = true; pointerX = e.clientX; resumeAt = performance.now() + 3000; root.setPointerCapture(e.pointerId) }
-    const raycaster = new THREE.Raycaster(), point = new THREE.Vector2()
-    const inspect = (e: PointerEvent) => {
-      const rect = root.getBoundingClientRect(); point.set(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1)
-      raycaster.setFromCamera(point, camera)
-      const key = raycaster.intersectObjects(group.children, false)[0]?.object.userData.key as string | undefined
-      const stage = stages.find(item => item.part === (key === 'door' ? 'windows' : key))
-      setActive(stage ? `${stage.name}: ${Math.round(stage.percent)}%` : null)
-    }
-    const move = (e: PointerEvent) => { if (dragging && interactive) { group.rotation.y += (e.clientX - pointerX) * .008; pointerX = e.clientX } else inspect(e) }
-    const up = () => { dragging = false; resumeAt = performance.now() + 3000 }
-    const leave = () => setActive(null)
-    root.addEventListener('pointerdown', down); root.addEventListener('pointermove', move); root.addEventListener('pointerup', up); root.addEventListener('pointercancel', up); root.addEventListener('pointerleave', leave); root.addEventListener('click', inspect)
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const draw = (now: number) => { raf = requestAnimationFrame(draw); if (!visible || !pageVisible) return; if (interactive && !dragging && !reduce && now > resumeAt) group.rotation.y += .0012; renderer.render(scene, camera) }
-    raf = requestAnimationFrame(draw)
-    const contextLost = (e: Event) => { e.preventDefault(); setFailed(true) }; renderer.domElement.addEventListener('webglcontextlost', contextLost)
+    scene.setProgress(live.current.percents); scene.select(live.current.selected)
+    sceneRef.current = scene
     return () => {
-      cancelAnimationFrame(raf); observer.disconnect(); intersection.disconnect(); document.removeEventListener('visibilitychange', visibility)
-      root.removeEventListener('pointerdown', down); root.removeEventListener('pointermove', move); root.removeEventListener('pointerup', up); root.removeEventListener('pointercancel', up); root.removeEventListener('pointerleave', leave); root.removeEventListener('click', inspect)
-      renderer.domElement.removeEventListener('webglcontextlost', contextLost)
-      const snapshot = { geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures, programs: renderer.info.programs?.length ?? 0 }
-      geometries.forEach(geometry => geometry.dispose()); mats.forEach(material => material.dispose()); grid.geometry.dispose(); (grid.material as THREE.Material).dispose(); renderer.dispose(); renderer.forceContextLoss(); renderer.domElement.remove(); onRendererDisposeRef.current?.(snapshot)
+      sceneRef.current = null
+      const snapshot = scene.dispose()
+      setPlayingPart(null)
+      live.current.onRendererDispose?.(snapshot)
     }
-  }, [stages, interactive, initialAngle])
-  const rows = stages.map(s => `${s.name}: ${Math.round(s.percent)}%`)
-  return <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm" aria-label={t.title}>
-    {!failed ? <div ref={host} className="house3d-canvas w-full" style={height ? { height } : undefined} role="img" aria-label={rows.join(', ')} /> : <p className="p-4 text-sm text-slate-600">{t.fallback}</p>}
-    <div className="space-y-3 p-4"><div className="flex flex-wrap gap-4 text-xs"><span style={{ color: HOUSE_COLORS.ready, background: '#0b2a4a', padding: '3px 6px', textShadow: `0 0 5px ${HOUSE_COLORS.glow}` }}>━ {t.ready}</span><span style={{ color: HOUSE_COLORS.working }}>━ {t.working}</span><span style={{ color: HOUSE_COLORS.ghost }}>━ {t.notStarted}</span></div>
-      {active ? <p role="status">{active}</p> : null}<ul className="grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">{stages.map(s => <li key={s.key} className="flex justify-between gap-2"><span>{s.name}</span><span className="tabular-nums">{Math.round(s.percent)}%</span></li>)}</ul></div>
+  }, [interactive, initialAngle])
+
+  useEffect(() => { sceneRef.current?.setProgress(percents) }, [percents])
+  useEffect(() => { sceneRef.current?.select(selected) }, [selected])
+  useEffect(() => { sceneRef.current?.setReducedMotion(reduced) }, [reduced])
+
+  // Esc clears the selection and stops playback.
+  useEffect(() => {
+    if (!selected && !playingPart) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      dispatch({ type: 'clear' }); sceneRef.current?.stopPlayback()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [selected, playingPart, dispatch])
+
+  // While playback runs, the first click anywhere only stops it.
+  useEffect(() => {
+    if (!playingPart) return
+    const stop = (event: MouseEvent) => { event.stopPropagation(); event.preventDefault(); sceneRef.current?.stopPlayback() }
+    document.addEventListener('click', stop, true)
+    return () => document.removeEventListener('click', stop, true)
+  }, [playingPart])
+
+  const toggle = (part: StagePart) => dispatch({ type: 'toggle', part })
+  const play = () => { dispatch({ type: 'clear' }); sceneRef.current?.play(modelStages.map(stage => stage.part as StagePart)) }
+
+  const selectedStage = selected ? modelStages.find(stage => stage.part === selected) ?? null : null
+  const counts = selected && selectedStage && STAGE_KIND[selected] === 'count'
+    ? { total: GROUPS[selected].elements.length, done: doneCount(GROUPS[selected].elements.length, selectedStage.percent) }
+    : null
+  const playingStage = playingPart ? modelStages.find(stage => stage.part === playingPart) : null
+  const rows = stages.map(stage => `${stage.name}: ${Math.round(stage.percent)}%`).join(', ')
+
+  return <section aria-label={t.title} className="overflow-hidden rounded-2xl border border-slate-800 text-white shadow-sm" style={{ background: HOUSE_BG }}>
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_17rem]">
+      {!failed
+        ? <div ref={host} className="house3d-canvas w-full" style={height ? { height } : undefined} role="img" aria-label={t.modelLabel(rows)} />
+        : <p className="p-4 text-sm text-slate-300">{t.fallback}</p>}
+      <aside aria-live="polite" className="min-h-24 border-t border-white/10 p-4 lg:border-l lg:border-t-0">
+        {playingStage
+          ? <div className="space-y-1">
+              <p className="text-sm text-slate-300">{t.playing}</p>
+              <p className="text-xl font-semibold" style={{ color: STAGE_COLORS[playingStage.part as StagePart] }}>{playingStage.name}</p>
+              <p className="text-xs text-slate-400">{t.playInterrupt}</p>
+            </div>
+          : <StageCard stage={selectedStage} part={selected} counts={counts}
+              doneStages={modelStages.filter(stage => stage.percent >= 100).length} totalStages={modelStages.length}
+              onClose={() => dispatch({ type: 'clear' })} />}
+      </aside>
+    </div>
+    <div className="space-y-4 border-t border-white/10 p-4">
+      <div role="group" aria-label={t.stageLegend} className="flex flex-wrap gap-1.5">
+        {modelStages.map(stage => <button key={stage.key} type="button" aria-pressed={selected === stage.part} onClick={() => toggle(stage.part as StagePart)}
+          className="inline-flex min-h-8 cursor-pointer items-center gap-1.5 rounded-full border border-white/15 px-2.5 text-xs text-white transition-colors hover:border-white/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white aria-pressed:border-white/60 aria-pressed:bg-white/15">
+          <span className="size-2.5 shrink-0 rounded-full" style={{ background: STAGE_COLORS[stage.part as StagePart] }} aria-hidden />{stage.name}
+        </button>)}
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <ul aria-label={t.stateLegend} className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-300">
+          <li className="flex items-center gap-1.5"><span className="h-0.5 w-5 rounded bg-white shadow-[0_0_6px_1px_rgba(255,255,255,.7)]" aria-hidden />{t.ready} <span className="text-slate-400">({t.readyHint})</span></li>
+          <li className="flex items-center gap-1.5"><span className="flex h-0.5 w-5 overflow-hidden rounded" aria-hidden><span className="w-1/2 bg-white" /><span className="w-1/2 bg-white/15" /></span>{t.working} <span className="text-slate-400">({t.workingHint})</span></li>
+          <li className="flex items-center gap-1.5"><span className="h-0.5 w-5 rounded bg-white/15" aria-hidden />{t.notStarted} <span className="text-slate-400">({t.notStartedHint})</span></li>
+        </ul>
+        {!failed && modelStages.length ? <button type="button" onClick={play} disabled={!!playingPart}
+          className="inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg bg-white/10 px-3 text-sm font-medium text-white hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-default disabled:opacity-60">
+          <Play className="size-4" aria-hidden />{t.play}
+        </button> : null}
+      </div>
+      <StageRows stages={stages} selected={selected} onSelect={toggle} />
+    </div>
   </section>
 }
