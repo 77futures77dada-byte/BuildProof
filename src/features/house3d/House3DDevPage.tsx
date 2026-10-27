@@ -1,8 +1,12 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { HouseModel } from './HouseModel'
 import { stagesToParts } from './stagesToParts'
-import type { HouseRendererSnapshot } from './types'
+import { initialSelection, selectionReducer } from './selection'
+import { STAGE_COLORS } from './palette'
+import { devStrings as d } from './strings'
+import { STAGE_PARTS, type HouseRendererSnapshot } from './types'
 
+// Local fixture: the seven catalogue stages. Names are the real catalogue names, percents come from the sliders.
 const BASE_STAGES = [
   { key: 'foundation', name: 'Фундамент', sortOrder: 1 },
   { key: 'frame', name: 'Каркас', sortOrder: 2 },
@@ -13,12 +17,15 @@ const BASE_STAGES = [
   { key: 'finish', name: 'Отделка', sortOrder: 7 },
 ]
 type TrackedContext = WebGLRenderingContext | WebGL2RenderingContext
+const button = 'rounded-lg px-3 py-2 text-sm'
 
 export default function House3DDevPage() {
-  const [percents, setPercents] = useState<number[]>(BASE_STAGES.map(() => 0))
+  const [percents, setPercents] = useState<number[]>([100, 60, 30, 50, 25, 50, 0])
   const [mounted, setMounted] = useState(true)
   const [running, setRunning] = useState(false)
-  const [angle, setAngle] = useState(35)
+  const [reduced, setReduced] = useState(false)
+  const selection = useReducer(selectionReducer, initialSelection)
+  const [{ selected }, dispatch] = selection
   const [log, setLog] = useState<string[]>([])
   const [contextMetrics, setContextMetrics] = useState({ created: 0, live: 0 })
   const contexts = useRef<TrackedContext[]>([])
@@ -47,22 +54,25 @@ export default function House3DDevPage() {
     }
     setRunning(false)
   }
-  const preset = (values: number[]) => setPercents(values)
   return <main className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
-    <header><p className="text-xs font-semibold uppercase tracking-wider text-sky-700">DEV · Локальная демонстрация</p><h1 className="mt-2 text-2xl font-bold text-slate-900">Проверка модели дома</h1><p className="mt-1 text-sm text-slate-600">Тестовые значения; страница не обращается к Supabase и отсутствует в production-сборке.</p></header>
-    <section className="flex flex-wrap gap-2" aria-label="Наборы процентов">
-      <button data-testid="preset-zero" className="rounded-lg bg-slate-800 px-3 py-2 text-sm text-white" onClick={() => preset(BASE_STAGES.map(() => 0))}>Все этапы 0%</button>
-      <button data-testid="preset-mixed" className="rounded-lg bg-slate-800 px-3 py-2 text-sm text-white" onClick={() => preset([100,60,30,50,0,50,0])}>Смешанный прогресс</button>
-      <button data-testid="preset-complete" className="rounded-lg bg-slate-800 px-3 py-2 text-sm text-white" onClick={() => preset(BASE_STAGES.map(() => 100))}>Все этапы 100%</button>
-      <button data-testid="view-end" className="rounded-lg border border-slate-600 px-3 py-2 text-sm" onClick={() => setAngle(90)}>Вид с торца</button>
-      <button data-testid="view-front" className="rounded-lg border border-slate-600 px-3 py-2 text-sm" onClick={() => setAngle(35)}>Три четверти</button>
+    <header><p className="text-xs font-semibold uppercase tracking-wider text-sky-700">{d.badge}</p><h1 className="mt-2 text-2xl font-bold text-slate-900">{d.title}</h1><p className="mt-1 text-sm text-slate-600">{d.note}</p></header>
+    <section className="flex flex-wrap gap-2" aria-label={d.presets}>
+      <button data-testid="preset-zero" className={`${button} bg-slate-800 text-white`} onClick={() => setPercents(BASE_STAGES.map(() => 0))}>{d.zero}</button>
+      <button data-testid="preset-mixed" className={`${button} bg-slate-800 text-white`} onClick={() => setPercents([100, 60, 30, 50, 25, 50, 0])}>{d.mixed}</button>
+      <button data-testid="preset-complete" className={`${button} bg-slate-800 text-white`} onClick={() => setPercents(BASE_STAGES.map(() => 100))}>{d.complete}</button>
+      <label className={`${button} flex items-center gap-2 border border-slate-400`}><input data-testid="reduced-motion" type="checkbox" checked={reduced} onChange={event => setReduced(event.target.checked)} />{d.reducedMotion}</label>
     </section>
     <section className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-2">
-      {BASE_STAGES.map((stage, index) => <label key={stage.key} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 text-sm"><span>{stage.name}</span><output>{percents[index]}%</output><input className="col-span-2 w-full accent-sky-600" aria-label={`${stage.name} percent`} type="range" min="0" max="100" step="5" value={percents[index]} onChange={event => setPercents(current => current.map((value, i) => i === index ? Number(event.target.value) : value))} /></label>)}
+      {BASE_STAGES.map((stage, index) => <label key={stage.key} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 text-sm"><span>{stage.name}</span><output>{percents[index]}%</output><input className="col-span-2 w-full accent-sky-600" aria-label={d.percentLabel(stage.name)} type="range" min="0" max="100" step="5" value={percents[index]} onChange={event => setPercents(current => current.map((value, i) => i === index ? Number(event.target.value) : value))} /></label>)}
     </section>
-    <section className="space-y-3"><div className="flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">Предпросмотр · {angle === 90 ? 'вид с торца' : 'три четверти'}</h2><button data-testid="cycles" disabled={running} onClick={runCycles} className="rounded-lg border border-sky-700 px-3 py-2 text-sm font-medium text-sky-800 disabled:opacity-50">{running ? 'Идёт проверка…' : 'mount/unmount ×20'}</button></div>
-      <div className="mx-auto max-w-3xl">{mounted ? <HouseModel key="model" stages={stages} height={310} interactive={false} initialAngle={angle} onRendererDispose={snapshot} /> : <p className="rounded-xl bg-slate-100 p-6 text-center text-sm text-slate-600">Модель размонтирована</p>}</div>
+    <section className="flex flex-wrap gap-2" aria-label={d.select}>
+      <button data-testid="select-none" className={`${button} border border-slate-400`} aria-pressed={selected === null} onClick={() => dispatch({ type: 'clear' })}>{d.none}</button>
+      {STAGE_PARTS.map((part, index) => <button key={part} data-testid={`select-${part}`} aria-pressed={selected === part} className={`${button} border border-slate-400 aria-pressed:bg-slate-800 aria-pressed:text-white`} style={{ borderLeft: `4px solid ${STAGE_COLORS[part]}` }}
+        onClick={() => dispatch({ type: 'toggle', part })}>{BASE_STAGES[index].name}</button>)}
     </section>
-    <details className="rounded-lg border border-slate-200 p-3"><summary className="cursor-pointer text-sm font-semibold">Журнал освобождения ресурсов</summary><p className="mt-2 text-xs text-slate-600">Создано context: {contextMetrics.created}; живых: {contextMetrics.live}</p><ol className="mt-2 max-h-72 space-y-1 overflow-auto rounded-lg bg-slate-950 p-3 font-mono text-xs text-green-300">{log.map((entry, index) => <li key={index}>{index + 1}. {entry}</li>)}</ol></details>
+    <section className="space-y-3"><div className="flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">{d.preview}</h2><button data-testid="cycles" disabled={running} onClick={runCycles} className={`${button} border border-sky-700 font-medium text-sky-800 disabled:opacity-50`}>{running ? d.cyclesRunning : d.cycles}</button></div>
+      <div className="mx-auto max-w-4xl">{mounted ? <HouseModel key="model" stages={stages} reducedMotion={reduced || undefined} selection={selection} onRendererDispose={snapshot} /> : <p className="rounded-xl bg-slate-100 p-6 text-center text-sm text-slate-600">{d.unmounted}</p>}</div>
+    </section>
+    <details className="rounded-lg border border-slate-200 p-3"><summary className="cursor-pointer text-sm font-semibold">{d.log}</summary><p className="mt-2 text-xs text-slate-600">{d.contexts(contextMetrics.created, contextMetrics.live)}</p><ol className="mt-2 max-h-72 space-y-1 overflow-auto rounded-lg bg-slate-950 p-3 font-mono text-xs text-green-300">{log.map((entry, index) => <li key={index}>{index + 1}. {entry}</li>)}</ol></details>
   </main>
 }
