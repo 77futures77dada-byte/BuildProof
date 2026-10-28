@@ -2,8 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion'
 import { LOOP_SECONDS, STILL_FRAME, createSiteLoopScene, wrap } from './siteLoopScene'
 import type { SiteLoopScene } from './siteLoopScene'
+import { siteLoopText } from './siteLoopText'
+import type { SiteLoopLang } from './siteLoopText'
 
 interface SiteLoopProps {
+  /** Language of the copy inside the scene; English until the landing gets i18n. */
+  lang?: SiteLoopLang
   className?: string
 }
 
@@ -15,7 +19,8 @@ interface SiteLoopProps {
  * still frame when the user prefers reduced motion. Playback controls exist
  * only in dev builds (`import.meta.env.DEV`), tucked into a collapsed panel.
  */
-export function SiteLoop({ className = '' }: SiteLoopProps) {
+export function SiteLoop({ lang = 'en', className = '' }: SiteLoopProps) {
+  const text = siteLoopText(lang)
   const svgRef = useRef<SVGSVGElement>(null)
   const sceneRef = useRef<SiteLoopScene | null>(null)
   const timeRef = useRef(0)
@@ -43,12 +48,16 @@ export function SiteLoop({ className = '' }: SiteLoopProps) {
   useEffect(() => {
     const svg = svgRef.current
     if (!svg) return
-    const scene = createSiteLoopScene(svg)
+    const scene = createSiteLoopScene(svg, text)
     sceneRef.current = scene
     scene.setWidth(svg.getBoundingClientRect().width)
     scene.render(timeRef.current, 1)
 
-    const resize = new ResizeObserver(([entry]) => scene.setWidth(entry.contentRect.width))
+    // Re-draw on resize so a paused / reduced-motion frame picks up the new card scale.
+    const resize = new ResizeObserver(([entry]) => {
+      scene.setWidth(entry.contentRect.width)
+      scene.render(timeRef.current, 1)
+    })
     resize.observe(svg)
 
     const visibility =
@@ -63,7 +72,7 @@ export function SiteLoop({ className = '' }: SiteLoopProps) {
       scene.destroy()
       sceneRef.current = null
     }
-  }, [])
+  }, [text])
 
   useEffect(() => {
     if (reducedMotion) drawStill(STILL_FRAME)
@@ -93,7 +102,7 @@ export function SiteLoop({ className = '' }: SiteLoopProps) {
           viewBox="0 0 1280 720"
           xmlns="http://www.w3.org/2000/svg"
           role="img"
-          aria-label="Анимация стройплощадки: рабочие в касках носят окна к недостроенному дому, устанавливают три окна, фотографируют результат, и карточка этапа «Окна» показывает 100%."
+          aria-label={text.ariaLabel}
           className="block h-auto w-full"
         >
           <defs>
@@ -149,7 +158,7 @@ export function SiteLoop({ className = '' }: SiteLoopProps) {
             <rect x="38" y="568" width="72" height="42" fill="#17487a" stroke="#7dd3fc" strokeOpacity=".6" />
             <line x1="38" y1="589" x2="110" y2="589" stroke="#7dd3fc" strokeOpacity=".35" />
             <text x="74" y="583" textAnchor="middle" className="t-mono" fontSize="9" fill="#cfe9ff" letterSpacing=".8">
-              ОКНА
+              {text.crate}
             </text>
             <rect x="120" y="596" width="140" height="8" fill="#6d86a3" />
             <line x1="124" y1="548" x2="124" y2="596" stroke="#9fb4c9" strokeWidth="4" />
@@ -195,7 +204,7 @@ export function SiteLoop({ className = '' }: SiteLoopProps) {
 
       {import.meta.env.DEV && (
         <details className="mt-3 font-mono text-xs text-slate-500">
-          <summary className="cursor-pointer select-none">Управление анимацией (dev)</summary>
+          <summary className="cursor-pointer select-none">Animation controls (dev)</summary>
           <div className="mt-2 flex items-center gap-3">
             <button
               type="button"
@@ -211,7 +220,7 @@ export function SiteLoop({ className = '' }: SiteLoopProps) {
               max={LOOP_SECONDS}
               step={0.01}
               defaultValue={0}
-              aria-label="Время анимации"
+              aria-label="Animation time"
               className="min-w-0 flex-1 accent-sky-600"
               onInput={(e) => {
                 setDevPaused(true)

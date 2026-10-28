@@ -6,14 +6,17 @@
  * SVG and exposes a pure `render(t)` for a 15-second seamless loop. It owns
  * no clock — playback, pausing and reduced motion are the component's job.
  *
- * Names, times and percentages shown on the card are example data and are
- * labelled as such inside the scene.
+ * All copy comes in through `text` (see siteLoopText.ts). Names, times and
+ * percentages on the card are example data and are labelled as such.
  */
+
+import type { SiteLoopText } from './siteLoopText'
 
 export const LOOP_SECONDS = 15
 /** Frame shown when motion is reduced: report card at 100%, readiness chip in. */
 export const STILL_FRAME = 12.4
 
+const CARD_TITLE_MIN_PX = 12
 const NS = 'http://www.w3.org/2000/svg'
 const TAU = Math.PI * 2
 
@@ -123,7 +126,7 @@ export interface SiteLoopScene {
 
 const BUILT_LAYERS = ['crane', 'win2', 'openings', 'panesBack', 'actors', 'panes', 'fx', 'ui']
 
-export function createSiteLoopScene(svg: SVGSVGElement): SiteLoopScene {
+export function createSiteLoopScene(svg: SVGSVGElement, text: SiteLoopText): SiteLoopScene {
   const layer = (name: string) => {
     const el = svg.querySelector<SVGGElement>(`[data-layer="${name}"]`)
     if (!el) throw new Error(`SiteLoop: missing layer "${name}"`)
@@ -382,7 +385,7 @@ export function createSiteLoopScene(svg: SVGSVGElement): SiteLoopScene {
   /* ---------- UI overlay: stage strip, report card, chip, bubbles, viewfinder, flash ---------- */
   const STAGE_COLORS = ['#e3cba8', '#ff9f40', '#ff6b6b', '#5eead4', '#fff176', '#60a5fa', '#f0abfc']
   const strip = mk('g', {}, uiG)
-  mk('text', { x: 40, y: 50, class: 't-mono', 'font-size': 12, fill: '#8fb0cf', 'letter-spacing': 1 }, strip).textContent = 'ЭТАП 4 ИЗ 7  ·  ОКНА'
+  mk('text', { x: 40, y: 50, class: 't-mono', 'font-size': 12, fill: '#8fb0cf', 'letter-spacing': 1 }, strip).textContent = text.stage
   const stripFill = STAGE_COLORS.map((c, i) => {
     mk('rect', { x: 40 + i * 42, y: 62, width: 36, height: 9, rx: 2, fill: c, opacity: 0.16 }, strip)
     return mk('rect', { x: 40 + i * 42, y: 62, width: 0, height: 9, rx: 2, fill: c }, strip)
@@ -402,19 +405,19 @@ export function createSiteLoopScene(svg: SVGSVGElement): SiteLoopScene {
   mk('rect', { width: 350, height: 156, rx: 14, fill: '#0d2f50', stroke: '#7dd3fc', 'stroke-opacity': 0.55 }, card)
   mk('circle', { cx: 30, cy: 34, r: 12, fill: '#5eead4' }, card)
   mk('path', { d: 'M24 34 l5 5 l9 -10', stroke: '#0b2a4a', 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, card)
-  mk('text', { x: 52, y: 41, class: 't-sans', 'font-size': 21, 'font-weight': 600, fill: '#e8f4ff' }, card).textContent = 'Окна'
+  mk('text', { x: 52, y: 41, class: 't-sans', 'font-size': 21, 'font-weight': 600, fill: '#e8f4ff' }, card).textContent = text.cardTitle
   const pct = mk('text', { x: 330, y: 46, 'text-anchor': 'end', class: 't-sans', 'font-size': 36, 'font-weight': 600, fill: '#5eead4' }, card)
   mk('rect', { x: 20, y: 64, width: 310, height: 10, rx: 5, fill: '#1c476f' }, card)
   const barFill = mk('rect', { x: 20, y: 64, width: 0, height: 10, rx: 5, fill: '#5eead4' }, card)
   const cardThumbHolder = mk('g', { transform: 'translate(20 92)', opacity: 0 }, card)
   thumbIcon(cardThumbHolder, 46, 34)
-  mk('text', { x: 78, y: 106, class: 't-sans', 'font-size': 14, 'font-weight': 500, fill: '#cfe3f5' }, card).textContent = 'Фото прикреплено'
-  mk('text', { x: 78, y: 124, class: 't-mono', 'font-size': 12, fill: '#8fb0cf' }, card).textContent = 'Иван · 14:32'
-  mk('text', { x: 330, y: 144, 'text-anchor': 'end', class: 't-mono', 'font-size': 10, fill: '#6f93b5', 'letter-spacing': 1.2 }, card).textContent = 'ПРИМЕР ДАННЫХ'
+  mk('text', { x: 78, y: 106, class: 't-sans', 'font-size': 14, 'font-weight': 500, fill: '#cfe3f5' }, card).textContent = text.photoAttached
+  mk('text', { x: 78, y: 124, class: 't-mono', 'font-size': 12, fill: '#8fb0cf' }, card).textContent = `${text.author} · 14:32`
+  mk('text', { x: 330, y: 144, 'text-anchor': 'end', class: 't-mono', 'font-size': 10, fill: '#6f93b5', 'letter-spacing': 1.2 }, card).textContent = text.exampleData
 
   const chip = mk('g', { opacity: 0, filter: shadow }, uiG)
   mk('rect', { width: 350, height: 46, rx: 12, fill: '#0d2f50', stroke: '#7dd3fc', 'stroke-opacity': 0.55 }, chip)
-  mk('text', { x: 18, y: 29, class: 't-sans', 'font-size': 15, fill: '#cfe3f5' }, chip).textContent = 'Общая готовность'
+  mk('text', { x: 18, y: 29, class: 't-sans', 'font-size': 15, fill: '#cfe3f5' }, chip).textContent = text.overall
   const gain = mk('text', { x: 256, y: 29, 'text-anchor': 'end', class: 't-mono', 'font-size': 13, fill: '#5eead4' }, chip)
   gain.textContent = '▲ +6'
   const overall = mk('text', { x: 332, y: 31, 'text-anchor': 'end', class: 't-sans', 'font-size': 20, 'font-weight': 600, fill: '#e8f4ff' }, chip)
@@ -428,21 +431,27 @@ export function createSiteLoopScene(svg: SVGSVGElement): SiteLoopScene {
   mk('rect', { x: 733, y: 494, width: 84, height: 72, rx: 2, stroke: '#ffd23f', 'stroke-width': 2 }, finder)
   const flash = mk('rect', { width: 1280, height: 720, fill: '#fff', opacity: 0 }, uiG)
 
-  function bubble(text: string, w: number) {
+  // Bubble width follows its copy, so every language fits.
+  function bubble(copy: string) {
     const g = mk('g', { opacity: 0 }, uiG)
-    mk('rect', { x: -w / 2, y: -28, width: w, height: 26, rx: 9, fill: '#f4f7fb' }, g)
+    const rect = mk('rect', { y: -28, height: 26, rx: 9, fill: '#f4f7fb' }, g)
     mk('polygon', { points: '-6,-3 6,-3 0,6', fill: '#f4f7fb' }, g)
-    mk('text', { x: 0, y: -10, 'text-anchor': 'middle', class: 't-sans', 'font-size': 13, 'font-weight': 600, fill: '#0b2a4a' }, g).textContent = text
+    const label = mk('text', { x: 0, y: -10, 'text-anchor': 'middle', class: 't-sans', 'font-size': 13, 'font-weight': 600, fill: '#0b2a4a' }, g)
+    label.textContent = copy
+    const w = Math.ceil(label.getComputedTextLength() || copy.length * 7.5) + 24
+    rect.setAttribute('x', String(-w / 2))
+    rect.setAttribute('width', String(w))
     return g
   }
-  const bub1 = bubble('Давай!', 72)
-  const bub2 = bubble('Почти всё!', 100)
+  const bub1 = bubble(text.hurry)
+  const bub2 = bubble(text.almost)
   const sweat = mk('path', { d: 'M0 -4 C3 1 4 3 0 5 C-4 3 -3 1 0 -4Z', fill: '#9fe0ff', opacity: 0 }, uiG)
 
   const clouds = layer('clouds')
   const hook = layer('hook')
 
-  /* narrow screens: enlarge the report card so it stays readable */
+  /* narrow screens: enlarge the report card so its 21-unit title renders at
+     >= CARD_TITLE_MIN_PX on screen (capped so it never covers the whole scene) */
   let S = 1
 
   /* ---------- render ---------- */
@@ -527,7 +536,7 @@ export function createSiteLoopScene(svg: SVGSVGElement): SiteLoopScene {
   return {
     render,
     setWidth(px) {
-      S = px < 640 ? 1.3 : 1
+      if (px > 0) S = clamp(CARD_TITLE_MIN_PX / ((21 * px) / 1280), 1, 2.2)
     },
     destroy() {
       for (const name of BUILT_LAYERS) layer(name).replaceChildren()
