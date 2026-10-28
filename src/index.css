@@ -49,3 +49,11 @@ body {
     transition: none;
   }
 }
+
+/* Landing hero animation (components/SiteLoop.tsx) — SVG text faces */
+.site-loop .t-sans {
+  font-family: inherit;
+}
+.site-loop .t-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
