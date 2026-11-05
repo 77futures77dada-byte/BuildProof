@@ -275,20 +275,6 @@
     "empty": "Ettevõttes pole veel teisi töötajaid.",
     "accessFor": "Ligipääs objektile: {{name}}"
   },
-  "landing": {
-    "heroTitle1": "Teie ehitus.",
-    "heroTitle2": "Teie taskus.",
-    "heroText": "Tellija näeb objekti edenemist reaalajas — iga etapi kohta fotokinnitusega ja probleemide fikseerimisega. Ilma lõputute kõnedeta töödejuhatajale.",
-    "howTitle": "Kuidas see töötab",
-    "step1Title": "Töödejuhataja — objektilt",
-    "step1Text": "Uuendab valmidusprotsenti ja laadib fotod üles otse ehitusplatsilt, telefonist.",
-    "step2Title": "Tellija — reaalajas",
-    "step2Text": "Näeb iga etapi edenemist ja kogu muudatuste ajalugu. Ilma kõnedeta töödejuhatajale.",
-    "step3Title": "Probleemid — faktidena",
-    "step3Text": "Probleem fikseeritakse foto, prioriteedi ja vastutajaga. Mitte „suusõnaliselt“.",
-    "previewTitle": "Nii näeb objekt tellijale välja",
-    "previewText": "Üks ekraan: üldine valmidus, seitsme etapi edenemine ja avatud probleemid."
-  },
   "demo": {
     "badge": "demo",
     "projectName": "Eramu, Viimsi",
@@ -298,5 +284,21 @@
     "activeIssues": "Avatud probleemid",
     "issue1": "Pragu tasanduskihis, 2. korrus",
     "issue2": "Elutoa aknad on tarnimata"
+  },
+  "tariff": {
+    "title": "Plan",
+    "back": "← Sites",
+    "link": "Plan",
+    "lead": "{{price}} € per site per month, + VAT. Workers and clients are free.",
+    "colObjects": "Active sites",
+    "colPrice": "Per month + VAT",
+    "objects_one": "{{count}} site",
+    "objects_other": "{{count}} sites",
+    "capRow": "{{from}} or more (up to {{max}} sites and {{gb}} GB; more by agreement)",
+    "days": "We count calendar days from opening a site to archiving it. Paused days do not count; a partial month is billed by the day (price × days ÷ {{divisor}}).",
+    "trial": "{{days}} days free, no card. After that nothing is charged: the site becomes read-only. Reminder {{reminder}} days before.",
+    "included": "Up to {{managers}} owners and managers, unlimited workers on personal links, a client page, PDF export.",
+    "invoice": "One PDF invoice a month, one line per site. E-arve on request.",
+    "noBilling": "There is no payment in the app yet: this page only shows the plan. Nothing is charged."
   }
 }
