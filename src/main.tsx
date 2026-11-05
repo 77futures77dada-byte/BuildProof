@@ -6,6 +6,10 @@ import './i18n'
 
 const App = lazy(() => import('./App.tsx'))
 
+// On the landing, fetch its chunk alongside App instead of after it (one round
+// trip less before the hero paints). App's own lazy import reuses this request.
+if (window.location.pathname === '/') void import('./features/landing/LandingPage')
+
 const House3DDevPage = import.meta.env.DEV
   ? lazy(() => import('./features/house3d/House3DDevPage'))
   : null
