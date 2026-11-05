@@ -1,22 +1,26 @@
+import { useContext } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useAuth } from '../hooks/useAuth'
+import { AuthContext } from '../hooks/auth-context'
 import { LOCALES, changeLocale, currentLocale } from '../i18n'
 import type { Locale } from '../i18n'
-import { saveProfileLocale } from '../lib/locale'
 
 /**
  * ET / RU / EN segmented control for page headers. The choice is remembered on
  * this device and, when signed in, saved to the user's profile.
+ *
+ * Also rendered on the public landing, which has no <AuthProvider>: auth is
+ * read optionally and the Supabase-backed save is loaded only when needed, so
+ * the landing chunk stays free of the Supabase client.
  */
 export function LanguageSwitcher({ className = '' }: { className?: string }) {
   const { t } = useTranslation()
-  const { user } = useAuth()
+  const user = useContext(AuthContext)?.user ?? null
   const active = currentLocale()
 
   function pick(locale: Locale) {
     if (locale === active) return
     void changeLocale(locale)
-    if (user) void saveProfileLocale(user.id, locale)
+    if (user) void import('../lib/locale').then((m) => m.saveProfileLocale(user.id, locale))
   }
 
   return (
