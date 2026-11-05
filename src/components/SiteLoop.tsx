@@ -15,9 +15,9 @@ interface SiteLoopProps {
  * Landing hero animation: a 15 s seamless loop of a crew installing windows,
  * photographing the result and the report card reaching 100%.
  *
- * Plays on its own, pauses while scrolled out of view and shows a single
- * still frame when the user prefers reduced motion. Playback controls exist
- * only in dev builds (`import.meta.env.DEV`), tucked into a collapsed panel.
+ * Plays on its own and pauses while scrolled out of view. With reduced motion
+ * it starts paused on a single still frame; the Pause / Play button lets
+ * anyone stop or start it, and the scrubber is hidden on screens ≤ 640 px.
  */
 export function SiteLoop({ lang = 'en', className = '' }: SiteLoopProps) {
   const text = siteLoopText(lang)
@@ -29,11 +29,12 @@ export function SiteLoop({ lang = 'en', className = '' }: SiteLoopProps) {
 
   const reducedMotion = usePrefersReducedMotion()
   const [inView, setInView] = useState(true)
-  const [devPaused, setDevPaused] = useState(false)
-  const playing = !reducedMotion && inView && !devPaused
+  // null until the viewer presses Pause / Play or scrubs; until then reduced motion decides.
+  const [pausedByViewer, setPausedByViewer] = useState<boolean | null>(null)
+  const paused = pausedByViewer ?? reducedMotion
+  const playing = inView && !paused
 
-  // Dev-only readout; the refs are never attached in production builds.
-  const syncDevControls = () => {
+  const syncControls = () => {
     if (scrubRef.current) scrubRef.current.value = timeRef.current.toFixed(2)
     if (clockRef.current) clockRef.current.textContent = `${timeRef.current.toFixed(1)} s`
   }
@@ -42,7 +43,7 @@ export function SiteLoop({ lang = 'en', className = '' }: SiteLoopProps) {
   const drawStill = (t: number) => {
     timeRef.current = t
     for (let i = 0; i < 3; i++) sceneRef.current?.render(t, 1)
-    syncDevControls()
+    syncControls()
   }
 
   useEffect(() => {
@@ -75,8 +76,8 @@ export function SiteLoop({ lang = 'en', className = '' }: SiteLoopProps) {
   }, [text])
 
   useEffect(() => {
-    if (reducedMotion) drawStill(STILL_FRAME)
-  }, [reducedMotion])
+    if (reducedMotion && pausedByViewer === null) drawStill(STILL_FRAME)
+  }, [reducedMotion, pausedByViewer])
 
   useEffect(() => {
     if (!playing) return
@@ -87,7 +88,7 @@ export function SiteLoop({ lang = 'en', className = '' }: SiteLoopProps) {
       last = now
       timeRef.current = wrap(timeRef.current + dt)
       sceneRef.current?.render(timeRef.current, 1 - Math.exp(-dt * 16))
-      syncDevControls()
+      syncControls()
       raf = requestAnimationFrame(frame)
     }
     raf = requestAnimationFrame(frame)
@@ -202,37 +203,33 @@ export function SiteLoop({ lang = 'en', className = '' }: SiteLoopProps) {
         </svg>
       </div>
 
-      {import.meta.env.DEV && (
-        <details className="mt-3 font-mono text-xs text-slate-500">
-          <summary className="cursor-pointer select-none">Animation controls (dev)</summary>
-          <div className="mt-2 flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setDevPaused((p) => !p)}
-              className="rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:border-sky-500"
-            >
-              {devPaused ? 'Play' : 'Pause'}
-            </button>
-            <input
-              ref={scrubRef}
-              type="range"
-              min={0}
-              max={LOOP_SECONDS}
-              step={0.01}
-              defaultValue={0}
-              aria-label="Animation time"
-              className="min-w-0 flex-1 accent-sky-600"
-              onInput={(e) => {
-                setDevPaused(true)
-                drawStill(Number(e.currentTarget.value))
-              }}
-            />
-            <output ref={clockRef} className="w-14 text-right text-slate-700">
-              0.0 s
-            </output>
-          </div>
-        </details>
-      )}
+      <div className="mt-3 flex items-center gap-3 font-mono text-sm">
+        <button
+          type="button"
+          onClick={() => setPausedByViewer(!paused)}
+          aria-pressed={paused}
+          className="min-h-12 shrink-0 rounded-lg border-2 border-current px-4 font-medium"
+        >
+          {paused ? text.play : text.pause}
+        </button>
+        <input
+          ref={scrubRef}
+          type="range"
+          min={0}
+          max={LOOP_SECONDS}
+          step={0.01}
+          defaultValue={0}
+          aria-label={text.timeLabel}
+          className="min-h-12 min-w-0 flex-1 accent-current max-[640px]:hidden"
+          onInput={(e) => {
+            setPausedByViewer(true)
+            drawStill(Number(e.currentTarget.value))
+          }}
+        />
+        <output ref={clockRef} className="w-14 text-right max-[640px]:hidden">
+          0.0 s
+        </output>
+      </div>
     </div>
   )
 }
