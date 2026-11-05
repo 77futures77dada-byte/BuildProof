@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Building2, HardHat, LineChart, TriangleAlert } from 'lucide-react'
 import { Reveal } from '../components/Reveal'
 import { DashboardPreview } from '../components/DashboardPreview'
+import { SiteLoop } from '../components/SiteLoop'
 
 const STEPS = [
   {
@@ -71,8 +72,8 @@ export function Landing() {
             </div>
           </div>
 
-          <Reveal className="hidden min-w-0 lg:block lg:justify-self-end">
-            <DashboardPreview />
+          <Reveal className="min-w-0">
+            <SiteLoop />
           </Reveal>
         </div>
       </section>
