@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/check-placeholders.mjs",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "test": "vitest run",
     "test:house3d": "vitest run src/features/house3d/stagesToParts.test.ts",
     "preview": "vite preview"
   },
