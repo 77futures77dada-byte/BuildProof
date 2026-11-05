@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { useIssues } from '../hooks/useIssues'
 import type { IssueItem } from '../hooks/useIssues'
@@ -68,6 +69,7 @@ export function IssuesView({
   canCreate: boolean
   canManage: boolean
 }) {
+  const { t } = useTranslation()
   const [showForm, setShowForm] = useState(false)
   const [resolvedOpen, setResolvedOpen] = useState(false)
 
@@ -81,9 +83,9 @@ export function IssuesView({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-sm font-semibold text-slate-700">Проблемы</h2>
+        <h2 className="text-sm font-semibold text-slate-700">{t('issues.title')}</h2>
         {canCreate && !showForm ? (
-          <Button onClick={() => setShowForm(true)}>Создать замечание</Button>
+          <Button onClick={() => setShowForm(true)}>{t('issues.create')}</Button>
         ) : null}
       </div>
 
@@ -99,12 +101,12 @@ export function IssuesView({
       ) : null}
 
       {loading ? (
-        <Spinner label="Загрузка замечаний…" />
+        <Spinner label={t('issues.loading')} />
       ) : error ? (
         <ErrorMessage message={error} onRetry={reload} />
       ) : issues.length === 0 ? (
         <p className="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm">
-          Замечаний по объекту пока нет.
+          {t('issues.empty')}
         </p>
       ) : (
         <>
@@ -120,7 +122,7 @@ export function IssuesView({
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-500">Активных замечаний нет.</p>
+            <p className="text-sm text-slate-500">{t('issues.noActive')}</p>
           )}
 
           {resolved.length > 0 ? (
@@ -132,7 +134,7 @@ export function IssuesView({
                 className="flex w-full items-center gap-1 px-4 py-3 text-sm font-medium text-slate-600"
               >
                 <span aria-hidden="true">{resolvedOpen ? '▾' : '▸'}</span>
-                Решённые ({resolved.length})
+                {t('issues.resolved', { count: resolved.length })}
               </button>
               {resolvedOpen ? (
                 <ul className="space-y-3 border-t border-slate-100 p-3">

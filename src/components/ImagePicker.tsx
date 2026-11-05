@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from './Button'
 
 interface ImagePickerProps {
@@ -13,6 +14,7 @@ interface ImagePickerProps {
  * issue form. Reset it by remounting (e.g. a changing `key`).
  */
 export function ImagePicker({ onChange, disabled }: ImagePickerProps) {
+  const { t } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null)
   const urlRef = useRef<string | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -54,7 +56,7 @@ export function ImagePicker({ onChange, disabled }: ImagePickerProps) {
           >
             <img
               src={previewUrl}
-              alt="Предпросмотр"
+              alt={t('image.preview')}
               className="max-h-64 w-full rounded-lg bg-slate-100 object-contain"
             />
           </button>
@@ -65,7 +67,7 @@ export function ImagePicker({ onChange, disabled }: ImagePickerProps) {
               disabled={disabled}
               className="text-sky-700 underline underline-offset-2"
             >
-              Заменить
+              {t('image.replace')}
             </button>
             <button
               type="button"
@@ -73,7 +75,7 @@ export function ImagePicker({ onChange, disabled }: ImagePickerProps) {
               disabled={disabled}
               className="text-slate-500 underline underline-offset-2"
             >
-              Убрать
+              {t('image.remove')}
             </button>
           </div>
         </div>
@@ -84,7 +86,7 @@ export function ImagePicker({ onChange, disabled }: ImagePickerProps) {
           disabled={disabled}
           onClick={() => inputRef.current?.click()}
         >
-          Выбрать фото
+          {t('image.choose')}
         </Button>
       )}
     </div>

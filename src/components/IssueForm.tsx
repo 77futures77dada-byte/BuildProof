@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
+import { PHOTO_MAX_EDGE } from '../lib/image'
 import { useAuth } from '../hooks/useAuth'
 import { createIssue } from '../lib/issues'
 import { toErrorMessage } from '../lib/format'
-import { ISSUE_PRIORITY_LABELS } from '../types'
 import type { IssuePriority } from '../types'
 import { Button } from './Button'
 import { TextField } from './TextField'
@@ -19,10 +20,11 @@ interface IssueFormProps {
 const fieldClass =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200'
 
-const PRIORITIES = Object.keys(ISSUE_PRIORITY_LABELS) as IssuePriority[]
+const PRIORITIES: IssuePriority[] = ['low', 'medium', 'high']
 
 export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
   const { user } = useAuth()
+  const { t } = useTranslation()
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -36,11 +38,11 @@ export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!title.trim()) {
-      setError('Укажите заголовок замечания.')
+      setError(t('issues.titleRequired'))
       return
     }
     if (!user) {
-      setError('Сессия не найдена. Войдите заново.')
+      setError(t('common.sessionMissing'))
       return
     }
     setError(null)
@@ -69,36 +71,36 @@ export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
       onSubmit={handleSubmit}
       className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
     >
-      <h2 className="text-base font-semibold text-slate-900">Новое замечание</h2>
+      <h2 className="text-base font-semibold text-slate-900">{t('issues.formHeading')}</h2>
 
       <TextField
-        label="Заголовок"
+        label={t('issues.titleField')}
         required
         value={title}
         disabled={busy}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="Например: трещина в стяжке на 2 этаже"
+        placeholder={t('issues.titlePlaceholder')}
       />
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">Описание</span>
+        <span className="text-sm font-medium text-slate-700">{t('issues.description')}</span>
         <textarea
           value={description}
           disabled={busy}
           onChange={(e) => setDescription(e.target.value)}
           rows={3}
           className={fieldClass}
-          placeholder="Необязательно"
+          placeholder={t('common.optional')}
         />
       </label>
 
       <div className="space-y-1">
-        <span className="text-sm font-medium text-slate-700">Фото</span>
+        <span className="text-sm font-medium text-slate-700">{t('issues.photo')}</span>
         <ImagePicker onChange={setFile} disabled={busy} />
       </div>
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">Приоритет</span>
+        <span className="text-sm font-medium text-slate-700">{t('issues.priority')}</span>
         <select
           value={priority}
           disabled={busy}
@@ -107,22 +109,22 @@ export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
         >
           {PRIORITIES.map((p) => (
             <option key={p} value={p}>
-              {ISSUE_PRIORITY_LABELS[p]}
+              {t(`issuePriority.${p}`)}
             </option>
           ))}
         </select>
       </label>
 
       <TextField
-        label="Ответственный"
+        label={t('issues.responsible')}
         value={responsibleParty}
         disabled={busy}
         onChange={(e) => setResponsibleParty(e.target.value)}
-        placeholder="Свободный текст: подрядчик, бригада, ФИО"
+        placeholder={t('issues.responsiblePlaceholder')}
       />
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">Срок устранения</span>
+        <span className="text-sm font-medium text-slate-700">{t('issues.dueDate')}</span>
         <input
           type="date"
           value={dueDate}
@@ -136,14 +138,14 @@ export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
 
       <div className="flex gap-2">
         <Button type="submit" loading={busy}>
-          Создать замечание
+          {t('issues.create')}
         </Button>
         <Button type="button" variant="secondary" onClick={onCancel} disabled={busy}>
-          Отмена
+          {t('common.cancel')}
         </Button>
       </div>
       <p className="text-xs text-slate-500">
-        Фото уменьшается до 1600px по длинной стороне перед загрузкой.
+        {t('common.photoResizeHint', { size: PHOTO_MAX_EDGE })}
       </p>
     </form>
   )

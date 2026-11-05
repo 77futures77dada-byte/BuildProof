@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
+import { PHOTO_MAX_EDGE } from '../lib/image'
+import { stageLabel } from '../i18n/stageLabel'
 import { useAuth } from '../hooks/useAuth'
 import { useStageOptions } from '../hooks/useStageOptions'
 import { uploadProjectPhoto } from '../lib/photos'
@@ -23,11 +26,12 @@ const selectClass =
 export function PhotoUploadForm({
   projectId,
   fixedStageId,
-  heading = 'Новое фото',
+  heading,
   onUploaded,
   onCancel,
 }: PhotoUploadFormProps) {
   const { user } = useAuth()
+  const { t } = useTranslation()
   const { options, loading: stagesLoading, error: stagesError } = useStageOptions(projectId)
 
   const [file, setFile] = useState<File | null>(null)
@@ -39,16 +43,16 @@ export function PhotoUploadForm({
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!file) {
-      setError('Выберите фото.')
+      setError(t('photos.pickPhoto'))
       return
     }
     const effectiveStageId = fixedStageId ?? stageId
     if (!effectiveStageId) {
-      setError('Выберите этап.')
+      setError(t('photos.pickStage'))
       return
     }
     if (!user) {
-      setError('Сессия не найдена. Войдите заново.')
+      setError(t('common.sessionMissing'))
       return
     }
 
@@ -75,7 +79,7 @@ export function PhotoUploadForm({
       onSubmit={handleSubmit}
       className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
     >
-      <h2 className="text-base font-semibold text-slate-900">{heading}</h2>
+      <h2 className="text-base font-semibold text-slate-900">{heading ?? t('photos.formHeading')}</h2>
 
       <ImagePicker onChange={setFile} disabled={busy} />
 
@@ -83,7 +87,7 @@ export function PhotoUploadForm({
         <>
           <label className="block space-y-1">
             <span className="text-sm font-medium text-slate-700">
-              Этап <span className="text-red-600">*</span>
+              {t('photos.stage')} <span className="text-red-600">*</span>
             </span>
             <select
               required
@@ -93,11 +97,11 @@ export function PhotoUploadForm({
               className={selectClass}
             >
               <option value="" disabled>
-                {stagesLoading ? 'Загрузка этапов…' : 'Выберите этап'}
+                {stagesLoading ? t('photos.loadingStages') : t('photos.chooseStage')}
               </option>
               {options.map((opt) => (
                 <option key={opt.id} value={opt.id}>
-                  {opt.name}
+                  {stageLabel(opt.name)}
                 </option>
               ))}
             </select>
@@ -107,13 +111,13 @@ export function PhotoUploadForm({
       )}
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">Подпись</span>
+        <span className="text-sm font-medium text-slate-700">{t('photos.caption')}</span>
         <input
           type="text"
           value={caption}
           disabled={busy}
           onChange={(e) => setCaption(e.target.value)}
-          placeholder="Необязательно"
+          placeholder={t('common.optional')}
           className={selectClass}
         />
       </label>
@@ -122,14 +126,14 @@ export function PhotoUploadForm({
 
       <div className="flex gap-2">
         <Button type="submit" loading={busy}>
-          {busy ? 'Загрузка…' : 'Загрузить'}
+          {busy ? t('photos.uploading') : t('photos.upload')}
         </Button>
         <Button type="button" variant="secondary" onClick={onCancel} disabled={busy}>
-          Отмена
+          {t('common.cancel')}
         </Button>
       </div>
       <p className="text-xs text-slate-500">
-        Фото уменьшается до 1600px по длинной стороне перед загрузкой.
+        {t('common.photoResizeHint', { size: PHOTO_MAX_EDGE })}
       </p>
     </form>
   )

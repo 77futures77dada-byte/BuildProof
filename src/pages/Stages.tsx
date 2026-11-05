@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { useProjectStages } from '../hooks/useProjectStages'
 import type { EditableStage } from '../hooks/useProjectStages'
@@ -14,13 +15,14 @@ const EDITOR_ROLES = new Set(['gc', 'foreman', 'worker'])
 export function Stages() {
   const { id } = useParams<{ id: string }>()
   const { profile } = useAuth()
+  const { t } = useTranslation()
   const { stages, loading, error, reload, commitPercent, historyToken } =
     useProjectStages(id)
 
   const canEdit = profile ? EDITOR_ROLES.has(profile.role) : false
 
   if (loading) {
-    return <Spinner label="Загрузка этапов…" />
+    return <Spinner label={t('stages.loading')} />
   }
 
   if (error) {
@@ -48,18 +50,19 @@ export function StagesView({
   onCommit: (stageId: string, newPercent: number) => Promise<void>
   historyToken: number
 }) {
+  const { t } = useTranslation()
   return (
     <div className="space-y-4">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-sm font-semibold text-slate-700">Этапы</h2>
+        <h2 className="text-sm font-semibold text-slate-700">{t('stages.title')}</h2>
         {!canEdit ? (
-          <span className="text-xs text-slate-400">Только просмотр</span>
+          <span className="text-xs text-slate-400">{t('stages.readOnly')}</span>
         ) : null}
       </div>
 
       {stages.length === 0 ? (
         <p className="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm">
-          Этапы по объекту ещё не заведены.
+          {t('stages.empty')}
         </p>
       ) : (
         <ul className="space-y-3">

@@ -1,3 +1,4 @@
+import i18n from '../i18n'
 import { supabase } from './supabaseClient'
 import { PHOTOS_BUCKET } from './storage'
 import { resizeImageToJpeg } from './image'
@@ -34,7 +35,9 @@ export async function createIssue(input: NewIssueInput): Promise<void> {
       ;({ blob } = await resizeImageToJpeg(input.file))
     } catch (err) {
       throw new Error(
-        `Не удалось подготовить фото: ${err instanceof Error ? err.message : 'ошибка'}`,
+        i18n.t('issues.preparePhotoFailed', {
+          message: err instanceof Error ? err.message : String(err),
+        }),
       )
     }
 
@@ -43,7 +46,7 @@ export async function createIssue(input: NewIssueInput): Promise<void> {
       .from(PHOTOS_BUCKET)
       .upload(photoPath, blob, { contentType: 'image/jpeg', upsert: false })
     if (uploadError) {
-      throw new Error(`Не удалось загрузить фото: ${uploadError.message}`)
+      throw new Error(i18n.t('issues.uploadPhotoFailed', { message: uploadError.message }))
     }
   }
 
@@ -67,15 +70,13 @@ export async function createIssue(input: NewIssueInput): Promise<void> {
       .remove([photoPath])
     if (cleanupError) {
       throw new Error(
-        `Замечание не сохранено (${dbError.message}). Загруженное фото осталось ` +
-          `в хранилище: ${photoPath}. Сообщите администратору.`,
+        i18n.t('issues.saveFailedOrphan', { message: dbError.message, path: photoPath }),
       )
     }
     throw new Error(
-      `Замечание не сохранено (${dbError.message}). Загруженное фото удалено, ` +
-        `повторите попытку.`,
+      i18n.t('issues.saveFailedCleaned', { message: dbError.message }),
     )
   }
 
-  throw new Error(`Не удалось сохранить замечание: ${dbError.message}`)
+  throw new Error(i18n.t('issues.saveFailed', { message: dbError.message }))
 }

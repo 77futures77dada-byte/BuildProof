@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { isProfileConfigured } from '../lib/profile'
 import { FullPageSpinner } from './Spinner'
@@ -16,6 +17,7 @@ import { ProfileNotConfigured } from '../pages/ProfileNotConfigured'
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { session, profile, loading, error, refreshProfile } = useAuth()
   const location = useLocation()
+  const { t } = useTranslation()
 
   if (loading) return <FullPageSpinner />
 
@@ -27,7 +29,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     return (
       <div className="mx-auto max-w-md p-6">
         <ErrorMessage
-          message={`Не удалось загрузить профиль. ${error}`}
+          message={t('auth.profileLoadFailed', { error })}
           onRetry={() => void refreshProfile()}
         />
       </div>

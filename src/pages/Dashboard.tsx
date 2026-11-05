@@ -1,18 +1,21 @@
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { useAuth } from '../hooks/useAuth'
 import { useProjects } from '../hooks/useProjects'
-import { ROLE_LABELS } from '../types'
 import { isProfileConfigured } from '../lib/profile'
 import { Button } from '../components/Button'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { FullPageSpinner, Spinner } from '../components/Spinner'
 import { CreateProjectForm } from '../components/CreateProjectForm'
 import { ProjectListCard } from '../components/ProjectListCard'
+import { WorkerProjectCard } from '../components/WorkerProjectCard'
 import { ProfileNotConfigured } from './ProfileNotConfigured'
 
 export function Dashboard() {
   const { profile, user, loading: authLoading, signOut } = useAuth()
+  const { t } = useTranslation()
   const { projects, loading, error, reload } = useProjects()
   const navigate = useNavigate()
   const [creating, setCreating] = useState(false)
@@ -24,10 +27,13 @@ export function Dashboard() {
   if (!isProfileConfigured(profile)) return <ProfileNotConfigured />
 
   const isGc = profile.role === 'gc'
+  const isWorker = profile.role === 'worker'
 
-  // Non-GC roles with exactly one accessible project go straight to it.
+  // Non-GC roles with exactly one accessible project go straight to it —
+  // workers to their "Today" screen, so the app opens where they act.
   if (!isGc && !loading && !error && projects.length === 1) {
-    return <Navigate to={`/project/${projects[0].id}`} replace />
+    const target = `/project/${projects[0].id}${isWorker ? '/today' : ''}`
+    return <Navigate to={target} replace />
   }
 
   return (
@@ -37,10 +43,11 @@ export function Dashboard() {
           <span className="text-sm font-semibold text-slate-900">BuildProof</span>
           <div className="flex items-center gap-3">
             <span className="hidden text-xs text-slate-500 sm:inline">
-              {profile.full_name ?? user?.email} · {ROLE_LABELS[profile.role]}
+              {profile.full_name ?? user?.email} · {t(`roles.${profile.role}`)}
             </span>
+            <LanguageSwitcher />
             <Button variant="ghost" onClick={() => void signOut()}>
-              Выйти
+              {t('common.signOut')}
             </Button>
           </div>
         </div>
@@ -48,9 +55,11 @@ export function Dashboard() {
 
       <main className="mx-auto max-w-4xl space-y-4 px-4 py-6">
         <div className="flex items-center justify-between gap-3">
-          <h1 className="text-xl font-semibold text-slate-900">Объекты</h1>
+          <h1 className="text-xl font-semibold text-slate-900">
+            {isWorker ? t('dashboard.pickProject') : t('dashboard.title')}
+          </h1>
           {isGc && !creating ? (
-            <Button onClick={() => setCreating(true)}>Создать объект</Button>
+            <Button onClick={() => setCreating(true)}>{t('dashboard.createProject')}</Button>
           ) : null}
         </div>
 
@@ -68,18 +77,22 @@ export function Dashboard() {
         <ErrorMessage message={error} onRetry={reload} />
 
         {loading ? (
-          <Spinner label="Загрузка объектов…" />
+          <Spinner label={t('dashboard.loading')} />
         ) : projects.length === 0 && !error ? (
           <p className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-500">
             {isGc
-              ? 'Пока нет ни одного объекта. Создайте первый.'
-              : 'Вам ещё не выдан доступ ни к одному объекту.'}
+              ? t('dashboard.emptyGc')
+              : t('dashboard.emptyOther')}
           </p>
         ) : (
           <ul className="space-y-3">
             {projects.map((project) => (
               <li key={project.id}>
-                <ProjectListCard project={project} />
+                {isWorker ? (
+                  <WorkerProjectCard project={project} />
+                ) : (
+                  <ProjectListCard project={project} />
+                )}
               </li>
             ))}
           </ul>

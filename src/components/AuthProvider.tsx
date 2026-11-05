@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
+import { syncProfileLocale } from '../lib/locale'
 import { supabase } from '../lib/supabaseClient'
 import { toErrorMessage } from '../lib/format'
 import type { Profile } from '../types'
@@ -34,6 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return
     }
     setProfile(data as Profile | null)
+    if (data) void syncProfileLocale(userId)
   }, [])
 
   const applySession = useCallback(

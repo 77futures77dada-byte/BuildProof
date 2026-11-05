@@ -1,6 +1,6 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { AccessRow } from '../hooks/useProjectAccessSettings'
-import { ROLE_LABELS } from '../types'
 import { toErrorMessage } from '../lib/format'
 import { Toggle } from './Toggle'
 import { ErrorMessage } from './ErrorMessage'
@@ -11,6 +11,8 @@ interface MemberAccessRowProps {
 }
 
 export function MemberAccessRow({ row, onToggle }: MemberAccessRowProps) {
+  const { t } = useTranslation()
+  const name = row.name || t('common.noName')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -30,14 +32,14 @@ export function MemberAccessRow({ row, onToggle }: MemberAccessRowProps) {
     <li className="space-y-1 px-4 py-3">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-sm text-slate-900">{row.name}</p>
-          <p className="text-xs text-slate-500">{ROLE_LABELS[row.role]}</p>
+          <p className="truncate text-sm text-slate-900">{name}</p>
+          <p className="text-xs text-slate-500">{t(`roles.${row.role}`)}</p>
         </div>
         <Toggle
           checked={row.hasAccess}
           disabled={busy}
           onChange={handle}
-          label={`Доступ к объекту: ${row.name}`}
+          label={t('settings.accessFor', { name })}
         />
       </div>
       <ErrorMessage message={error} />

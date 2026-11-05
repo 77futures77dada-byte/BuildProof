@@ -1,3 +1,4 @@
+import i18n from '../i18n'
 import { supabase } from './supabaseClient'
 
 export interface NewProjectInput {
@@ -31,7 +32,7 @@ export async function createProjectWithStages(
 
   if (error) throw error
   if (typeof data !== 'string') {
-    throw new Error('Не удалось создать объект: сервер не вернул идентификатор.')
+    throw new Error(i18n.t('createProject.noId'))
   }
   return data
 }

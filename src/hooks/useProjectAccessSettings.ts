@@ -63,7 +63,7 @@ export function useProjectAccessSettings(
         .filter((p) => p.id !== excludeUserId)
         .map((p) => ({
           userId: p.id,
-          name: p.full_name ?? 'Без имени',
+          name: p.full_name ?? '',
           role: p.role,
           hasAccess: granted.has(p.id),
         }))

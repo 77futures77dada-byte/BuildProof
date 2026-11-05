@@ -1,9 +1,9 @@
 /**
  * Copy shown inside the SiteLoop hero animation, per language.
  *
- * Kept local to the component: the landing has no i18n yet. Once react-i18next
- * lands (branch claude/i18n), pass the current language to `<SiteLoop lang>`;
- * a language without its own entry falls back to English.
+ * Kept next to the scene rather than in src/i18n/locales: the copy is drawn
+ * into SVG by siteLoopScene.ts. Callers pass the UI language to
+ * `<SiteLoop lang>`; a language without its own entry falls back to English.
  */
 
 export type SiteLoopLang = 'en' | 'ru' | 'et'

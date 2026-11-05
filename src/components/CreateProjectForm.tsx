@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { createProjectWithStages } from '../lib/projects'
 import { toErrorMessage } from '../lib/format'
 import { Button } from './Button'
@@ -13,6 +14,7 @@ interface CreateProjectFormProps {
 }
 
 export function CreateProjectForm({ companyId, onCreated, onCancel }: CreateProjectFormProps) {
+  const { t } = useTranslation()
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
   const [deadline, setDeadline] = useState('')
@@ -22,7 +24,7 @@ export function CreateProjectForm({ companyId, onCreated, onCancel }: CreateProj
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!name.trim()) {
-      setError('Укажите название объекта.')
+      setError(t('createProject.nameRequired'))
       return
     }
     setError(null)
@@ -42,44 +44,44 @@ export function CreateProjectForm({ companyId, onCreated, onCancel }: CreateProj
       onSubmit={handleSubmit}
       className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
     >
-      <h2 className="text-base font-semibold text-slate-900">Новый объект</h2>
+      <h2 className="text-base font-semibold text-slate-900">{t('createProject.heading')}</h2>
 
       <TextField
-        label="Название"
+        label={t('createProject.name')}
         required
         value={name}
         onChange={(e) => setName(e.target.value)}
         disabled={submitting}
-        placeholder="ЖК «Северный», корпус 3"
+        placeholder={t('createProject.namePlaceholder')}
       />
       <TextField
-        label="Адрес"
+        label={t('createProject.address')}
         value={address}
         onChange={(e) => setAddress(e.target.value)}
         disabled={submitting}
-        placeholder="г. Москва, ул. Примерная, 1"
+        placeholder={t('createProject.addressPlaceholder')}
       />
       <TextField
-        label="Дедлайн"
+        label={t('createProject.deadline')}
         type="date"
         value={deadline}
         onChange={(e) => setDeadline(e.target.value)}
         disabled={submitting}
-        hint="Плановая дата завершения объекта"
+        hint={t('createProject.deadlineHint')}
       />
 
       <ErrorMessage message={error} />
 
       <div className="flex gap-2">
         <Button type="submit" loading={submitting}>
-          Создать объект
+          {t('createProject.submit')}
         </Button>
         <Button type="button" variant="secondary" onClick={onCancel} disabled={submitting}>
-          Отмена
+          {t('common.cancel')}
         </Button>
       </div>
       <p className="text-xs text-slate-500">
-        При создании автоматически добавятся 7 этапов с прогрессом 0%.
+        {t('createProject.stagesHint')}
       </p>
     </form>
   )

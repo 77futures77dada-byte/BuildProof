@@ -6,7 +6,7 @@ import { siteLoopText } from './siteLoopText'
 import type { SiteLoopLang } from './siteLoopText'
 
 interface SiteLoopProps {
-  /** Language of the copy inside the scene; English until the landing gets i18n. */
+  /** Language of the copy inside the scene (defaults to English). */
   lang?: SiteLoopLang
   className?: string
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { IssueItem } from '../hooks/useIssues'
-import { ISSUE_PRIORITY_LABELS, ISSUE_STATUS_LABELS } from '../types'
 import type { IssuePriority, IssueStatus } from '../types'
 import { formatDate, toErrorMessage } from '../lib/format'
 import { Button } from './Button'
@@ -31,12 +31,13 @@ const STATUS_BADGE: Record<IssueStatus, string> = {
   resolved: 'bg-green-100 text-green-800',
 }
 
-const NEXT_STATUS: Partial<Record<IssueStatus, { status: IssueStatus; label: string }>> = {
-  open: { status: 'in_progress', label: 'В работу' },
-  in_progress: { status: 'resolved', label: 'Решено' },
+const NEXT_STATUS: Partial<Record<IssueStatus, { status: IssueStatus; labelKey: string }>> = {
+  open: { status: 'in_progress', labelKey: 'issues.toInProgress' },
+  in_progress: { status: 'resolved', labelKey: 'issues.toResolved' },
 }
 
 export function IssueCard({ issue, canManage, onUpdateStatus }: IssueCardProps) {
+  const { t } = useTranslation()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [zoom, setZoom] = useState(false)
@@ -65,7 +66,7 @@ export function IssueCard({ issue, canManage, onUpdateStatus }: IssueCardProps) 
         <span
           className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${PRIORITY_BADGE[issue.priority]}`}
         >
-          {ISSUE_PRIORITY_LABELS[issue.priority]}
+          {t(`issuePriority.${issue.priority}`)}
         </span>
       </div>
 
@@ -85,18 +86,21 @@ export function IssueCard({ issue, canManage, onUpdateStatus }: IssueCardProps) 
       ) : null}
 
       <p className="text-xs text-slate-500">
-        Ответственный: {issue.responsibleParty ?? '—'} · Срок: {formatDate(issue.dueDate)}
+        {t('issues.responsibleDue', {
+          who: issue.responsibleParty ?? t('common.notSet'),
+          date: formatDate(issue.dueDate),
+        })}
       </p>
 
       <div className="flex items-center gap-2">
         <span
           className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[issue.status]}`}
         >
-          {ISSUE_STATUS_LABELS[issue.status]}
+          {t(`issueStatus.${issue.status}`)}
         </span>
         {canManage && next ? (
           <Button loading={busy} onClick={() => void advance()}>
-            {next.label}
+            {t(next.labelKey)}
           </Button>
         ) : null}
       </div>

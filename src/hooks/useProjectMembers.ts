@@ -51,7 +51,7 @@ export function useProjectMembers(projectId: string | undefined): UseProjectMemb
 
       return ((profiles ?? []) as { id: string; full_name: string | null; role: UserRole }[])
         .filter((p) => ASSIGNABLE_ROLES.has(p.role))
-        .map((p) => ({ id: p.id, name: p.full_name ?? 'Без имени', role: p.role }))
+        .map((p) => ({ id: p.id, name: p.full_name ?? '', role: p.role }))
         .sort((a, b) => a.name.localeCompare(b.name))
     }
 
