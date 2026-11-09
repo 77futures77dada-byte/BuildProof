@@ -11,6 +11,7 @@ import { Tasks } from '../pages/Tasks'
 import { Issues } from '../pages/Issues'
 import { Settings } from '../pages/Settings'
 import { NotFound } from '../pages/NotFound'
+import { Tariff } from '../pages/Tariff'
 import { Route, Routes } from 'react-router-dom'
 
 export default function AuthenticatedRoutes() {
@@ -18,6 +19,7 @@ export default function AuthenticatedRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/tariff" element={<ProtectedRoute><Tariff /></ProtectedRoute>} />
       <Route path="/project/:id" element={<ProtectedRoute><ProjectLayout /></ProtectedRoute>}>
         <Route index element={<ProjectHome />} />
         <Route path="today" element={<Today />} />

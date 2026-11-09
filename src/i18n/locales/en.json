@@ -275,20 +275,6 @@
     "empty": "There are no other members in your company yet.",
     "accessFor": "Project access: {{name}}"
   },
-  "landing": {
-    "heroTitle1": "Your build.",
-    "heroTitle2": "In your pocket.",
-    "heroText": "See your project's progress in real time — with photo proof for every stage and a record of every problem. No more endless calls to the foreman.",
-    "howTitle": "How it works",
-    "step1Title": "Foreman — on site",
-    "step1Text": "Updates stage progress and uploads photos straight from the site, from a phone.",
-    "step2Title": "Client — in real time",
-    "step2Text": "Sees the progress of every stage and the full change history. No calls to the foreman.",
-    "step3Title": "Problems — on record",
-    "step3Text": "Every issue is logged with a photo, a priority and who is responsible. Not just “by word of mouth”.",
-    "previewTitle": "What the client sees",
-    "previewText": "One screen: overall progress, all seven stages and open issues."
-  },
   "demo": {
     "badge": "demo",
     "projectName": "Family house, Viimsi",
@@ -298,5 +284,21 @@
     "activeIssues": "Open issues",
     "issue1": "Crack in the screed, floor 2",
     "issue2": "Living-room windows not delivered"
+  },
+  "tariff": {
+    "title": "Plan",
+    "back": "← Sites",
+    "link": "Plan",
+    "lead": "{{price}} € per site per month, + VAT. Workers and clients are free.",
+    "colObjects": "Active sites",
+    "colPrice": "Per month + VAT",
+    "objects_one": "{{count}} site",
+    "objects_other": "{{count}} sites",
+    "capRow": "{{from}} or more (up to {{max}} sites and {{gb}} GB; more by agreement)",
+    "days": "We count calendar days from opening a site to archiving it. Paused days do not count; a partial month is billed by the day (price × days ÷ {{divisor}}).",
+    "trial": "{{days}} days free, no card. After that nothing is charged: the site becomes read-only. Reminder {{reminder}} days before.",
+    "included": "Up to {{managers}} owners and managers, unlimited workers on personal links, a client page, PDF export.",
+    "invoice": "One PDF invoice a month, one line per site. E-arve on request.",
+    "noBilling": "There is no payment in the app yet: this page only shows the plan. Nothing is charged."
   }
 }

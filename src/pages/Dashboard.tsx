@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { useAuth } from '../hooks/useAuth'
@@ -45,6 +45,11 @@ export function Dashboard() {
             <span className="hidden text-xs text-slate-500 sm:inline">
               {profile.full_name ?? user?.email} · {t(`roles.${profile.role}`)}
             </span>
+            {isGc ? (
+              <Link to="/tariff" className="text-sm font-medium text-sky-700 underline underline-offset-2">
+                {t('tariff.link')}
+              </Link>
+            ) : null}
             <LanguageSwitcher />
             <Button variant="ghost" onClick={() => void signOut()}>
               {t('common.signOut')}

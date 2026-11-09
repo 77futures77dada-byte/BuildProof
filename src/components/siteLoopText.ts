@@ -3,7 +3,7 @@
  *
  * Kept next to the scene rather than in src/i18n/locales: the copy is drawn
  * into SVG by siteLoopScene.ts. Callers pass the UI language to
- * `<SiteLoop lang>`; a language without its own entry falls back to English.
+ * `<SiteLoop lang>`.
  */
 
 export type SiteLoopLang = 'en' | 'ru' | 'et'
@@ -26,6 +26,10 @@ export interface SiteLoopText {
   /** Foreman's speech bubbles. */
   hurry: string
   almost: string
+  /** Playback button and scrubber (the scrubber is hidden on narrow screens). */
+  pause: string
+  play: string
+  timeLabel: string
 }
 
 const en: SiteLoopText = {
@@ -34,30 +38,37 @@ const en: SiteLoopText = {
   crate: 'WINDOWS',
   stage: 'STAGE 4 OF 7  ·  WINDOWS',
   cardTitle: 'Windows',
-  photoAttached: 'Photo attached',
-  author: 'John',
-  exampleData: 'EXAMPLE DATA',
+  photoAttached: 'Photo attached · awaiting review',
+  author: 'Jaan',
+  exampleData: 'EXAMPLE',
   overall: 'Overall readiness',
   hurry: 'Come on!',
   almost: 'Almost there!',
+  pause: 'Pause',
+  play: 'Play',
+  timeLabel: 'Animation time',
 }
 
-// TODO: Estonian (et) copy.
-export const SITE_LOOP_TEXT: Partial<Record<SiteLoopLang, SiteLoopText>> = {
+export const SITE_LOOP_TEXT: Record<SiteLoopLang, SiteLoopText> = {
   en,
   ru: {
     ariaLabel:
-      'Анимация стройплощадки: рабочие в жёлтых и белых касках носят окна к недостроенному дому, устанавливают три окна, фотографируют результат, и карточка этапа «Окна» показывает 100%.',
+      'Анимация стройки: рабочие в жёлтых и белых касках устанавливают три окна, фотографируют результат, и карточка отчёта показывает этап «Окна» на 100%, ждёт проверки.',
     crate: 'ОКНА',
     stage: 'ЭТАП 4 ИЗ 7  ·  ОКНА',
     cardTitle: 'Окна',
-    photoAttached: 'Фото прикреплено',
-    author: 'Иван',
-    exampleData: 'ПРИМЕР ДАННЫХ',
+    photoAttached: 'Фото приложено · ждёт проверки',
+    author: 'Яан',
+    exampleData: 'ПРИМЕР',
     overall: 'Общая готовность',
     hurry: 'Давай!',
-    almost: 'Почти всё!',
+    almost: 'Почти!',
+    pause: 'Пауза',
+    play: 'Пуск',
+    timeLabel: 'Время анимации',
   },
+  // TODO native ET review: English placeholder until a native speaker writes the Estonian copy.
+  et: en,
 }
 
-export const siteLoopText = (lang: SiteLoopLang): SiteLoopText => SITE_LOOP_TEXT[lang] ?? en
+export const siteLoopText = (lang: SiteLoopLang): SiteLoopText => SITE_LOOP_TEXT[lang]
