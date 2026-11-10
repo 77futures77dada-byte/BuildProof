@@ -16,7 +16,6 @@
     "noCompany": "Your profile has no company assigned. Please contact your administrator.",
     "noPreview": "no preview",
     "projectPhoto": "Site photo",
-    "photoResizeHint": "Photos are scaled down to {{size}}px on the long side before upload.",
     "due": "Due: {{date}}"
   },
   "language": {
@@ -223,11 +222,10 @@
     "uploading": "Uploading…",
     "pickPhoto": "Choose a photo.",
     "pickStage": "Choose a stage.",
-    "prepareFailed": "Could not prepare the image.",
-    "uploadFailed": "Could not upload the file: {{message}}",
-    "dbFailedCleaned": "The file was uploaded but the database record was not created ({{message}}). The uploaded file was removed from storage; please try again.",
-    "dbFailedOrphan": "The file was uploaded but the database record was not created ({{message}}). The uploaded file could not be removed automatically and remains in storage: {{path}}. Please tell your administrator.",
-    "linksFailed": "Could not get photo links:"
+    "prepareFailed": "Could not open the photo. Try another one.",
+    "uploadFailed": "Could not send the photo. Check the connection and try again.",
+    "linksFailed": "Could not get photo links:",
+    "saveFailed": "Could not save the photo. Please try again."
   },
   "image": {
     "notImage": "The selected file is not an image.",
@@ -249,8 +247,8 @@
     "toInProgress": "Start work",
     "toResolved": "Mark resolved",
     "responsibleDue": "Responsible: {{who}} · Due: {{date}}",
-    "formHeading": "New issue",
-    "titleField": "Title",
+    "formHeading": "Report an issue",
+    "titleField": "What happened",
     "titlePlaceholder": "e.g. crack in the screed on floor 2",
     "description": "Description",
     "photo": "Photo",
@@ -258,12 +256,15 @@
     "responsible": "Responsible",
     "responsiblePlaceholder": "Free text: subcontractor, crew, name",
     "dueDate": "Fix by",
-    "titleRequired": "Enter an issue title.",
-    "preparePhotoFailed": "Could not prepare the photo: {{message}}",
-    "uploadPhotoFailed": "Could not upload the photo: {{message}}",
-    "saveFailedOrphan": "The issue was not saved ({{message}}). The uploaded photo remains in storage: {{path}}. Please tell your administrator.",
-    "saveFailedCleaned": "The issue was not saved ({{message}}). The uploaded photo was removed; please try again.",
-    "saveFailed": "Could not save the issue: {{message}}"
+    "titleRequired": "Write in one line what happened.",
+    "preparePhotoFailed": "Could not open the photo. Try another one.",
+    "uploadPhotoFailed": "Could not send the photo. Check the connection and try again.",
+    "saveFailed": "Could not send. Check the connection and try again.",
+    "urgency": "How urgent",
+    "urgent": "Urgent",
+    "notUrgent": "Not urgent",
+    "more": "More",
+    "submit": "Send"
   },
   "stages": {
     "title": "Stages",

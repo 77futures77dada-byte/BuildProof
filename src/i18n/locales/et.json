@@ -16,7 +16,6 @@
     "noCompany": "Teie profiilil pole ettevõtet määratud. Pöörduge administraatori poole.",
     "noPreview": "eelvaade puudub",
     "projectPhoto": "Objekti foto",
-    "photoResizeHint": "Enne üleslaadimist vähendatakse foto pikem külg {{size}} pikslini.",
     "due": "Tähtaeg: {{date}}"
   },
   "language": {
@@ -223,11 +222,10 @@
     "uploading": "Üleslaadimine…",
     "pickPhoto": "Valige foto.",
     "pickStage": "Valige etapp.",
-    "prepareFailed": "Pildi ettevalmistamine ebaõnnestus.",
-    "uploadFailed": "Faili üleslaadimine ebaõnnestus: {{message}}",
-    "dbFailedCleaned": "Fail laaditi üles, kuid andmebaasi kirjet ei loodud ({{message}}). Üleslaaditud fail kustutati hoidlast, proovige uuesti.",
-    "dbFailedOrphan": "Fail laaditi üles, kuid andmebaasi kirjet ei loodud ({{message}}). Üleslaaditud faili ei õnnestunud automaatselt kustutada — see jäi hoidlasse: {{path}}. Teavitage administraatorit.",
-    "linksFailed": "Fotode linkide saamine ebaõnnestus:"
+    "prepareFailed": "Fotot ei õnnestunud avada. Proovige teist.",
+    "uploadFailed": "Fotot ei õnnestunud saata. Kontrollige ühendust ja proovige uuesti.",
+    "linksFailed": "Fotode linkide saamine ebaõnnestus:",
+    "saveFailed": "Fotot ei õnnestunud salvestada. Proovige uuesti."
   },
   "image": {
     "notImage": "Valitud fail ei ole pilt.",
@@ -241,7 +239,7 @@
   },
   "issues": {
     "title": "Probleemid",
-    "create": "Lisa probleem",
+    "create": "Teata probleemist",
     "loading": "Probleemide laadimine…",
     "empty": "Objektil pole veel probleeme registreeritud.",
     "noActive": "Avatud probleeme pole.",
@@ -249,8 +247,8 @@
     "toInProgress": "Võta töösse",
     "toResolved": "Märgi lahendatuks",
     "responsibleDue": "Vastutaja: {{who}} · Tähtaeg: {{date}}",
-    "formHeading": "Uus probleem",
-    "titleField": "Pealkiri",
+    "formHeading": "Teata probleemist",
+    "titleField": "Mis juhtus",
     "titlePlaceholder": "Näiteks: pragu tasanduskihis 2. korrusel",
     "description": "Kirjeldus",
     "photo": "Foto",
@@ -258,12 +256,15 @@
     "responsible": "Vastutaja",
     "responsiblePlaceholder": "Vaba tekst: alltöövõtja, brigaad, nimi",
     "dueDate": "Kõrvaldamise tähtaeg",
-    "titleRequired": "Sisestage probleemi pealkiri.",
-    "preparePhotoFailed": "Foto ettevalmistamine ebaõnnestus: {{message}}",
-    "uploadPhotoFailed": "Foto üleslaadimine ebaõnnestus: {{message}}",
-    "saveFailedOrphan": "Probleemi ei salvestatud ({{message}}). Üleslaaditud foto jäi hoidlasse: {{path}}. Teavitage administraatorit.",
-    "saveFailedCleaned": "Probleemi ei salvestatud ({{message}}). Üleslaaditud foto kustutati, proovige uuesti.",
-    "saveFailed": "Probleemi salvestamine ebaõnnestus: {{message}}"
+    "titleRequired": "Kirjutage ühe reaga, mis juhtus.",
+    "preparePhotoFailed": "Fotot ei õnnestunud avada. Proovige teist.",
+    "uploadPhotoFailed": "Fotot ei õnnestunud saata. Kontrollige ühendust ja proovige uuesti.",
+    "saveFailed": "Saatmine ei õnnestunud. Kontrollige ühendust ja proovige uuesti.",
+    "urgency": "Kui kiire",
+    "urgent": "Kiire",
+    "notUrgent": "Pole kiire",
+    "more": "Veel",
+    "submit": "Saada"
   },
   "stages": {
     "title": "Etapid",

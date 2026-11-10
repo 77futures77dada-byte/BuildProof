@@ -34,11 +34,8 @@ export async function createIssue(input: NewIssueInput): Promise<void> {
     try {
       ;({ blob } = await resizeImageToJpeg(input.file))
     } catch (err) {
-      throw new Error(
-        i18n.t('issues.preparePhotoFailed', {
-          message: err instanceof Error ? err.message : String(err),
-        }),
-      )
+      console.warn('issue photo resize failed:', err)
+      throw new Error(i18n.t('issues.preparePhotoFailed'))
     }
 
     photoPath = buildIssuePhotoPath(input.projectId, input.file.name)
@@ -46,7 +43,8 @@ export async function createIssue(input: NewIssueInput): Promise<void> {
       .from(PHOTOS_BUCKET)
       .upload(photoPath, blob, { contentType: 'image/jpeg', upsert: false })
     if (uploadError) {
-      throw new Error(i18n.t('issues.uploadPhotoFailed', { message: uploadError.message }))
+      console.warn('issue photo upload failed:', uploadError)
+      throw new Error(i18n.t('issues.uploadPhotoFailed'))
     }
   }
 
@@ -64,19 +62,15 @@ export async function createIssue(input: NewIssueInput): Promise<void> {
 
   if (!dbError) return
 
+  // Technical details (server message, orphaned storage path) go to the
+  // console for support; the person on site gets one plain sentence.
+  console.warn('issue insert failed:', dbError)
   if (photoPath) {
     const { error: cleanupError } = await supabase.storage
       .from(PHOTOS_BUCKET)
       .remove([photoPath])
-    if (cleanupError) {
-      throw new Error(
-        i18n.t('issues.saveFailedOrphan', { message: dbError.message, path: photoPath }),
-      )
-    }
-    throw new Error(
-      i18n.t('issues.saveFailedCleaned', { message: dbError.message }),
-    )
+    if (cleanupError) console.warn('orphaned issue photo left in storage:', photoPath, cleanupError)
   }
 
-  throw new Error(i18n.t('issues.saveFailed', { message: dbError.message }))
+  throw new Error(i18n.t('issues.saveFailed'))
 }

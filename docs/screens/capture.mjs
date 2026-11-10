@@ -208,19 +208,26 @@ const SCREENS = [
   ['09-tariff', '/tariff', 'gc'],
   ['10-worker-today', '/project/p1/today', 'w1'],
 ]
-for (const [name, path, as] of SCREENS) {
-  for (const [suffix, width, height] of [['390x844', 390, 844], ['1440x900', 1440, 900]]) {
-    const page = await open(path, { as, width, height })
-    await checks(page, `${name} ${suffix}`)
-    await page.screenshot({ path: `${outDir}${name}-${suffix}.png`, fullPage: true })
-    await page.context().close()
+// SET=worker PREFIX=before- → only the worker's phone screens, as worker/<prefix><name>.png
+const WORKER_ONLY = process.env.SET === 'worker'
+const PREFIX = process.env.PREFIX ?? ''
+const workerDir = `${outDir}worker/`
+
+if (!WORKER_ONLY) {
+  for (const [name, path, as] of SCREENS) {
+    for (const [suffix, width, height] of [['390x844', 390, 844], ['1440x900', 1440, 900]]) {
+      const page = await open(path, { as, width, height })
+      await checks(page, `${name} ${suffix}`)
+      await page.screenshot({ path: `${outDir}${name}-${suffix}.png`, fullPage: true })
+      await page.context().close()
+    }
   }
 }
 
-// Phone: a worker raises an issue with a photo on the Issues screen.
-{
-  const page = await open('/project/p1/issues', { as: 'w1', width: 390, height: 844 })
-  const add = page.getByRole('button', { name: /проблем|замечани/i }).first()
+/** Opens a form by its button, attaches a photo, screenshots it. */
+async function workerForm(path, button, name) {
+  const page = await open(path, { as: 'w1', width: 390, height: 844 })
+  const add = page.getByRole('button', { name: button }).first()
   if (await add.count()) {
     await add.click()
     await page.waitForTimeout(300)
@@ -228,12 +235,25 @@ for (const [name, path, as] of SCREENS) {
     if (await file.count()) {
       await file.setInputFiles({ name: 'site.svg', mimeType: 'image/svg+xml', buffer: Buffer.from(PHOTO_SVG) })
       await page.waitForTimeout(400)
-    } else problems.push('issue form: no photo input')
-    await checks(page, '11-issue-form 390x844')
-    await page.screenshot({ path: `${outDir}11-worker-issue-form-390x844.png`, fullPage: true })
-  } else problems.push('issues screen (worker): no «create issue» button found')
+    } else problems.push(`${name}: no photo input`)
+    await checks(page, `${name} 390x844`)
+    await page.screenshot({ path: WORKER_ONLY ? `${workerDir}${PREFIX}${name}.png` : `${outDir}${name}-390x844.png`, fullPage: true })
+  } else problems.push(`${name}: button ${button} not found`)
   await page.context().close()
 }
+
+if (WORKER_ONLY) {
+  for (const [name, path] of [['today', '/project/p1/today'], ['stages', '/project/p1/stages'], ['photos', '/project/p1/photos'], ['issues', '/project/p1/issues']]) {
+    const page = await open(path, { as: 'w1', width: 390, height: 844 })
+    await checks(page, `worker ${name}`)
+    await page.screenshot({ path: `${workerDir}${PREFIX}${name}.png`, fullPage: true })
+    await page.context().close()
+  }
+  // «Завершить» on a task opens the photo form a worker sees most.
+  await workerForm('/project/p1/today', /завершить/i, 'task-photo-form')
+}
+// Phone: a worker raises an issue with a photo on the Issues screen.
+await workerForm('/project/p1/issues', /проблем|замечани/i, WORKER_ONLY ? 'issue-form' : '11-worker-issue-form')
 
 console.log(`page errors: ${errors.length ? errors.join(' | ') : 'none'}`)
 console.log(problems.length ? `PROBLEMS:\n- ${problems.join('\n- ')}` : 'all checks passed')
