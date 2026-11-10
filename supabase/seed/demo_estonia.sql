@@ -1,6 +1,8 @@
 -- Demo seed for the company attached to artjomsamokater@gmail.com.
 -- Run the whole file in Supabase SQL Editor after migrations 000–005.
 -- This file only removes the named legacy demo objects inside that one company.
+begin;
+
 do $$
 declare
   v_owner_id uuid;
@@ -140,6 +142,8 @@ begin
   end loop;
 end;
 $$;
+
+commit;
 
 -- Verification output: expected rows are the three Estonia projects, with
 -- readiness rounded from the seven stage percentages and one open issue on Võru.

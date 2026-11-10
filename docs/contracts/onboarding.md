@@ -12,7 +12,7 @@ The landing form creates an account with `supabase.auth.signUp({ email, password
 create_company_and_profile(
   p_company_name text,      -- may be null: default to the e-mail domain or «Моя компания»
   p_full_name    text,      -- may be null
-  p_locale       text       -- 'et' | 'ru' | 'en', written to profiles.locale
+  p_locale       text       -- optional; defaults to 'ru'; 'et' | 'ru' | 'en', written to profiles.locale
 ) returns uuid              -- the new companies.id
 ```
 

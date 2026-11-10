@@ -1,3 +1,5 @@
+begin;
+
 -- C1: close cross-tenant writes and restrict direct stage mutation.
 revoke update on public.profiles from authenticated, anon;
 grant update (full_name) on public.profiles to authenticated;
@@ -127,3 +129,12 @@ exception when duplicate_object then null; end $$;
 grant update (locale) on public.profiles to authenticated;
 
 notify pgrst, 'reload schema';
+
+commit;
+
+select count(*) filter (where c.relrowsecurity) as tables_with_rls,
+       count(*) filter (where not c.relrowsecurity) as public_tables_missing_rls,
+       has_column_privilege('authenticated', 'public.profiles', 'role', 'UPDATE') as authenticated_can_update_role
+from pg_class c
+join pg_namespace n on n.oid = c.relnamespace
+where n.nspname = 'public' and c.relkind in ('r', 'p');

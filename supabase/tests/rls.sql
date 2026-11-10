@@ -1,7 +1,38 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(28);
+select plan(33);
+select is(
+  (select bool_and(c.relrowsecurity)
+   from pg_class c join pg_namespace n on n.oid=c.relnamespace
+   where n.nspname='public' and c.relkind in ('r','p')),
+  true,
+  'baseline and hardening migrations keep RLS enabled on public tables'
+);
+select is(
+  (select c.relrowsecurity from pg_class c where c.oid='public.invite_log'::regclass),
+  true,
+  'invite migration enables RLS on invite_log'
+);
+select is(
+  has_function_privilege('service_role','public.reserve_company_invite(uuid,uuid,text)','EXECUTE')
+  and not has_function_privilege('anon','public.reserve_company_invite(uuid,uuid,text)','EXECUTE')
+  and not has_function_privilege('authenticated','public.reserve_company_invite(uuid,uuid,text)','EXECUTE'),
+  true,
+  'invite reservation is executable only by the server service role'
+);
+select is(
+  (select p.prosecdef and 'search_path=public'=any(p.proconfig)
+   from pg_proc p where p.oid='public.create_project_with_stages(uuid,text,text,date,numeric)'::regprocedure),
+  true,
+  'project creation RPC is SECURITY DEFINER with a fixed search path'
+);
+select is(
+  (select p.prosecdef and 'search_path=public'=any(p.proconfig)
+   from pg_proc p where p.oid='public.create_company_and_profile(text,text)'::regprocedure),
+  true,
+  'onboarding RPC is SECURITY DEFINER with a fixed search path'
+);
 select is(
   has_function_privilege('anon','public.create_project_with_stages(uuid,text,text,date,numeric)','EXECUTE'),
   false,
