@@ -85,22 +85,30 @@ select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000004'
 select lives_ok($$select public.update_stage_progress('50000000-0000-4000-8000-000000000001',5)$$,'foreman can update stage through RPC');
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000005',true);
 select is(
-  (select c.name from public.companies c
-   where c.id=public.create_company_and_profile('Recovered Company','Recovered Owner')),
+  (with created as materialized (
+     select public.create_company_and_profile('Recovered Company','Recovered Owner') as id
+   )
+   select c.name from public.companies c join created on c.id=created.id),
   'Recovered Company'::text,
   'onboarding RPC creates a company and profile for an existing auth user'
 );
 select is(
-  public.create_company_and_profile('Ignored Retry Name','Ignored Retry Name'),
-  (select company_id from public.profiles where id=auth.uid()),
+  (with retry as materialized (
+     select public.create_company_and_profile('Ignored Retry Name','Ignored Retry Name') as company_id
+   )
+   select retry.company_id = p.company_id
+   from retry join public.profiles p on p.id=auth.uid()),
+  true,
   'onboarding RPC retry returns the same company without creating a duplicate'
 );
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',true);
 select is((select count(*) from public.projects where id='40000000-0000-4000-8000-000000000002'),0::bigint,'gc cannot read another tenant project');
 select throws_ok($$insert into public.project_access(project_id,user_id) values ('40000000-0000-4000-8000-000000000002','20000000-0000-4000-8000-000000000001')$$,'42501',null,'gc cannot grant another tenant access');
 select is(
-  (select count(*) from public.project_stages ps
-   where ps.project_id=public.create_project_with_stages('30000000-0000-4000-8000-000000000001','RPC project')),
+  (with created as materialized (
+     select public.create_project_with_stages('30000000-0000-4000-8000-000000000001','RPC project') as id
+   )
+   select count(*) from public.project_stages ps join created on ps.project_id=created.id),
   7::bigint,
   'company owner creates a project with all stages through the RPC'
 );
