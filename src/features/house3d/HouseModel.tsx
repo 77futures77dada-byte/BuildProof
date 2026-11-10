@@ -111,7 +111,7 @@ export function HouseModel({ stages, height, interactive = true, initialAngle = 
   const playingStage = playingPart ? modelStages.find(stage => stage.part === playingPart) : null
   const rows = stages.map(stage => `${stage.name}: ${Math.round(stage.percent)}%`).join(', ')
 
-  return <section aria-label={t.title} className="overflow-hidden rounded-2xl border border-slate-800 text-white shadow-sm" style={{ background: HOUSE_BG }}>
+  return <section aria-label={t.title} className="bp-native overflow-hidden rounded-2xl border border-slate-800 text-white shadow-sm" style={{ background: HOUSE_BG }}>
     <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_17rem]">
       {!failed
         ? <div ref={host} className="house3d-canvas w-full" style={height ? { height } : undefined} role="img" aria-label={t.modelLabel(rows)} />

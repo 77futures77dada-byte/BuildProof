@@ -53,7 +53,7 @@ export function ReportStatusBadge({
               : t('reportStatus.none')
 
   return (
-    <span className={`inline-flex min-w-0 items-center gap-1.5 text-xs ${TONE_TEXT[status.tone]}`}>
+    <span className={`bp-pill bp-pill-${status.tone} inline-flex min-w-0 items-center gap-1.5 text-xs ${TONE_TEXT[status.tone]}`}>
       <Shape status={status} />
       <span className="min-w-0">{label}</span>
     </span>

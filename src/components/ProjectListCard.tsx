@@ -17,13 +17,13 @@ export function ProjectListCard({ project }: { project: DashboardProject }) {
   return (
     <Link
       to={`/project/${project.id}`}
-      className="block rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow-md"
+      className="bp-card block rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow-md"
     >
       <div className="md:flex md:items-center md:gap-5">
         <div className="min-w-0 md:flex-1">
           <div className="flex items-baseline justify-between gap-2 md:block">
-            <span className="font-medium text-slate-900">{project.name}</span>
-            <span className="text-2xl font-semibold tabular-nums text-slate-900 md:hidden">
+            <span className="text-lg font-semibold text-slate-900">{project.name}</span>
+            <span className="bp-pct text-2xl font-semibold tabular-nums text-slate-900 md:hidden">
               {project.overallPercent}%
             </span>
           </div>
@@ -35,10 +35,10 @@ export function ProjectListCard({ project }: { project: DashboardProject }) {
 
         <div className="mt-3 md:mt-0 md:w-44 md:shrink-0">
           <div className="mb-1 hidden items-baseline justify-between md:flex">
-            <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+            <span className="bp-eyebrow text-[11px] font-medium uppercase tracking-wide text-slate-400">
               {t('projectCard.readiness')}
             </span>
-            <span className="text-2xl font-semibold tabular-nums text-slate-900">
+            <span className="bp-pct text-2xl font-semibold tabular-nums text-slate-900">
               {project.overallPercent}%
             </span>
           </div>
@@ -52,7 +52,7 @@ export function ProjectListCard({ project }: { project: DashboardProject }) {
             waitingFor={project.firstWorkerName}
           />
           {hasIssues ? (
-            <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+            <span className="bp-pill bp-pill-warn inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
               <TriangleAlert className="size-3.5" aria-hidden="true" />
               {t('projectCard.activeIssues', { count: project.activeIssueCount })}
             </span>

@@ -38,21 +38,21 @@ export function Dashboard() {
   }
 
   return (
-    <div className="min-h-svh bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3">
-          <span className="text-sm font-semibold text-slate-900">BuildProof</span>
-          <div className="flex items-center gap-3">
-            <span className="hidden text-xs text-slate-500 sm:inline">
+    <div className="bp" data-skin-dark="">
+      <header className="bp-nav">
+        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-2">
+          <span className="bp-logo">BuildProof</span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="hidden text-xs text-slate-500 lg:inline">
               {profile.full_name ?? user?.email} · {t(`roles.${profile.role}`)}
             </span>
             {isGc ? (
-              <Link to="/tariff" className="text-sm font-medium text-sky-700 underline underline-offset-2">
+              <Link to="/tariff" className="bp-nav-link px-1 underline underline-offset-4">
                 {t('tariff.link')}
               </Link>
             ) : null}
-            <LanguageSwitcher />
-            <Button variant="ghost" onClick={() => void signOut()}>
+            <LanguageSwitcher className="bp-lang" />
+            <Button variant="ghost" onClick={() => void signOut()} className="px-2">
               {t('common.signOut')}
             </Button>
           </div>
@@ -60,12 +60,14 @@ export function Dashboard() {
       </header>
 
       <main className="mx-auto max-w-4xl space-y-4 px-4 py-6">
-        <div className="flex items-center justify-between gap-3">
-          <h1 className="text-xl font-semibold text-slate-900">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="bp-title text-slate-900">
             {isWorker ? t('dashboard.pickProject') : t('dashboard.title')}
           </h1>
           {isGc && !creating && (loading || projects.length > 0) ? (
-            <Button onClick={() => setCreating(true)}>{t('dashboard.createProject')}</Button>
+            <Button onClick={() => setCreating(true)} className="bp-main">
+              {t('dashboard.createProject')}
+            </Button>
           ) : null}
         </div>
 
@@ -90,7 +92,11 @@ export function Dashboard() {
               <NextSteps
                 title={t('dashboard.empty.title')}
                 steps={[t('dashboard.empty.step1'), t('dashboard.empty.step2'), t('dashboard.empty.step3')]}
-                action={<Button onClick={() => setCreating(true)}>{t('dashboard.empty.action')}</Button>}
+                action={
+                  <Button onClick={() => setCreating(true)} className="bp-main">
+                    {t('dashboard.empty.action')}
+                  </Button>
+                }
               />
             )
           ) : (

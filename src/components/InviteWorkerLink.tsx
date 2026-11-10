@@ -30,7 +30,7 @@ export function InviteWorkerLink({ projectName }: { projectName: string }) {
         href={`https://wa.me/?text=${encodeURIComponent(text)}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-sky-700 underline underline-offset-2"
+        className="inline-flex min-h-12 items-center gap-2 text-sm font-medium text-sky-700 underline underline-offset-2"
       >
         <MessageCircle className="size-4" aria-hidden="true" />
         {t('invite.whatsapp')}
@@ -38,7 +38,7 @@ export function InviteWorkerLink({ projectName }: { projectName: string }) {
       <button
         type="button"
         onClick={() => void copy()}
-        className="inline-flex min-h-11 items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900"
+        className="inline-flex min-h-12 items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900"
       >
         <Copy className="size-4" aria-hidden="true" />
         <span role="status">{copied ? t('invite.copied') : t('invite.copy')}</span>

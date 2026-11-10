@@ -17,7 +17,7 @@ class ModelBoundary extends Component<{ children: ReactNode; fallback: ReactNode
 
 /** Shown while the 3D chunk loads (placeholder of the canvas height) and when it fails. */
 function StageListFallback({ stages, loading }: { stages: MappedStage[]; loading: boolean }) {
-  return <div className="overflow-hidden rounded-2xl border border-slate-800 text-white" style={{ background: HOUSE_BG }}>
+  return <div className="bp-native overflow-hidden rounded-2xl border border-slate-800 text-white" style={{ background: HOUSE_BG }}>
     {loading
       ? <div className="house3d-canvas flex items-center justify-center text-sm text-slate-300" role="status">{t.loading}</div>
       : <p className="p-4 pb-0 text-sm text-slate-300" role="status">{t.fallback}</p>}

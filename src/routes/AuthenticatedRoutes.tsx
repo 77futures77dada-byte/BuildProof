@@ -13,6 +13,8 @@ import { Settings } from '../pages/Settings'
 import { NotFound } from '../pages/NotFound'
 import { Tariff } from '../pages/Tariff'
 import { Route, Routes } from 'react-router-dom'
+// Landing-style skin for the app shells (scoped to `.bp`); app chunk only.
+import '../styles/app-skin.css'
 
 export default function AuthenticatedRoutes() {
   return <AuthProvider>
