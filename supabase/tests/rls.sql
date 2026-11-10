@@ -28,8 +28,11 @@ select is(
   'project creation RPC is SECURITY DEFINER with a fixed search path'
 );
 select is(
-  (select p.prosecdef and 'search_path=public'=any(p.proconfig)
-   from pg_proc p where p.oid='public.create_company_and_profile(text,text)'::regprocedure),
+  (select p.prosecdef
+          and 'search_path=public'=any(p.proconfig)
+          and not has_function_privilege('anon',p.oid,'EXECUTE')
+          and has_function_privilege('authenticated',p.oid,'EXECUTE')
+   from pg_proc p where p.oid='public.create_company_and_profile(text,text,text)'::regprocedure),
   true,
   'onboarding RPC is SECURITY DEFINER with a fixed search path'
 );
@@ -57,12 +60,14 @@ insert into auth.users(id,aud,role,email,encrypted_password,email_confirmed_at,r
  ('10000000-0000-4000-8000-000000000004','authenticated','authenticated','foreman-a@test.invalid','',now(),'{}','{}',now(),now()),
  ('10000000-0000-4000-8000-000000000005','authenticated','authenticated','onboarding-a@test.invalid','',now(),
   '{"provider":"email","providers":["email"]}',
-  '{"company_name":"Signup Company","full_name":"Signup Owner"}',now(),now());
-select is((select count(*) from public.profiles where id='10000000-0000-4000-8000-000000000005'),1::bigint,
-  'signup creates a profile');
-select is((select role::text from public.profiles where id='10000000-0000-4000-8000-000000000005'),'gc',
-  'signup profile receives the owner app role');
-delete from public.profiles where id='10000000-0000-4000-8000-000000000005';
+  '{"company_name":"Signup Company","full_name":"Signup Owner"}',now(),now()),
+ ('10000000-0000-4000-8000-000000000006','authenticated','authenticated','locale-a@test.invalid','',now(),
+  '{"provider":"email","providers":["email"]}',
+  '{"company_name":"Locale Company","full_name":"Locale Owner"}',now(),now());
+select is((select count(*) from public.profiles where id='10000000-0000-4000-8000-000000000005'),0::bigint,
+  'signup leaves profile creation to the authenticated onboarding RPC');
+insert into public.profiles(id,company_id,full_name,role) values
+ ('10000000-0000-4000-8000-000000000006',null,'Locale Owner','gc');
 insert into public.companies(id,name) values
  ('30000000-0000-4000-8000-000000000001','Tenant A'),('30000000-0000-4000-8000-000000000002','Tenant B');
 insert into public.profiles(id,company_id,full_name,role) values
@@ -119,9 +124,11 @@ select is(
   (with created as materialized (
      select public.create_company_and_profile('Recovered Company','Recovered Owner') as id
    )
-   select c.name from public.companies c join created on c.id=created.id),
-  'Recovered Company'::text,
-  'onboarding RPC creates a company and profile for an existing auth user'
+   select c.name='Recovered Company' and p.locale='ru'
+   from public.companies c join created on c.id=created.id
+   join public.profiles p on p.company_id=c.id and p.id=auth.uid()),
+  true,
+  'two-argument onboarding RPC creates the profile with its default Russian locale'
 );
 select is(
   (with retry as materialized (
@@ -131,6 +138,18 @@ select is(
    from retry join public.profiles p on p.id=auth.uid()),
   true,
   'onboarding RPC retry returns the same company without creating a duplicate'
+);
+select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000006',true);
+select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000006","email":"locale-a@test.invalid"}',true);
+select is(
+  (with created as materialized (
+     select public.create_company_and_profile(null,'Locale Owner','et') as id
+   )
+   select c.name='test.invalid' and p.locale='et' and p.role::text='gc'
+   from public.companies c join created on c.id=created.id
+   join public.profiles p on p.company_id=c.id and p.id=auth.uid()),
+  true,
+  'onboarding RPC accepts p_locale and repairs a profile with no company'
 );
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',true);
 select is((select count(*) from public.projects where id='40000000-0000-4000-8000-000000000002'),0::bigint,'gc cannot read another tenant project');
