@@ -5,36 +5,28 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/check-placeholders.mjs",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "test": "vitest run",
-    "test:house3d": "vitest run src/features/house3d/stagesToParts.test.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.check.json",
+    "test:api": "node --experimental-strip-types --test api/tests/invite.test.ts",
     "preview": "vite preview"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.113.0",
-    "i18next": "^26.4.4",
     "lucide-react": "^1.39.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "react-i18next": "^17.0.16",
-    "react-router-dom": "^7.18.3",
-    "three": "0.180.0"
+    "react-router-dom": "^7.18.3"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
-    "@types/three": "0.180.0",
     "@vitejs/plugin-react": "^6.1.0",
     "oxlint": "^1.79.0",
-    "playwright-core": "1.56.1",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
-    "vite": "^8.2.2",
-    "vitest": "3.2.4"
+    "vite": "^8.2.2"
   }
 }
