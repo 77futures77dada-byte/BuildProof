@@ -151,7 +151,10 @@ export function ProjectDashboardView({
               <span className="flex items-center gap-1.5">
                 <span
                   aria-hidden="true"
-                  className={`size-2 shrink-0 rounded-full ${FRESHNESS_DOT[freshness.level]}`}
+                  className={`size-2 shrink-0 rounded-full ${
+                    // Nothing reported yet is not "stale": a new site gets a neutral ring, not red.
+                    lastUpdatedAt ? FRESHNESS_DOT[freshness.level] : 'border-2 border-slate-400'
+                  }`}
                 />
                 <span className="text-xs font-medium text-slate-900">{freshness.label}</span>
               </span>
