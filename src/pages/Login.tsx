@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { supabase } from '../lib/supabaseClient'
-import { toErrorMessage } from '../lib/format'
+import { signInErrorMessage } from '../lib/authErrors'
 import { useAuth } from '../hooks/useAuth'
 import { Button } from '../components/Button'
 import { TextField } from '../components/TextField'
@@ -39,17 +39,13 @@ export function Login() {
         password,
       })
       if (signInError) {
-        setError(
-          signInError.message === 'Invalid login credentials'
-            ? t('auth.invalidCredentials')
-            : toErrorMessage(signInError),
-        )
+        setError(signInErrorMessage(signInError))
         return
       }
       // On success the auth listener updates context and the <Navigate> above
       // takes over on the next render.
     } catch (err) {
-      setError(toErrorMessage(err))
+      setError(signInErrorMessage(err))
     } finally {
       setSubmitting(false)
     }
@@ -58,12 +54,16 @@ export function Login() {
   return (
     <div className="flex min-h-svh items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-sm space-y-6">
-        <div className="flex justify-end">
+        <div className="flex items-center justify-between gap-3">
+          <Link to="/" className="inline-flex min-h-11 items-center text-sm text-slate-600 underline underline-offset-2 hover:text-slate-900">
+            {t('auth.backHome')}
+          </Link>
           <LanguageSwitcher />
         </div>
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-slate-900">BuildProof</h1>
-          <p className="mt-1 text-sm text-slate-500">{t('auth.subtitle')}</p>
+          <p className="mt-1 text-sm text-slate-600">{t('auth.tagline')}</p>
+          <p className="mt-3 text-sm font-medium text-slate-500">{t('auth.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -92,6 +92,13 @@ export function Login() {
             {t('common.signIn')}
           </Button>
         </form>
+
+        <p className="text-center text-sm text-slate-600">
+          {t('auth.noAccount')}{' '}
+          <Link to="/#start" className="font-medium text-sky-700 underline underline-offset-2">
+            {t('auth.startFree')}
+          </Link>
+        </p>
       </div>
     </div>
   )

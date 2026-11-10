@@ -1,67 +1,69 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { LandingCopy } from './copy'
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/
-const CODE_LENGTH = 6
+const MIN_PASSWORD = 8
 
-type Step =
-  | { kind: 'email'; status: 'idle' | 'sending' | 'invalid' | 'failed' }
-  | { kind: 'code'; email: string; status: 'idle' | 'verifying' | 'invalid' }
+type Status = 'idle' | 'sending' | 'invalidEmail' | 'shortPassword' | 'exists' | 'failed' | 'created'
 
 /** Supabase is loaded on submit only, so the landing chunk stays without it. */
 const loadSupabase = () => import('../../lib/supabaseClient').then((m) => m.supabase)
 
 /**
- * E-mail sign-up: Supabase sends one message with a magic link and, when the
- * e-mail template includes {{ .Token }}, a 6-digit code. Either signs the user
- * in; the code path verifies here and continues to /dashboard.
+ * Sign-up with e-mail and password. Magic link / e-mail code are off until we
+ * have our own domain and SMTP: Supabase's default mailer cannot carry
+ * {{ .Token }}, so the page promises neither a link nor a code.
  */
 export function SignupSection({ copy }: { copy: LandingCopy }) {
   const f = copy.final
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
-  const [code, setCode] = useState('')
-  const [step, setStep] = useState<Step>({ kind: 'email', status: 'idle' })
+  const [password, setPassword] = useState('')
+  const [status, setStatus] = useState<Status>('idle')
+  const location = useLocation()
 
-  async function sendEmail(e: FormEvent) {
+  // Arriving from another route at /#start (e.g. «Начать бесплатно» on the
+  // login screen): this section mounts late (lazy chunk), so scroll here.
+  useEffect(() => {
+    if (location.hash === '#start') document.getElementById('start')?.scrollIntoView()
+  }, [location.hash])
+
+  async function submit(e: FormEvent) {
     e.preventDefault()
     const address = email.trim()
-    if (!EMAIL_RE.test(address)) {
-      setStep({ kind: 'email', status: 'invalid' })
-      return
-    }
-    setStep({ kind: 'email', status: 'sending' })
+    if (!EMAIL_RE.test(address)) return setStatus('invalidEmail')
+    if (password.length < MIN_PASSWORD) return setStatus('shortPassword')
+    setStatus('sending')
     try {
       const supabase = await loadSupabase()
-      const { error } = await supabase.auth.signInWithOtp({
-        email: address,
-        options: { shouldCreateUser: true, emailRedirectTo: `${window.location.origin}/dashboard` },
-      })
-      if (error) throw error
-      setCode('')
-      setStep({ kind: 'code', email: address, status: 'idle' })
+      const { data, error } = await supabase.auth.signUp({ email: address, password })
+      if (error) {
+        if (error.code === 'user_already_exists' || /already registered/i.test(error.message)) return setStatus('exists')
+        throw error
+      }
+      if (data.session) navigate('/dashboard')
+      else setStatus('created')
     } catch (err) {
-      console.warn('signInWithOtp failed:', err)
-      setStep({ kind: 'email', status: 'failed' })
+      console.warn('signUp failed:', err)
+      setStatus('failed')
     }
   }
 
-  async function verifyCode(e: FormEvent) {
-    e.preventDefault()
-    if (step.kind !== 'code') return
-    setStep({ ...step, status: 'verifying' })
-    try {
-      const supabase = await loadSupabase()
-      const { error } = await supabase.auth.verifyOtp({ email: step.email, token: code.trim(), type: 'email' })
-      if (error) throw error
-      navigate('/dashboard')
-    } catch (err) {
-      console.warn('verifyOtp failed:', err)
-      setStep({ ...step, status: 'invalid' })
-    }
-  }
+  const message =
+    status === 'invalidEmail'
+      ? f.invalidEmail
+      : status === 'shortPassword'
+        ? f.shortPassword(MIN_PASSWORD)
+        : status === 'exists'
+          ? f.exists
+          : status === 'failed'
+            ? f.failed
+            : status === 'created'
+              ? f.created
+              : ''
+  const isError = status !== 'idle' && status !== 'sending' && status !== 'created'
 
   return (
     <section className="final" id="start" aria-labelledby="start-title">
@@ -69,57 +71,44 @@ export function SignupSection({ copy }: { copy: LandingCopy }) {
         <h2 id="start-title">{f.title}</h2>
         <p>{f.lead}</p>
 
-        {step.kind === 'email' ? (
-          <form className="signup" onSubmit={sendEmail} noValidate>
-            <label htmlFor="signup-email">{f.emailLabel}</label>
-            <input
-              id="signup-email"
-              type="email"
-              inputMode="email"
-              autoComplete="email"
-              placeholder={f.emailPlaceholder}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              aria-invalid={step.status === 'invalid'}
-              aria-describedby="signup-note"
-            />
-            <button className="btn btn-main" type="submit" disabled={step.status === 'sending'}>
-              {step.status === 'sending' ? f.sending : f.submit}
-            </button>
-            <div id="signup-note" className={`note${step.status === 'idle' || step.status === 'sending' ? '' : ' err'}`} role="status">
-              {step.status === 'invalid' ? f.invalidEmail : step.status === 'failed' ? f.failed : ''}
-            </div>
+        <form className="signup" onSubmit={submit} noValidate>
+          <label htmlFor="signup-email">{f.emailLabel}</label>
+          <input
+            id="signup-email"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            placeholder={f.emailPlaceholder}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            aria-invalid={status === 'invalidEmail'}
+            aria-describedby="signup-note"
+          />
+          <label htmlFor="signup-password">{f.passwordLabel}</label>
+          <input
+            id="signup-password"
+            type="password"
+            autoComplete="new-password"
+            minLength={MIN_PASSWORD}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            aria-invalid={status === 'shortPassword'}
+            aria-describedby="signup-note"
+          />
+          <button className="btn btn-main" type="submit" disabled={status === 'sending'}>
+            {status === 'sending' ? f.sending : f.submit}
+          </button>
+          <div id="signup-note" className={`note${isError ? ' err' : ''}`} role="status">
+            {message}
+          </div>
+          {status === 'exists' || status === 'created' ? (
+            <Link className="linkbtn" to="/login">
+              {f.toLogin}
+            </Link>
+          ) : (
             <div className="hint">{f.hint}</div>
-          </form>
-        ) : (
-          <form className="signup" onSubmit={verifyCode} noValidate>
-            <div className="note" role="status">
-              {f.sent(step.email)}
-            </div>
-            <label htmlFor="signup-code">{f.codeLabel}</label>
-            <input
-              id="signup-code"
-              type="text"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              pattern="[0-9]*"
-              maxLength={CODE_LENGTH}
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-              aria-invalid={step.status === 'invalid'}
-              aria-describedby="signup-code-note"
-            />
-            <button className="btn btn-main" type="submit" disabled={code.length !== CODE_LENGTH || step.status === 'verifying'}>
-              {step.status === 'verifying' ? f.verifying : f.verify}
-            </button>
-            <div id="signup-code-note" className="note err" role="status">
-              {step.status === 'invalid' ? f.invalidCode : ''}
-            </div>
-            <button type="button" className="linkbtn" onClick={() => setStep({ kind: 'email', status: 'idle' })}>
-              {f.changeEmail}
-            </button>
-          </form>
-        )}
+          )}
+        </form>
       </div>
     </section>
   )

@@ -2,16 +2,16 @@ import { Link } from 'react-router-dom'
 import { TriangleAlert } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { DashboardProject } from '../hooks/useProjects'
-import { getReportFreshness } from '../lib/format'
 import { ProgressBar } from './ProgressBar'
+import { ReportStatusBadge } from './ReportStatusBadge'
 
 /**
- * Dashboard project row: overall %, open-issue count and a freshness signal.
+ * Dashboard project row: overall %, report status (shape + text) and open
+ * issues. The warning icon appears only when there are open issues.
  * Dense single row on desktop, stacked card on a phone.
  */
 export function ProjectListCard({ project }: { project: DashboardProject }) {
   const { t } = useTranslation()
-  const fresh = getReportFreshness(project.lastReportAt)
   const hasIssues = project.activeIssueCount > 0
 
   return (
@@ -45,23 +45,19 @@ export function ProjectListCard({ project }: { project: DashboardProject }) {
           <ProgressBar value={project.overallPercent} />
         </div>
 
-        <div className="mt-3 flex items-center justify-between gap-3 md:mt-0 md:w-64 md:shrink-0 md:justify-end">
-          <span
-            className={`inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${
-              hasIssues ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'
-            }`}
-          >
-            <TriangleAlert className="size-3.5" aria-hidden="true" />
-            {hasIssues
-              ? t('projectCard.activeIssues', { count: project.activeIssueCount })
-              : t('projectCard.noIssues')}
-          </span>
-          {fresh.stale ? (
-            <span className="shrink-0 whitespace-nowrap rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
-              {fresh.label}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 md:mt-0 md:w-72 md:shrink-0 md:flex-col md:items-end md:justify-center">
+          <ReportStatusBadge
+            lastReportAt={project.lastReportAt}
+            active={project.status === 'active'}
+            waitingFor={project.firstWorkerName}
+          />
+          {hasIssues ? (
+            <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+              <TriangleAlert className="size-3.5" aria-hidden="true" />
+              {t('projectCard.activeIssues', { count: project.activeIssueCount })}
             </span>
           ) : (
-            <span className="shrink-0 whitespace-nowrap text-xs text-slate-400">{fresh.label}</span>
+            <span className="shrink-0 whitespace-nowrap text-xs text-slate-500">{t('projectCard.noIssues')}</span>
           )}
         </div>
       </div>

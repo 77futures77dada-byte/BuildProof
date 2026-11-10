@@ -74,15 +74,6 @@
     "notUpdatedDays_one": "pole uuendatud {{count}} päev",
     "notUpdatedDays_other": "pole uuendatud {{count}} päeva"
   },
-  "reportFreshness": {
-    "none": "aruandeid veel pole",
-    "today": "uuendatud täna",
-    "yesterday": "uuendatud eile",
-    "daysAgo_one": "uuendatud {{count}} päev tagasi",
-    "daysAgo_other": "uuendatud {{count}} päeva tagasi",
-    "noReportsDays_one": "aruandeid pole {{count}} päev",
-    "noReportsDays_other": "aruandeid pole {{count}} päeva"
-  },
   "nav": {
     "overview": "Ülevaade",
     "today": "Täna",
@@ -98,9 +89,15 @@
     "password": "Parool",
     "invalidCredentials": "Vale e-post või parool.",
     "profileLoadFailed": "Profiili laadimine ebaõnnestus. {{error}}",
-    "notConfiguredTitle": "Profiil pole seadistatud",
-    "notConfiguredText": "Konto on loodud, kuid profiil pole veel seadistatud. Pöörduge administraatori poole.",
-    "signedInAs": "Olete sisse logitud kui {{email}}"
+    "signedInAs": "Olete sisse logitud kui {{email}}",
+    "tagline": "Ehitusetappide fotod ja protsendid töölistelt ühes kohas omanikule ja tellijale.",
+    "backHome": "← Avalehele",
+    "noAccount": "Kontot pole?",
+    "startFree": "Alusta tasuta",
+    "emailNotConfirmed": "E-post pole veel kinnitatud. Avage BuildProofi kiri ja kinnitage aadress.",
+    "rateLimited": "Liiga palju katseid. Oodake minut ja proovige uuesti.",
+    "network": "Serveriga ühendust pole. Kontrollige internetti ja proovige uuesti.",
+    "signInFailed": "Sisselogimine ei õnnestunud. Proovige veidi hiljem uuesti."
   },
   "notFound": {
     "text": "Sellist lehte pole.",
@@ -111,8 +108,14 @@
     "pickProject": "Valige objekt",
     "createProject": "Loo objekt",
     "loading": "Objektide laadimine…",
-    "emptyGc": "Objekte veel pole. Looge esimene.",
-    "emptyOther": "Teile pole veel ühelegi objektile ligipääsu antud."
+    "emptyOther": "Teile pole veel ühelegi objektile ligipääsu antud.",
+    "empty": {
+      "title": "Looge esimene objekt",
+      "step1": "Looge objekt: 7 tüüpetappi lisatakse ise.",
+      "step2": "Saatke töölisele link WhatsAppis.",
+      "step3": "Tööline saadab fotod ja protsendi, teie näete töö käiku siin.",
+      "action": "Loo esimene objekt"
+    }
   },
   "projectCard": {
     "noAddress": "Aadress puudub",
@@ -144,7 +147,6 @@
     "issuesOpen_one": "avatud",
     "issuesOpen_other": "avatud",
     "updated": "Uuendatud",
-    "notStarted": "Edenemise jälgimine pole veel alanud. Märkige esimese etapi edenemine, et jälgimist alustada.",
     "goToStages": "Ava etapid",
     "noStages": "Objektil pole veel etappe.",
     "recentPhotos": "Viimased fotod",
@@ -158,7 +160,15 @@
     "reportIssueFor": "Teata probleemist: {{stage}}",
     "photoHeading": "Foto · {{stage}}",
     "trendNone": "nädalaga muutusi pole",
-    "trendWeek": "{{delta}}% nädalaga"
+    "trendWeek": "{{delta}}% nädalaga",
+    "next": {
+      "title": "Mis edasi",
+      "step1": "Saatke töölisele link WhatsAppis, et ta saaks fotosid saata.",
+      "step2": "Märkige, mitu protsenti esimesest etapist on valmis.",
+      "step3": "Aruanded, fotod ja probleemid ilmuvad sellele lehele.",
+      "action": "Märgi esimene etapp"
+    },
+    "notStartedReadOnly": "Objekti kohta aruandeid veel pole. Töö käik ilmub siia pärast esimest aruannet."
   },
   "today": {
     "loadingProgress": "Edenemise laadimine…",
@@ -300,5 +310,26 @@
     "included": "Up to {{managers}} owners and managers, unlimited workers on personal links, a client page, PDF export.",
     "invoice": "One PDF invoice a month, one line per site. E-arve on request.",
     "noBilling": "There is no payment in the app yet: this page only shows the plan. Nothing is charged."
+  },
+  "onboarding": {
+    "title": "Konto on loodud. Seadistame ettevõtte",
+    "text": "Loome teie ettevõtte ja avame juurdepääsu objektidele, tavaliselt ühe tööpäeva jooksul. Kui kõik on valmis, vajutage „Kontrolli uuesti“.",
+    "checkAgain": "Kontrolli uuesti"
+  },
+  "reportStatus": {
+    "today": "Aruanne täna",
+    "yesterday": "Aruanne eile",
+    "late_one": "{{count}} päev ilma aruandeta",
+    "late_other": "{{count}} päeva ilma aruandeta",
+    "overdue_one": "{{count}} päev ilma aruandeta",
+    "overdue_other": "{{count}} päeva ilma aruandeta",
+    "none": "Aruandeid veel pole. Kutsuge tööline",
+    "noneWaiting": "Aruandeid veel pole, ootame esimest aruannet: {{name}}"
+  },
+  "invite": {
+    "whatsapp": "Saada töölisele link WhatsAppis",
+    "copy": "Kopeeri tekst",
+    "copied": "Kopeeritud",
+    "message": "Tere! Objekti „{{project}}“ fotod ja aruanded saadame BuildProofi kaudu: {{url}}"
   }
 }
