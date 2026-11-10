@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useParams } from 'react-router-dom'
+import { NavLink, Outlet, useMatch, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { useAuth } from '../hooks/useAuth'
@@ -49,21 +49,24 @@ export function ProjectLayout() {
 
   const isWorker = profile?.role === 'worker'
   const tabs = tabsFor(profile?.role)
+  // The landing skin's dark theme is switched on only for the overview tab;
+  // the other tabs are not redrawn yet and stay light (see app-skin.css).
+  const onOverview = useMatch('/project/:id') !== null
 
   return (
-    <div className="min-h-svh bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
-          <NavLink to="/dashboard" className="text-sm font-semibold text-slate-900">
+    <div className="bp" data-skin-dark={onOverview ? '' : undefined}>
+      <header className="bp-nav">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-2">
+          <NavLink to="/dashboard" className="bp-logo">
             BuildProof
           </NavLink>
-          <div className="flex items-center gap-3">
-            <span className="hidden text-xs text-slate-500 sm:inline">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="hidden text-xs text-slate-500 lg:inline">
               {profile?.full_name ?? user?.email}
               {profile ? ` · ${t(`roles.${profile.role}`)}` : ''}
             </span>
-            <LanguageSwitcher />
-            <Button variant="ghost" onClick={() => void signOut()}>
+            <LanguageSwitcher className="bp-lang" />
+            <Button variant="ghost" onClick={() => void signOut()} className="px-2">
               {t('common.signOut')}
             </Button>
           </div>
@@ -71,7 +74,7 @@ export function ProjectLayout() {
         {project ? (
           <div className="mx-auto max-w-5xl px-4 pb-3">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <h1 className="text-lg font-semibold text-slate-900">{project.name}</h1>
+              <h1 className="bp-title text-slate-900">{project.name}</h1>
               <ProjectStatusBadge status={project.status} />
             </div>
             {project.address ? (
@@ -79,7 +82,7 @@ export function ProjectLayout() {
             ) : null}
           </div>
         ) : null}
-        <nav className="mx-auto max-w-5xl overflow-x-auto px-2">
+        <nav className="bp-tabs mx-auto max-w-5xl overflow-x-auto px-2">
           <ul className={`flex gap-1 pb-px ${isWorker ? '' : 'min-w-max'}`}>
             {tabs.map((tab) => (
               <li key={tab.to || 'overview'} className={isWorker ? 'flex-1' : undefined}>

@@ -37,7 +37,7 @@ const FRESHNESS_DOT: Record<FreshnessLevel, string> = {
 }
 
 const linkButtonClass =
-  'inline-flex items-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-sky-700'
+  'bp-main inline-flex items-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-sky-700'
 
 function capabilitiesFor(role: UserRole | undefined): StageActionCapabilities {
   const onSite = role === 'gc' || role === 'foreman' || role === 'worker'
@@ -125,7 +125,7 @@ export function ProjectDashboardView({
         <section className="space-y-3">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <StatTile label={t('overview.readiness')}>
-              <p className="text-lg font-semibold text-slate-900">{overallPercent}%</p>
+              <p className="bp-pct text-lg font-semibold text-slate-900">{overallPercent}%</p>
               {weeklyTrend !== null ? <WeeklyTrend delta={weeklyTrend} /> : null}
             </StatTile>
             <StatTile
@@ -174,7 +174,7 @@ export function ProjectDashboardView({
         </section>
       ) : (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-slate-700">{t('overview.stages')}</h2>
+          <h2 className="text-lg font-semibold text-slate-900">{t('overview.stages')}</h2>
           <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <p className="text-sm text-slate-600">{t('overview.noStages')}</p>
             <Link to={`/project/${projectId}/stages`} className={linkButtonClass}>
@@ -193,8 +193,8 @@ export function ProjectDashboardView({
 
       {stagesExist ? (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-slate-700">{t('overview.stages')}</h2>
-          <ul className="space-y-2 rounded-xl border border-slate-200 bg-white p-2 shadow-sm sm:p-3">
+          <h2 className="text-lg font-semibold text-slate-900">{t('overview.stages')}</h2>
+          <ul className="bp-card space-y-2 rounded-xl border border-slate-200 bg-white p-2 shadow-sm sm:p-3">
             {stages.map((stage) => (
               <StageRow
                 key={stage.id}
@@ -211,7 +211,7 @@ export function ProjectDashboardView({
 
       {photos.length > 0 ? (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-slate-700">{t('overview.recentPhotos')}</h2>
+          <h2 className="text-lg font-semibold text-slate-900">{t('overview.recentPhotos')}</h2>
           <ul className="grid grid-cols-3 gap-2 sm:grid-cols-6">
             {photos.map((photo) => (
               <PhotoTile key={photo.id} photo={photo} />
@@ -221,13 +221,13 @@ export function ProjectDashboardView({
       ) : null}
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-slate-700">{t('overview.activeIssues')}</h2>
+        <h2 className="text-lg font-semibold text-slate-900">{t('overview.activeIssues')}</h2>
         {activeIssues.length === 0 ? (
-          <p className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500 shadow-sm">
+          <p className="bp-card rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500 shadow-sm">
             {t('overview.noActiveIssues')}
           </p>
         ) : (
-          <ul className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <ul className="bp-card divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             {activeIssues.map((issue) => (
               <IssueRow key={issue.id} issue={issue} />
             ))}
@@ -283,8 +283,8 @@ function StatTile({
   children?: ReactNode
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
-      <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">{label}</p>
+    <div className="bp-card rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+      <p className="bp-eyebrow text-[11px] font-medium uppercase tracking-wide text-slate-500">{label}</p>
       <div className="mt-1">
         {children ?? (
           <p className="text-lg font-semibold text-slate-900">

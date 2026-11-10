@@ -35,7 +35,7 @@ export function StageActionButtons({
 }: StageActionButtonsProps) {
   const { t } = useTranslation()
   return (
-    <div className="flex shrink-0 gap-1.5 lg:invisible lg:group-hover:visible lg:group-focus-within:visible">
+    <div className="bp-stage-actions flex shrink-0 gap-1.5 lg:invisible lg:group-hover:visible lg:group-focus-within:visible">
       {capabilities.photo ? (
         <button
           type="button"

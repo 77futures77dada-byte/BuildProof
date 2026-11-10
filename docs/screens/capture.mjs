@@ -141,9 +141,9 @@ const browser = await chromium.launch({ executablePath: chrome })
 const errors = []
 const problems = []
 
-async function open(path, { as = null, width = 1440, height = 900 } = {}) {
+async function open(path, { as = null, width = 1440, height = 900, scheme = 'light' } = {}) {
   const me = as ? users[as] ?? { id: `u-${as}` } : null
-  const ctx = await browser.newContext({ viewport: { width, height }, locale: 'ru-RU', deviceScaleFactor: width < 500 ? 2 : 1 })
+  const ctx = await browser.newContext({ viewport: { width, height }, colorScheme: scheme, locale: 'ru-RU', deviceScaleFactor: width < 500 ? 2 : 1 })
   await ctx.addInitScript(([key, value]) => {
     try {
       localStorage.setItem('buildproof.locale', 'ru')
@@ -177,6 +177,12 @@ async function open(path, { as = null, width = 1440, height = 900 } = {}) {
   page.on('pageerror', (e) => errors.push(`${path}: ${e.message}`))
   await page.goto(`${base}${path}`)
   await page.waitForLoadState('networkidle')
+  // Fonts use font-display: optional, so a first visit paints system fonts.
+  // Load once, let the fonts reach the cache, then reload — what a returning
+  // user sees.
+  await page.evaluate(() => document.fonts.ready)
+  await page.reload()
+  await page.waitForLoadState('networkidle')
   await page.waitForTimeout(400)
   return page
 }
@@ -209,9 +215,51 @@ const SCREENS = [
   ['10-worker-today', '/project/p1/today', 'w1'],
 ]
 // SET=worker PREFIX=before- → only the worker's phone screens, as worker/<prefix><name>.png
+// SET=quickpass PREFIX=after- → «Объекты» and «Обзор объекта», light + dark,
+//   390 and 1440, as quickpass/<prefix><name>-<scheme>-<size>.png, plus checks
+//   for touch targets (≥ 48 px) and body text size (≥ 17 px).
 const WORKER_ONLY = process.env.SET === 'worker'
+const QUICKPASS = process.env.SET === 'quickpass'
 const PREFIX = process.env.PREFIX ?? ''
 const workerDir = `${outDir}worker/`
+
+if (QUICKPASS) {
+  const screens = [
+    ['dashboard', '/dashboard', 'gc'],
+    ['dashboard-empty', '/dashboard', 'empty'],
+    ['overview', '/project/p1', 'gc'],
+    ['overview-new', '/project/p4', 'gc'],
+  ]
+  for (const [name, path, as] of screens) {
+    for (const scheme of ['light', 'dark']) {
+      for (const [suffix, width, height] of [['390x844', 390, 844], ['1440x900', 1440, 900]]) {
+        const page = await open(path, { as, width, height, scheme })
+        const label = `${name} ${scheme} ${suffix}`
+        await checks(page, label)
+        if (width === 390 && scheme === 'light') {
+          const r = await page.evaluate(() => {
+            const small = []
+            for (const el of document.querySelectorAll('main a, main button, main summary, main select, header a, header button')) {
+              const b = el.getBoundingClientRect()
+              if (!b.width || getComputedStyle(el).visibility === 'hidden') continue
+              if (b.height < 48) small.push(`${el.tagName.toLowerCase()} «${(el.textContent || el.getAttribute('aria-label') || '').trim().slice(0, 22)}» ${Math.round(b.height)}px`)
+            }
+            const root = document.querySelector('.bp')
+            return { small, base: root ? getComputedStyle(root).fontSize : 'no .bp root' }
+          })
+          console.log(`${label}: base font ${r.base}; targets < 48px: ${r.small.length ? r.small.join('; ') : 'none'}`)
+          if (r.small.length) problems.push(`${label}: small touch targets: ${r.small.join('; ')}`)
+        }
+        await page.screenshot({ path: `${outDir}quickpass/${PREFIX}${name}-${scheme}-${suffix}.png`, fullPage: true })
+        await page.context().close()
+      }
+    }
+  }
+  console.log(`page errors: ${errors.length ? errors.join(' | ') : 'none'}`)
+  console.log(problems.length ? `PROBLEMS:\n- ${problems.join('\n- ')}` : 'all checks passed')
+  await browser.close()
+  process.exit(0)
+}
 
 if (!WORKER_ONLY) {
   for (const [name, path, as] of SCREENS) {
