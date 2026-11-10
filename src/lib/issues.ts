@@ -17,6 +17,13 @@ export interface NewIssueInput {
   createdBy: string
 }
 
+/**
+ * Left edge of an issue card: red only for urgent (`high`), neutral otherwise,
+ * so colour never hints at a level the form does not offer.
+ */
+export const issueBorder = (priority: IssuePriority) =>
+  priority === 'high' ? 'border-l-red-500' : 'border-l-slate-300'
+
 function buildIssuePhotoPath(projectId: string, originalName: string): string {
   return `${projectId}/issues/${Date.now()}-${sanitizeImageBaseName(originalName)}.jpg`
 }

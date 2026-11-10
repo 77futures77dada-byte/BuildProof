@@ -11,7 +11,7 @@ import type {
   ProjectOverview,
   StageProgress,
 } from '../hooks/useProjectOverview'
-import type { IssuePriority, UserRole } from '../types'
+import type { UserRole } from '../types'
 import type { FreshnessLevel } from '../lib/format'
 import { formatDate, getUpdateFreshness } from '../lib/format'
 import { ProgressBar } from '../components/ProgressBar'
@@ -26,18 +26,9 @@ import type { StageActionCapabilities, StageActionKind } from '../components/Sta
 import { HouseModelBlock } from '../features/house3d/HouseModelBlock'
 import { NextSteps } from '../components/NextSteps'
 import { InviteWorkerLink } from '../components/InviteWorkerLink'
+import { UrgentBadge } from '../components/UrgentBadge'
+import { issueBorder } from '../lib/issues'
 
-const PRIORITY_BADGE: Record<IssuePriority, string> = {
-  high: 'bg-red-100 text-red-800',
-  medium: 'bg-amber-100 text-amber-800',
-  low: 'bg-slate-100 text-slate-600',
-}
-
-const PRIORITY_BORDER: Record<IssuePriority, string> = {
-  high: 'border-l-red-500',
-  medium: 'border-l-amber-500',
-  low: 'border-l-slate-300',
-}
 
 const FRESHNESS_DOT: Record<FreshnessLevel, string> = {
   fresh: 'bg-green-500',
@@ -376,7 +367,7 @@ function IssueRow({ issue }: { issue: ActiveIssue }) {
   const { t } = useTranslation()
   return (
     <li
-      className={`flex items-start justify-between gap-3 border-l-4 p-3 ${PRIORITY_BORDER[issue.priority]}`}
+      className={`flex items-start justify-between gap-3 border-l-4 p-3 ${issueBorder(issue.priority)}`}
     >
       <div className="min-w-0">
         <p className="truncate text-sm text-slate-800">{issue.title}</p>
@@ -384,11 +375,7 @@ function IssueRow({ issue }: { issue: ActiveIssue }) {
           <p className="mt-0.5 text-xs text-slate-400">{t('common.due', { date: formatDate(issue.dueDate) })}</p>
         ) : null}
       </div>
-      <span
-        className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${PRIORITY_BADGE[issue.priority]}`}
-      >
-        {t(`issuePriority.${issue.priority}`)}
-      </span>
+      <UrgentBadge priority={issue.priority} />
     </li>
   )
 }

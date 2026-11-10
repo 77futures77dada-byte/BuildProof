@@ -1,0 +1,570 @@
+<meta charset="utf-8">
+<title>BuildProof</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout concept: owner-first one-pager. Hero = promise + a believable messy dashboard with a worker phone overlapping.
+   Then: how it works (with the 15s site animation), one interactive object, evidence and data, price table, FAQ. */
+:root{
+  --ink:#0b2a4a; --ink-2:#37506b; --paper:#f2f5f8; --surface:#ffffff; --line:#d3dce6;
+  --yellow:#ffc72c; --yellow-ink:#0b2a4a;
+  --ok:#1f8a5b; --warn:#b36b00; --bad:#c62f2f; --ok-bg:#e2f4ea; --warn-bg:#fff0d4; --bad-bg:#fde6e6;
+  --night:#0b2a4a; --night-text:#e8f4ff; --night-muted:#9db7d0;
+  --display:'IBM Plex Sans Condensed','Arial Narrow',system-ui,sans-serif;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --shadow:0 1px 0 rgba(11,42,74,.06),0 12px 32px -12px rgba(11,42,74,.25);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --ink:#e8f1fa; --ink-2:#9fb5cb; --paper:#0a1d33; --surface:#0f2a47; --line:#244462;
+  --ok:#4cd698; --warn:#ffb547; --bad:#ff7a7a; --ok-bg:#0f3a2b; --warn-bg:#3b2c0b; --bad-bg:#431a1a;
+  --night:#071a2e; --shadow:0 12px 32px -12px rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ink:#e8f1fa; --ink-2:#9fb5cb; --paper:#0a1d33; --surface:#0f2a47; --line:#244462;
+  --ok:#4cd698; --warn:#ffb547; --bad:#ff7a7a; --ok-bg:#0f3a2b; --warn-bg:#3b2c0b; --bad-bg:#431a1a;
+  --night:#071a2e; --shadow:0 12px 32px -12px rgba(0,0,0,.6); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+.in{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.08;letter-spacing:-.01em;margin:0;text-wrap:balance}
+h1{font-size:clamp(33px,3.6vw,52px);overflow-wrap:break-word}
+h2{font-size:clamp(28px,3.2vw,42px)}
+h3{font-size:21px;line-height:1.2}
+p{margin:0}
+a{color:inherit}
+.mono{font-family:var(--mono)}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:3px;border-radius:4px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:0 26px;border-radius:10px;font:600 18px/1 var(--sans);text-decoration:none;border:2px solid transparent;cursor:pointer;white-space:nowrap}
+.btn-main{background:var(--yellow);color:var(--yellow-ink);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.btn-main:hover{filter:brightness(1.05)}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--ink)}
+.btn-ghost:hover{background:var(--surface)}
+.btn-sm{min-height:44px;padding:0 18px;font-size:16px}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--paper)}
+.nav .in{display:flex;align-items:center;gap:14px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font:700 24px/1 var(--display);text-decoration:none;margin-right:auto}
+.logo i{width:30px;height:30px;border-radius:7px;background:var(--ink);display:grid;place-items:center}
+.logo svg{display:block}
+.lang{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.lang button{font:500 13px/1 var(--mono);background:transparent;color:var(--ink-2);border:0;padding:0 10px;min-height:40px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.login{font-weight:500;text-decoration:none;padding:10px 4px}
+.nav .btn{display:none}
+@media (min-width:760px){.nav .btn{display:inline-flex}}
+.langnote{display:none;background:var(--warn-bg);color:var(--warn);font:500 13px/1.4 var(--sans);padding:8px 0;text-align:center}
+.langnote.on{display:block}
+
+/* hero */
+.hero{padding-block:36px 56px}
+.hero .in{display:grid;gap:36px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:980px){.hero .in{grid-template-columns:minmax(0,1.08fr) minmax(0,1.25fr);align-items:center;gap:36px}.hero{padding-block:56px 72px}}
+.hero-copy{display:grid;gap:20px;grid-template-columns:minmax(0,1fr)}
+.sub{font-size:19px;color:var(--ink-2);max-width:34em}
+.sub b{color:var(--ink);font-weight:600}
+.ctas{display:grid;gap:12px}
+@media (min-width:560px){.ctas{display:flex;flex-wrap:wrap}}
+.trust{font:500 16px/1.5 var(--sans);color:var(--ink-2)}
+.trust b{color:var(--ink)}
+.human{font-size:14.5px;color:var(--ink-2);border-top:1px solid var(--line);padding-top:14px}
+.d-only{display:none}@media(min-width:980px){.d-only{display:block}.m-only{display:none!important}}.human mark{background:var(--warn-bg);color:var(--warn);padding:0 4px;border-radius:3px}
+
+/* app mock */
+.stagewrap{position:relative;padding-bottom:0}
+.app{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.app-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.app-top b{font:700 18px var(--display)}
+.app-top span{font:500 12px var(--mono);color:var(--ink-2)}
+.objs{display:grid}
+.obj{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.obj:last-child{border-bottom:0}
+.obj h4{margin:0;font:600 17px/1.25 var(--sans)}
+.obj .meta{font-size:13.5px;color:var(--ink-2)}
+.pct{font:700 30px/1 var(--display);text-align:right;font-variant-numeric:tabular-nums}
+.pct small{display:block;font:500 11px/1.3 var(--mono);color:var(--ink-2);margin-top:4px}
+.bar{grid-column:1/-1;height:8px;border-radius:99px;background:var(--line);position:relative;overflow:hidden}
+.bar i{position:absolute;inset:0 auto 0 0;background:var(--ink);border-radius:99px}
+.bar u{position:absolute;inset:0 auto 0 0;background:repeating-linear-gradient(45deg,var(--ink-2) 0 3px,transparent 3px 6px);opacity:.55}
+.tags{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px}
+.pill{display:inline-flex;align-items:center;gap:6px;font:500 13px/1 var(--sans);padding:6px 10px;border-radius:99px;background:var(--ok-bg);color:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.neutral{background:transparent;border:1px solid var(--line);color:var(--ink-2)}
+.pill svg{width:10px;height:10px;display:block;fill:currentColor}
+
+/* worker phone */
+.phone{width:218px;border:7px solid #0b2a4a;border-radius:30px;background:#fff;color:#0b2a4a;box-shadow:var(--shadow);overflow:hidden}
+:root[data-theme="dark"] .phone{border-color:#2a4a6c}
+.phone .scr{padding:12px;display:grid;gap:9px;font-size:13px}
+.phone .ph{height:96px;border-radius:8px;background:
+  linear-gradient(90deg,transparent 0 31px,rgba(11,42,74,.12) 31px 32px,transparent 32px) 0 0/32px 100%,
+  linear-gradient(0deg,transparent 0 15px,rgba(11,42,74,.12) 15px 16px,transparent 16px) 0 0/100% 16px,#cdd7e1;position:relative}
+.phone .ph::after{content:"Элва, Кооли 5 · кровля";position:absolute;left:8px;bottom:6px;font:500 10px var(--mono);background:rgba(11,42,74,.8);color:#fff;padding:2px 5px;border-radius:3px}
+.phone .row{font-weight:600}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.chips b{display:grid;place-items:center;min-height:44px;border-radius:8px;border:2px solid #0b2a4a;font:700 14px var(--sans)}
+.chips b.on{background:#0b2a4a;color:#fff}
+.send{display:grid;place-items:center;min-height:50px;border-radius:9px;background:#ffc72c;font:700 15px var(--sans)}
+.queued{background:#fff0d4;color:#7a4700;border-radius:7px;padding:8px;font:500 13px/1.35 var(--sans)}
+.hero .phone{display:none}
+@media (min-width:980px){.hero .phone{display:block;position:absolute;right:-10px;bottom:-40px;width:206px}.stagewrap{margin-bottom:40px}.stagewrap .app{margin-right:176px}.obj,.app-top{padding-right:64px}}
+
+/* sections */
+.sec{padding-block:72px}
+.sec.alt{background:var(--surface);border-block:1px solid var(--line)}
+.sec-head{display:grid;gap:12px;margin-bottom:36px;max-width:46em}
+.sec-head p{color:var(--ink-2);font-size:18px}
+.steps{display:grid;gap:18px}
+@media (min-width:900px){.steps{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.step{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px;display:grid;gap:10px;align-content:start}
+.alt .step{background:var(--paper)}
+.step .who{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.step p{color:var(--ink-2)}
+.confirm{margin-top:6px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:12px;display:grid;gap:8px;font-size:14px}
+.confirm .nums{display:flex;gap:16px;flex-wrap:wrap}
+.confirm .nums div{display:grid}
+.confirm .nums strong{font:700 26px/1 var(--display);font-variant-numeric:tabular-nums}
+.confirm .nums span{font:500 11px var(--mono);color:var(--ink-2)}
+
+.loopbox{margin-top:32px;border-radius:16px;overflow:hidden;background:#071d34;border:1px solid var(--line)}
+.loopbox iframe{display:block;width:100%;border:0;height:clamp(360px,62vw,740px);background:#071d34}
+.loopcap{margin-top:12px;font:500 13.5px/1.5 var(--mono);color:var(--ink-2)}
+
+/* interactive object */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.tab{min-height:48px;padding:0 20px;border-radius:99px;border:2px solid var(--ink);background:transparent;color:var(--ink);font:600 16px var(--sans);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+.obj-grid{display:grid;gap:22px}
+@media (min-width:980px){.obj-grid{grid-template-columns:minmax(0,6fr) minmax(0,5fr);align-items:start}}
+.blue{background:var(--night);border-radius:16px;padding:14px;position:relative;border:1px solid var(--line)}
+.blue svg{display:block;width:100%;height:auto}
+.blue .big{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;color:var(--night-text);padding:6px 6px 14px;flex-wrap:wrap}
+.blue .big strong{font:700 44px/1 var(--display);font-variant-numeric:tabular-nums}
+.blue .big span{font:500 12px/1.4 var(--mono);color:var(--night-muted);display:block}
+.blue .big .c{display:flex;gap:22px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;padding:12px 6px 2px;font:500 12px var(--mono);color:var(--night-muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-2px}
+.part{cursor:pointer;transition:opacity .15s}
+.part:focus-visible{outline:none}
+.part:focus-visible .sh,.part.sel .sh{stroke:var(--yellow);stroke-width:3}
+.side{display:grid;gap:14px}
+.list{display:grid;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;align-items:center;padding:12px 16px;min-height:56px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);text-align:left;font:500 16px var(--sans);cursor:pointer;width:100%}
+.li:last-child{border-bottom:0}
+.li:hover{background:var(--paper)}
+.li[aria-pressed="true"]{background:var(--paper);box-shadow:inset 4px 0 0 var(--yellow)}
+.li small{grid-column:1;font:400 13px var(--sans);color:var(--ink-2)}
+.li .p{grid-row:1/3;grid-column:2;font:700 22px var(--display);font-variant-numeric:tabular-nums}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px}
+.detail .top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.detail h3{margin:0}
+.photo{height:130px;border-radius:10px;border:1px solid var(--line);background:
+  linear-gradient(90deg,transparent 0 39px,rgba(11,42,74,.14) 39px 40px,transparent 40px) 0 0/40px 100%,
+  linear-gradient(0deg,transparent 0 19px,rgba(11,42,74,.14) 19px 20px,transparent 20px) 0 0/100% 20px,#c4cfdb;position:relative}
+:root[data-theme="dark"] .photo{background-color:#31465b}
+.photo span{position:absolute;left:8px;bottom:8px;font:500 11px var(--mono);background:rgba(11,42,74,.85);color:#fff;padding:3px 7px;border-radius:4px}
+.kv{display:grid;gap:6px;font-size:14.5px}
+.kv div{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px}
+.kv dt{color:var(--ink-2);font:500 12px/1.7 var(--mono);text-transform:uppercase}
+.kv dd{margin:0}
+.kv{margin:0}
+
+/* evidence */
+.two{display:grid;gap:18px}
+@media (min-width:900px){.two{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:24px;display:grid;gap:14px;align-content:start}
+.alt .card{background:var(--paper)}
+.card ul{margin:0;padding:0;list-style:none;display:grid;gap:12px}
+.card li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px}
+.card li svg{width:20px;height:20px;margin-top:3px}
+.card li b{font-weight:600}
+.no{border-style:dashed}
+.sub-host{font:500 13.5px/1.6 var(--mono);color:var(--ink-2)}
+.sub-host mark{background:var(--warn-bg);color:var(--warn);padding:0 4px;border-radius:3px}
+
+/* pricing */
+.price-grid{display:grid;gap:18px}
+@media (min-width:900px){.price-grid{grid-template-columns:minmax(0,7fr) minmax(0,5fr);align-items:start}}
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+th,td{padding:16px 20px;text-align:left;border-bottom:1px solid var(--line)}
+th{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);background:var(--paper)}
+tr:last-child td{border-bottom:0}
+td.n{font:700 28px/1 var(--display);font-variant-numeric:tabular-nums;text-align:right}
+tr.cap td{background:var(--warn-bg)}
+tr.cap td.n{color:var(--ink)}
+.incl ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.incl li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px}
+.incl li svg{width:20px;height:20px;margin-top:3px}
+.vat{font:500 13px var(--mono);color:var(--ink-2)}
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;gap:4px}
+.ex b{font:700 22px var(--display)}
+
+/* faq */
+.faq{display:grid;gap:10px;max-width:860px}
+details{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+summary{list-style:none;cursor:pointer;padding:18px 20px;min-height:56px;font:600 18px/1.35 var(--sans);display:flex;justify-content:space-between;align-items:center;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font:500 26px/1 var(--mono);color:var(--ink-2)}
+details[open] summary::after{content:"–"}
+details p{padding:0 20px 20px;color:var(--ink-2);max-width:62ch}
+details p b{color:var(--ink)}
+
+/* final */
+.final{background:var(--night);color:var(--night-text);padding-block:72px}
+.final h2{color:#fff}
+.final p{color:var(--night-muted);font-size:18px;max-width:34em}
+.signup{display:grid;gap:12px;margin-top:26px;max-width:520px}
+.signup label{font:500 13px var(--mono);color:var(--night-muted)}
+.signup input{min-height:56px;border-radius:10px;border:2px solid #38587a;background:#0d2f50;color:#fff;font:500 18px var(--sans);padding:0 16px;width:100%}
+.signup input::placeholder{color:#7f9bb7}
+.signup .btn-main{width:100%}
+.note{font:500 13px/1.5 var(--mono);color:var(--night-muted);min-height:20px}
+.signup .alt{color:var(--night-muted);font-size:14px}
+footer{background:#06172a;color:#9db7d0;padding-block:36px;font-size:14.5px}
+footer .in{display:grid;gap:18px}
+@media (min-width:900px){footer .in{grid-template-columns:repeat(3,minmax(0,1fr))}}
+footer b{color:#e8f4ff;font-weight:600}
+footer mark{background:#3b2c0b;color:#ffb547;padding:0 4px;border-radius:3px}
+footer a{color:#cfe3f6}
+
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+
+<header class="nav">
+  <div class="in">
+    <a class="logo" href="#top" aria-label="BuildProof">
+      <i aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18"><path d="M2 16V8l7-6 7 6v8" fill="none" stroke="#ffc72c" stroke-width="2.2" stroke-linejoin="round"/><path d="M6.2 11l2.2 2.2 4-4.4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></i>
+      BuildProof
+    </a>
+    <div class="lang" role="group" aria-label="Язык">
+      <button type="button" aria-pressed="false" data-l="et">ET</button>
+      <button type="button" aria-pressed="true" data-l="ru">RU</button>
+      <button type="button" aria-pressed="false" data-l="en">EN</button>
+    </div>
+    <a class="login" href="#start">Войти</a>
+    <a class="btn btn-main btn-sm" href="#start">Начать — 30 дней бесплатно</a>
+  </div>
+  <div class="langnote" id="langnote"><div class="in">В прототипе только русский текст. Эстонскую версию пишет и проверяет носитель языка, не машинный перевод.</div></div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="in">
+    <div class="hero-copy">
+      <h1>Все объекты на одном экране: фото, проценты, кто и когда отчитался.</h1>
+      <p class="sub">Бригада отправляет фото в несколько касаний. <b>Вы видите, где работа идёт, а где стоит.</b> Рабочим — бесплатно.</p>
+      <div class="ctas">
+        <a class="btn btn-main" href="#start">Начать — 30 дней бесплатно</a>
+        <a class="btn btn-ghost" href="#object">Посмотреть пример</a>
+      </div>
+      <p class="trust"><b>30 дней бесплатно</b> · без карты · потом от 29&nbsp;€ за&nbsp;объект, не&nbsp;больше 99&nbsp;€ + НДС</p>
+      <p class="human d-only">Новый продукт, без громких обещаний. Делает <mark>[Имя Фамилия]</mark>, Эстония · <mark>[телефон]</mark>. Отвечаю в течение рабочего дня.</p>
+    </div>
+
+    <div class="stagewrap">
+      <div class="app" role="img" aria-label="Пример экрана владельца: три объекта, у одного нет отчётов 5 дней">
+        <div class="app-top"><b>Мои объекты · 3</b><span>Сегодня, 08:40</span></div>
+        <div class="objs">
+          <div class="obj">
+            <div><h4>Выру, Юри 8 · крыша</h4><div class="meta">Отчитался Тоомас · 5 дней назад</div></div>
+            <div class="pct">31%<small>принято</small></div>
+            <div class="bar"><i style="width:31%"></i></div>
+            <div class="tags"><span class="pill bad"><svg viewBox="0 0 10 10"><rect width="10" height="10" rx="1"/></svg>5 дней без отчёта</span><span class="pill bad">Срочно: нет ПВХ-труб</span></div>
+          </div>
+          <div class="obj">
+            <div><h4>Элва, Кооли 5 · новый дом</h4><div class="meta">Отчитался Март · 2 дня назад</div></div>
+            <div class="pct">51%<small>с ждущими 55%</small></div>
+            <div class="bar"><u style="width:55%"></u><i style="width:51%"></i></div>
+            <div class="tags"><span class="pill warn"><svg viewBox="0 0 10 10"><path d="M5 0l5 10H0z"/></svg>2 дня без отчёта</span><span class="pill neutral">○ 1 ждёт проверки</span></div>
+          </div>
+          <div class="obj">
+            <div><h4>Тарту, Вокзали 12 · ремонт квартиры</h4><div class="meta">Отчитался Яан · сегодня 07:52</div></div>
+            <div class="pct">72%<small>принято</small></div>
+            <div class="bar"><i style="width:72%"></i></div>
+            <div class="tags"><span class="pill"><svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="5"/></svg>Отчёт сегодня</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="phone" aria-hidden="true"><div class="scr">
+        <div class="queued">Сохранено на телефоне, не отправлено. Откройте страницу, когда появится сеть.</div>
+        <div class="ph"></div>
+        <div class="row">Кровля · сейчас 60%</div>
+        <div class="chips"><b>+10</b><b>+25</b><b class="on">Всё</b></div>
+        <div class="send">Отправить</div>
+      </div></div>
+    </div>
+    <p class="human m-only">Новый продукт, без громких обещаний. Делает <mark>[Имя Фамилия]</mark>, Эстония · <mark>[телефон]</mark>. Отвечаю в течение рабочего дня.</p>
+  </div>
+</section>
+
+<section class="sec alt" id="how">
+  <div class="in">
+    <div class="sec-head">
+      <div class="eyebrow">Как это работает</div>
+      <h2>Рабочий снял. Крупные скачки проверяет бригадир. Вы видите итог.</h2>
+      <p>Рабочий открывает ссылку, которую ему выдал бригадир. Ни пароля, ни приложения из магазина.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="who">Рабочий · телефон</div><h3>Фото, этап, на сколько продвинулись</h3><p>Этап выбран с прошлого раза. Крупные кнопки +10, +25, «Готово» работают в перчатках.</p></div>
+      <div class="step"><div class="who">Бригадир или вы</div><h3>Скачок больше 25% ждёт проверки</h3><p>Мелкие отчёты принимаются сразу и помечаются «принято». Крупный скачок бригадир подтверждает с фото перед глазами. В главную цифру идёт принятое и проверенное, ждущее проверки показано отдельно.</p>
+        <div class="confirm"><div class="nums"><div><strong>51%</strong><span>ПРИНЯТО</span></div><div><strong style="color:var(--ink-2)">55%</strong><span>С УЧЁТОМ ЖДУЩИХ</span></div></div><span class="pill neutral" style="justify-self:start">○ Кровля: ждёт проверки, 60 → 90%</span></div></div>
+      <div class="step"><div class="who">Вы и заказчик</div><h3>Один экран вместо звонков</h3><p>Заказчику вы открываете только нужные этапы по ссылке. Видно проверенный процент и фото.</p></div>
+    </div>
+    <div class="loopbox"><iframe id="loop" src="loop.html" title="Анимация: рабочие снимают окно, этап обновляется" loading="lazy"></iframe></div>
+    <p class="loopcap">Как выглядит один отчёт на объекте: снимок, карточка отчёта, этап растёт. 15 секунд, затем повтор.</p>
+  </div>
+</section>
+
+<section class="sec" id="object">
+  <div class="in">
+    <div class="sec-head">
+      <div class="eyebrow">Пример объекта</div>
+      <h2>Так выглядит объект, где не всё гладко.</h2>
+      <p>Нажмите на любой этап. Зелёное принято, жёлтое в работе, красное давно без отчёта. Пунктир: ещё не начато.</p>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Тип объекта">
+      <button class="tab" role="tab" id="tab-house" aria-selected="true" data-k="house" type="button">Новый дом</button>
+      <button class="tab" role="tab" id="tab-flat" aria-selected="false" data-k="flat" type="button">Ремонт квартиры</button>
+    </div>
+    <div class="obj-grid">
+      <div class="blue">
+        <div class="big"><div class="c"><div><strong id="confN">51%</strong><span>ПРИНЯТО</span></div><div><strong id="claimN" style="color:var(--night-muted)">53%</strong><span>С УЧЁТОМ ЖДУЩИХ ПРОВЕРКИ</span></div></div><span id="objName">Элва, Кооли 5 · новый дом</span></div>
+        <svg id="plan" viewBox="0 0 400 290" role="group" aria-label="Схема объекта"></svg>
+        <div class="legend"><span><i style="background:#2fb67e"></i>принято</span><span><i style="background:#d9962b"></i>в работе</span><span><i style="background:#ff6b6b"></i>нет отчётов</span><span><i style="border:1px dashed #7dd3fc"></i>не начато</span></div>
+      </div>
+      <div class="side">
+        <div class="list" id="list"></div>
+        <div class="detail" id="detail" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec alt" id="trust">
+  <div class="in">
+    <div class="sec-head">
+      <div class="eyebrow">Доверие и данные</div>
+      <h2>Что мы проверяем — и чего не обещаем.</h2>
+      <p>Приложение не видит, что на самом деле построено. Оно показывает, что отметила бригада, и оставляет следы, по которым это проверяется.</p>
+    </div>
+    <div class="two">
+      <div class="card">
+        <h3>Что остаётся в истории</h3>
+        <ul>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg><span><b>Снято и отправлено.</b> Время съёмки из фото и время отправки. Пример: «снято пн 15:10, отправлено вт 07:40, был офлайн». Мелкий отчёт принимается сразу, крупный скачок ждёт бригадира.</span></li>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg><span><b>Своя ссылка на каждого рабочего.</b> Её выдаёт бригадир, её можно отозвать. Если ссылка открылась на другом телефоне, вы увидите это.</span></li>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg><span><b>Повторные фото.</b> Одно и то же фото в двух отчётах помечается. Это сигнал, а не гарантия.</span></li>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg><span><b>Журнал изменений.</b> Кто, когда и с какого процента на какой. Его можно выгрузить в PDF вместе с фото.</span></li>
+        </ul>
+      </div>
+      <div class="card no">
+        <h3>Чего мы не обещаем</h3>
+        <ul>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="var(--bad)" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg><span><b>Геолокации нет.</b> Она требует разрешений на телефонах рабочих, а в подвале сигнала всё равно нет.</span></li>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="var(--bad)" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg><span><b>Отправка из закрытой страницы.</b> Неотправленный отчёт хранится на телефоне и уходит, когда страница открыта и есть сеть. Телефон об этом предупреждает.</span></li>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="var(--bad)" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg><span><b>Замены ehituspäevik.</b> Мы выгружаем фотожурнал с датами, чтобы приложить к дневнику.</span></li>
+          <li><svg viewBox="0 0 20 20" fill="none" stroke="var(--bad)" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg><span><b>Процент не равен счёту.</b> Это ход работ. Заказчик видит эту пометку на своей странице.</span></li>
+        </ul>
+      </div>
+      <div class="card" style="grid-column:1/-1">
+        <h3>Ваши данные</h3>
+        <p>Фото и история принадлежат вам. Полная выгрузка фото и журнала бесплатна всегда. Удалим по запросу. Ссылки для заказчика имеют срок действия, их можно отозвать, они закрыты от поисковиков. Фото хранятся, пока объект активен, и 12 месяцев после архива.</p>
+        <p class="sub-host">Хранение: <mark>[провайдер, страна — заполнить]</mark> · Отправка писем: <mark>[провайдер, страна]</mark> · Аналитика: <mark>[провайдер или «нет»]</mark> · Договор об обработке данных (DPA): по запросу, <mark>[срок]</mark>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="price">
+  <div class="in">
+    <div class="sec-head">
+      <div class="eyebrow">Цена</div>
+      <h2>29 € за объект в месяц. Рабочие и заказчики бесплатно.</h2>
+      <p>Объект — это один адрес. Считаем календарные дни от открытия объекта до архива. Пауза не считается. Последний месяц оплачивается по дням.</p>
+    </div>
+    <div class="price-grid">
+      <div>
+        <table>
+          <thead><tr><th>Активных объектов</th><th style="text-align:right">В месяц + НДС</th></tr></thead>
+          <tbody>
+            <tr><td>1 объект</td><td class="n">29 €</td></tr>
+            <tr><td>2 объекта</td><td class="n">58 €</td></tr>
+            <tr><td>3 объекта</td><td class="n">87 €</td></tr>
+            <tr class="cap"><td>4 и больше (до 10 объектов и 50 ГБ; больше — пишите, договоримся)</td><td class="n">99 €</td></tr>
+          </tbody>
+        </table>
+        <p class="vat" style="margin-top:12px">Счёт раз в месяц PDF-файлом, по строке на объект. E-arve по запросу.</p>
+      </div>
+      <div style="display:grid;gap:14px">
+        <div class="ex"><span class="eyebrow">Пример</span><b>Ремонт ванной, 3 недели ≈ 20 €</b><span style="color:var(--ink-2);font-size:15px">21 день × 29 € ÷ 30, плюс НДС.</span></div>
+        <div class="card incl" style="padding:20px">
+          <ul>
+            <li><svg viewBox="0 0 20 20" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg><span>До 3 владельцев и менеджеров</span></li>
+            <li><svg viewBox="0 0 20 20" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg><span>Рабочие по личным ссылкам, без лимита</span></li>
+            <li><svg viewBox="0 0 20 20" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg><span>Страница для заказчика</span></li>
+            <li><svg viewBox="0 0 20 20" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-9"/></svg><span>Выгрузка фото и журнала в PDF</span></li>
+          </ul>
+        </div>
+        <p style="color:var(--ink-2);font-size:15.5px"><b style="color:var(--ink)">День 31 без карты.</b> Ничего не списывается. Объект станет доступен только для чтения и не удалится. За 5 дней до конца пришлём напоминание.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec alt" id="faq">
+  <div class="in">
+    <div class="sec-head"><div class="eyebrow">Вопросы</div><h2>Что спрашивают владельцы.</h2></div>
+    <div class="faq">
+      <details open><summary>Рабочие не будут этим пользоваться</summary><p>Самый частый риск. Поэтому у рабочего нет аккаунта и пароля: бригадир шлёт ему ссылку в WhatsApp или на листе с QR-кодом на стене. Отчёт занимает несколько касаний. Вы видите в приватном списке, от кого на этой неделе не было отчётов, а напоминание получает бригадир, а не десять человек.</p></details>
+      <details><summary>Сколько я заплачу за три объекта?</summary><p><b>87 € в месяц + НДС.</b> Начиная с четвёртого объекта счёт не растёт и остаётся 99 €. Короткий объект оплачивается по дням.</p></details>
+      <details><summary>Где мои фото и кто их видит?</summary><p>Видят только вы, ваши менеджеры и рабочие своего объекта. Заказчик видит то, что вы открыли для него. Хостинг и подрядчики перечислены в разделе «Ваши данные». Всё выгружается и удаляется по вашей просьбе.</p></details>
+      <details><summary>Что если на объекте нет сигнала?</summary><p>Отчёт сохраняется на телефоне, а наверху экрана появляется жёлтая плашка «не отправлено». Он уходит, когда страница открыта и есть сеть. Если закрыть страницу в подвале, отправка начнётся при следующем открытии. Поэтому плашка просит открыть страницу, когда сеть появится.</p></details>
+      <details><summary>Чем это лучше группы в WhatsApp?</summary><p>В группе фото тонут за день, нет процентов по этапам, нет истории изменений и нет страницы для заказчика. WhatsApp остаётся для разговоров, BuildProof для хода работ.</p></details>
+      <details><summary>Это заменяет строительный дневник (ehituspäevik)?</summary><p>Нет. Мы выгружаем фотожурнал с датами, который можно приложить к дневнику. Юридические требования к дневнику остаются на вас.</p></details>
+      <details><summary>Как мне сообщат о срочной проблеме?</summary><p>Push-уведомление (если страница добавлена на главный экран) и письмо, сразу бригадиру и вам. SMS и Telegram добавим позже, сейчас их не обещаем.</p></details>
+      <details><summary>А прогноз срока?</summary><p>Он включается после семи отчётов за десять дней и показывает диапазон дат с пометкой «оценка». Причины пауз (ждём материал, погода) останавливают отсчёт.</p></details>
+      <details><summary>Как отменить?</summary><p>В настройках одной кнопкой. Объекты переходят в архив, история и фото остаются доступны для выгрузки.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="final" id="start">
+  <div class="in">
+    <h2>Заведите первый объект сегодня.</h2>
+    <p>30 дней бесплатно, без карты. Пригласите бригадира ссылкой и посмотрите, что придёт к вечеру.</p>
+    <form class="signup" id="signup" novalidate>
+      <label for="em">Эл. почта для входа</label>
+      <input id="em" type="email" inputmode="email" autocomplete="email" placeholder="you@firma.ee">
+      <button class="btn btn-main" type="submit">Начать — 30 дней бесплатно</button>
+      <div class="note" id="note" role="status"></div>
+      <div class="alt">Мы пришлём ссылку или 6-значный код. Выбирайте, что удобнее на телефоне.</div>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="in">
+    <div><b>BuildProof</b><br><mark>[Название OÜ]</mark><br>Регистрационный код <mark>[код]</mark> · KMKR <mark>[номер]</mark></div>
+    <div><b>Связь</b><br><mark>[телефон]</mark> · <mark>[почта]</mark><br>Отвечаю в течение рабочего дня</div>
+    <div><b>Документы</b><br><a href="#trust">Политика данных</a> · <a href="#trust">Условия</a> · <a href="#trust">DPA по запросу</a></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // language buttons: prototype is Russian only, say so
+  var note=document.getElementById('langnote');
+  document.querySelectorAll('.lang button').forEach(function(b){b.addEventListener('click',function(){
+    document.querySelectorAll('.lang button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+    note.classList.toggle('on',b.dataset.l!=='ru');
+  })});
+
+  // signup form
+  document.getElementById('signup').addEventListener('submit',function(e){
+    e.preventDefault();
+    var v=document.getElementById('em').value.trim(),n=document.getElementById('note');
+    n.textContent=/^\S+@\S+\.\S+$/.test(v)?'Это прототип: письмо не отправляется.':'Проверьте адрес: нужна почта вида имя@домен.ee';
+  });
+
+  // iframe auto-height (same origin; fall back to CSS height)
+  var f=document.getElementById('loop');
+  function fit(){try{var d=f.contentDocument;if(d&&d.documentElement){var h=d.documentElement.scrollHeight;if(h>200)f.style.height=h+'px'}}catch(e){}}
+  f.addEventListener('load',function(){fit();setTimeout(fit,600)});
+  window.addEventListener('resize',fit);
+
+  // interactive object
+  var WEIGHTS_STATE={ok:'ok',part:'part',bad:'bad',none:'none'};
+  var DATA={
+    house:{name:'Элва, Кооли 5 · новый дом',items:[
+      {id:'f',n:'Фундамент',w:20,c:100,r:100,st:'ok',who:'Март',taken:'12 окт, 10:20',sent:'12 окт, 10:21',last:'3 нед назад',note:'Плита принята, фото армирования приложены.'},
+      {id:'k',n:'Каркас',w:20,c:90,r:90,st:'part',who:'Март',taken:'вчера, 15:10',sent:'вчера, 15:12',last:'вчера',note:'Остался фронтон с северной стороны.'},
+      {id:'r',n:'Кровля',w:12,c:60,r:90,st:'part',pend:true,who:'Яан',taken:'пн, 15:10',sent:'вт, 07:40 (был офлайн)',last:'2 дня назад',note:'Яан отметил 90%. Скачок на 30 пунктов выше порога 25%, ждёт проверки бригадира. Пока в итог идёт 60%.'},
+      {id:'o',n:'Окна',w:8,c:40,r:40,st:'part',who:'Март',taken:'вчера, 15:30',sent:'вчера, 15:31',last:'вчера',note:'Установлены 3 из 8, остальные привезут в пятницу.'},
+      {id:'e',n:'Электрика',w:10,c:0,r:0,st:'none',who:'не назначен',taken:'нет фото',sent:'нет',last:'не начато',note:'Начнётся после кровли.'},
+      {id:'p',n:'Сантехника',w:10,c:25,r:25,st:'bad',who:'Тоомас',taken:'5 дней назад',sent:'5 дней назад',last:'5 дней без отчёта',issue:'Срочно: нет ПВХ-труб, доставка не пришла.',note:'Тоомас сообщил о проблеме и больше не отчитывался.'},
+      {id:'d',n:'Отделка',w:20,c:0,r:0,st:'none',who:'не назначен',taken:'нет фото',sent:'нет',last:'не начато',note:''}
+    ]},
+    flat:{name:'Тарту, Вокзали 12 · ремонт квартиры',items:[
+      {id:'a',n:'Ванная',w:25,c:100,r:100,st:'ok',who:'Яан',taken:'сегодня, 07:50',sent:'сегодня, 07:52',last:'сегодня',note:'Гидроизоляция и плитка приняты.'},
+      {id:'b',n:'Кухня',w:20,c:70,r:70,st:'part',who:'Яан',taken:'вчера, 16:40',sent:'вчера, 16:41',last:'вчера',note:'Шкафы стоят, столешница в четверг.'},
+      {id:'c',n:'Комната 1',w:15,c:90,r:90,st:'part',who:'Март',taken:'вчера, 12:00',sent:'вчера, 12:01',last:'вчера',note:'Осталась покраска второго слоя.'},
+      {id:'g',n:'Комната 2',w:15,c:50,r:75,st:'part',pend:true,who:'Март',taken:'сегодня, 08:10',sent:'сегодня, 08:11',last:'сегодня',note:'Март отметил 75%. Скачок на 25 пунктов и больше, ждёт проверки.'},
+      {id:'h',n:'Прихожая',w:15,c:20,r:20,st:'bad',who:'Март',taken:'6 дней назад',sent:'6 дней назад',last:'6 дней без отчёта',note:'Стены не шпаклёваны, отчётов нет.'},
+      {id:'i',n:'Балкон',w:10,c:0,r:0,st:'none',who:'не назначен',taken:'нет фото',sent:'нет',last:'не начато',note:''}
+    ]}
+  };
+  // SVG geometry per object type
+  var SH={
+    house:{f:'<rect x="50" y="248" width="300" height="26" rx="2"/>',
+      k:'<rect x="66" y="150" width="268" height="98"/>',
+      r:'<polygon points="44,150 200,52 356,150"/>',
+      o:'<g><rect x="92" y="172" width="44" height="44"/><rect x="178" y="172" width="44" height="44"/><rect x="264" y="172" width="44" height="44"/></g>',
+      e:'<path d="M72 232H328M72 160H328" fill="none" stroke-width="7"/>',
+      p:'<path d="M84 250V212H150" fill="none" stroke-width="9"/>',
+      d:'<rect x="234" y="196" width="34" height="52"/>'},
+    flat:{a:'<rect x="40" y="40" width="130" height="100"/>',b:'<rect x="170" y="40" width="190" height="100"/>',
+      c:'<rect x="40" y="140" width="110" height="110"/>',g:'<rect x="150" y="140" width="130" height="110"/>',
+      h:'<rect x="280" y="140" width="80" height="110"/>',i:'<rect x="40" y="250" width="320" height="22"/>'}
+  };
+  var COL={ok:'#2fb67e',part:'#d9962b',bad:'#ff6b6b',none:'rgba(125,211,252,.06)'};
+  var cur='house',sel=0;
+  var plan=document.getElementById('plan'),list=document.getElementById('list'),det=document.getElementById('detail');
+  var STT={ok:'Принято',part:'В работе',bad:'Нет отчётов',none:'Не начато'};
+  function pillFor(it){
+    if(it.pend)return '<span class="pill neutral">○ Ждёт проверки</span>';
+    if(it.st==='ok')return '<span class="pill"><svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="5"/></svg>Принято</span>';
+    if(it.st==='bad')return '<span class="pill bad"><svg viewBox="0 0 10 10"><rect width="10" height="10" rx="1"/></svg>'+it.last+'</span>';
+    if(it.st==='none')return '<span class="pill neutral">Не начато</span>';
+    return '<span class="pill warn"><svg viewBox="0 0 10 10"><path d="M5 0l5 10H0z"/></svg>В работе, '+it.last+'</span>';
+  }
+  function totals(items){var W=0,C=0,R=0;items.forEach(function(i){W+=i.w;C+=i.c*i.w;R+=i.r*i.w});return[Math.round(C/W),Math.round(R/W)]}
+  function render(){
+    var d=DATA[cur],t=totals(d.items);
+    document.getElementById('confN').textContent=t[0]+'%';
+    document.getElementById('claimN').textContent=t[1]+'%';
+    document.getElementById('objName').textContent=d.name;
+    var s='<defs><pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#3f3115"/><rect width="2.5" height="8" fill="#d9962b"/></pattern></defs>';
+    if(cur==='flat')s+='<rect x="34" y="34" width="332" height="244" rx="3" fill="none" stroke="#7dd3fc" stroke-opacity=".4" stroke-width="2"/>';
+    else s+='<path d="M20 274H380" stroke="#7dd3fc" stroke-opacity=".4" stroke-width="2"/>';
+    d.items.forEach(function(it,ix){
+      var g=SH[cur][it.id]||'';
+      var stroke=it.st==='none'?'#7dd3fc':(it.st==='bad'?'#ffd0d0':'#0b2a4a');
+      var dash=it.st==='none'?' stroke-dasharray="5 4"':'';
+      var line=(it.id==='e'||it.id==='p'&&cur==='house');
+      var fillrule=line?('stroke="'+(it.st==='none'?'#7dd3fc':it.st==='bad'?'#ff6b6b':it.st==='ok'?'#2fb67e':'#ffb547')+'" fill="none"'):('fill="'+COL[it.st]+'" stroke="'+stroke+'" stroke-opacity="'+(it.st==='none'?'.6':'.55')+'"'+dash);
+      var lab='';
+      if(cur==='flat'){var m=g.match(/x="(\d+)" y="(\d+)" width="(\d+)" height="(\d+)"/);if(m){lab='<text x="'+(+m[1]+(+m[3])/2)+'" y="'+(+m[2]+(+m[4])/2+5)+'" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="'+(it.id==='i'?12:14)+'" font-weight="600" fill="'+(it.st==='part'?'#fff':it.st==='ok'?'#06281a':it.st==='bad'?'#4a0b0b':'#9db7d0')+'" stroke="'+(it.st==='part'?'#3b2a08':'none')+'" stroke-width="3" paint-order="stroke">'+it.n+' '+it.c+'%</text>'}}
+      s+='<g class="part'+(ix===sel?' sel':'')+'" data-i="'+ix+'" tabindex="0" role="button" aria-label="'+it.n+', '+it.c+'%, '+STT[it.st]+'"><g class="sh" '+fillrule+' stroke-linejoin="round" stroke-linecap="round">'+g+'</g>'+lab+'</g>';
+    });
+    plan.innerHTML=s;
+    list.innerHTML=d.items.map(function(it,ix){return '<button type="button" class="li" data-i="'+ix+'" aria-pressed="'+(ix===sel)+'"><span>'+it.n+'</span><span class="p">'+it.c+'%</span><small>'+(it.pend?'○ ждёт проверки · ':'')+it.last+'</small></button>'}).join('');
+    showDetail();
+  }
+  function showDetail(){
+    var it=DATA[cur].items[sel];
+    det.innerHTML='<div class="top"><div><h3>'+it.n+'</h3><div style="margin-top:8px">'+pillFor(it)+'</div></div><div class="pct">'+it.c+'%<small>'+(it.pend?'по отчёту '+it.r+'%':'принято')+'</small></div></div>'+
+    (it.st==='none'?'':'<div class="photo"><span>'+it.taken+'</span></div>')+
+    '<dl class="kv"><div><dt>Кто</dt><dd>'+it.who+(it.st==='none'?'':' · личная ссылка')+'</dd></div><div><dt>Снято</dt><dd>'+it.taken+'</dd></div><div><dt>Отправлено</dt><dd>'+it.sent+'</dd></div>'+(it.issue?'<div><dt>Проблема</dt><dd style="color:var(--bad);font-weight:600">'+it.issue+'</dd></div>':'')+(it.note?'<div><dt>Заметка</dt><dd>'+it.note+'</dd></div>':'')+'</dl>';
+  }
+  function pick(i){sel=i;render()}
+  plan.addEventListener('click',function(e){var g=e.target.closest('.part');if(g)pick(+g.dataset.i)});
+  plan.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){var g=e.target.closest('.part');if(g){e.preventDefault();pick(+g.dataset.i);var n=plan.querySelector('.part.sel');if(n)n.focus()}}});
+  list.addEventListener('click',function(e){var b=e.target.closest('.li');if(b)pick(+b.dataset.i)});
+  document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){
+    cur=t.dataset.k;sel=cur==='house'?2:3;
+    document.querySelectorAll('.tab').forEach(function(x){x.setAttribute('aria-selected',x===t?'true':'false')});
+    render();
+  })});
+  sel=2;render();
+})();
+</script>

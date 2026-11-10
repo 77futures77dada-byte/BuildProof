@@ -40,11 +40,6 @@
     "in_progress": "Töös",
     "done": "Valmis"
   },
-  "issuePriority": {
-    "low": "Madal",
-    "medium": "Keskmine",
-    "high": "Kõrge"
-  },
   "issueStatus": {
     "open": "Avatud",
     "in_progress": "Töös",
