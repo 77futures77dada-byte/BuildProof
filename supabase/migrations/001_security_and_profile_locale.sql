@@ -101,6 +101,7 @@ update storage.buckets set file_size_limit=10485760, allowed_mime_types=array['i
 where id='project-photos';
 
 -- Ensure all application tables, including future public tables, have RLS.
+-- Keep catalog references qualified here; the former joined check raised 42702.
 do $$
 declare
   r record;
