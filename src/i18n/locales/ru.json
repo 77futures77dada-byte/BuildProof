@@ -40,11 +40,6 @@
     "in_progress": "В работе",
     "done": "Готово"
   },
-  "issuePriority": {
-    "low": "Низкий",
-    "medium": "Средний",
-    "high": "Высокий"
-  },
   "issueStatus": {
     "open": "Открыта",
     "in_progress": "В работе",

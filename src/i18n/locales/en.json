@@ -40,11 +40,6 @@
     "in_progress": "In progress",
     "done": "Done"
   },
-  "issuePriority": {
-    "low": "Low",
-    "medium": "Medium",
-    "high": "High"
-  },
   "issueStatus": {
     "open": "Open",
     "in_progress": "In progress",
