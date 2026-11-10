@@ -30,13 +30,15 @@ The full A0 set in `docs/screens/` was regenerated: the issues screen and the fo
 
 **Checks:** lint clean, `tsc -b` clean, tests 38/38, `ALLOW_PLACEHOLDERS=1 npm run build` OK. The capture script finds no Latin words and no horizontal scroll on any screen.
 
+4. **Issue cards match the form.** They show only «Срочно» for `high`. `medium` and old `low` issues get no label, and their left edge is neutral; red appears only when the issue is urgent. This applies to the issues list and to the overview. The unused `issuePriority` labels were removed.
+5. **Design inputs.** The landing prototype is in `docs/design-inputs/landing-prototype/`: `index.html`, renamed from `index (1).html`, and `loop.html` unchanged, since `index.html` embeds it by that name.
+
 ## What I set aside
 
-- **Item 4, `docs/design-inputs/`.** `buildproof-decisions.md` is not on this machine. The only `landing-prototype` is the old copy in `Buildproof/.claude/docs/landing-prototype/` (5 Nov, `index (1).html` + `loop.html`). I did not commit a file I could not confirm. Once you tell me where the files are, it is one separate commit.
+- **`docs/design-inputs/buildproof-decisions.md`.** The file was not in `c:\Users\eesti\Desktop\Buildproof\` or anywhere under it when this branch was pushed. It will be one more commit once it is there.
 
 ## What remains
 
-- On the issue card the priority still says «Высокий / Средний / Низкий», while the form says «Срочно / Не срочно». I suggest showing «Срочно» on the card for `high` and nothing for the rest. That needs a decision on old `low` issues.
 - The new ET strings need a native-speaker review (A7).
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
