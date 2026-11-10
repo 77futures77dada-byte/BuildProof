@@ -36,7 +36,7 @@ export interface ProjectOverview {
   stages: StageProgress[]
   /** Number of stages at 100%. */
   completedStageCount: number
-  /** max(project_stages.updated_at), or null when there are no stages. */
+  /** Latest stage_history change or photo upload, or null when nothing was reported. */
   lastUpdatedAt: string | null
   /** True if any stage of this project has at least one stage_history row. */
   hasStageHistory: boolean
@@ -184,15 +184,15 @@ export function useProjectOverview(projectId: string | undefined): UseProjectOve
         weeklyTrend = overallPercent - overallThen
       }
 
-      const lastUpdatedAt =
-        stageRows.length === 0
-          ? null
-          : stageRows.reduce(
-              (max, row) => (row.updated_at > max ? row.updated_at : max),
-              stageRows[0].updated_at,
-            )
-
       const photoRows = (photosRes.data ?? []) as PhotoRow[]
+
+      // Latest real report: a stage change or a photo. Not stage updated_at —
+      // stages are seeded at creation and would read as "updated today".
+      const lastUpdatedAt =
+        [historyRows.at(-1)?.changed_at, photoRows[0]?.uploaded_at]
+          .filter((v): v is string => Boolean(v))
+          .sort()
+          .at(-1) ?? null
       const signedUrls = await resolvePhotoUrls(photoRows.map((p) => p.storage_path))
       const photos: OverviewPhoto[] = photoRows.map((p) => ({
         id: p.id,

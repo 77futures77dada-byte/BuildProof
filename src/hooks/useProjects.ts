@@ -13,8 +13,52 @@ export interface DashboardProject extends Project {
   overallPercent: number
   /** issues with status != 'resolved'. */
   activeIssueCount: number
-  /** max(project_stages.updated_at), or null. Drives the freshness label. */
+  /**
+   * Latest field report: max(stage_history.changed_at, photos.uploaded_at), or
+   * null. Not project_stages.updated_at — stages are seeded at creation, which
+   * would make a brand-new project look "reported today".
+   */
   lastReportAt: string | null
+  /** A worker with access, named in «ждём первый отчёт от …». Best effort. */
+  firstWorkerName: string | null
+}
+
+function latest(map: Map<string, string>, key: string, value: string | null | undefined) {
+  if (!value) return
+  const prev = map.get(key)
+  if (!prev || value > prev) map.set(key, value)
+}
+
+/** Worker names per project. Never fails the list: an RLS gap only hides the name. */
+async function fetchFirstWorkers(ids: string[]): Promise<Map<string, string>> {
+  const result = new Map<string, string>()
+  try {
+    const { data: access, error: accessError } = await supabase
+      .from('project_access')
+      .select('project_id, user_id')
+      .in('project_id', ids)
+    if (accessError || !access?.length) return result
+    const rows = access as { project_id: string; user_id: string }[]
+    const { data: people, error: peopleError } = await supabase
+      .from('profiles')
+      .select('id, full_name, role')
+      .in('id', [...new Set(rows.map((r) => r.user_id))])
+      .eq('role', 'worker')
+    if (peopleError || !people) return result
+    const names = new Map<string, string>()
+    for (const p of people as { id: string; full_name: string | null }[]) {
+      const name = p.full_name?.trim()
+      if (name) names.set(p.id, name)
+    }
+    for (const r of rows) {
+      const name = names.get(r.user_id)
+      const prev = result.get(r.project_id)
+      if (name && (!prev || name.localeCompare(prev) < 0)) result.set(r.project_id, name)
+    }
+  } catch {
+    // Names are decoration; the list still renders without them.
+  }
+  return result
 }
 
 interface UseProjectsResult {
@@ -83,31 +127,46 @@ export function useProjects(): UseProjectsResult {
       const ids = base.map((p) => p.id)
       if (ids.length === 0) return []
 
-      const [stagesRes, issuesRes] = await Promise.all([
+      const [stagesRes, issuesRes, historyRes, photosRes, workers] = await Promise.all([
         supabase
           .from('project_stages')
-          .select('project_id, progress_percent, updated_at')
+          .select('project_id, progress_percent')
           .in('project_id', ids),
         supabase
           .from('issues')
           .select('project_id')
           .in('project_id', ids)
           .neq('status', 'resolved'),
+        supabase
+          .from('stage_history')
+          .select('changed_at, project_stages!inner(project_id)')
+          .in('project_stages.project_id', ids),
+        supabase.from('photos').select('project_id, uploaded_at').in('project_id', ids),
+        fetchFirstWorkers(ids),
       ])
       if (stagesRes.error) throw stagesRes.error
       if (issuesRes.error) throw issuesRes.error
+      if (historyRes.error) throw historyRes.error
+      if (photosRes.error) throw photosRes.error
 
-      const agg = new Map<string, { sum: number; count: number; last: string | null }>()
-      for (const row of (stagesRes.data ?? []) as {
-        project_id: string
-        progress_percent: number
-        updated_at: string
-      }[]) {
-        const e = agg.get(row.project_id) ?? { sum: 0, count: 0, last: null }
+      const agg = new Map<string, { sum: number; count: number }>()
+      for (const row of (stagesRes.data ?? []) as { project_id: string; progress_percent: number }[]) {
+        const e = agg.get(row.project_id) ?? { sum: 0, count: 0 }
         e.sum += row.progress_percent
         e.count += 1
-        if (!e.last || row.updated_at > e.last) e.last = row.updated_at
         agg.set(row.project_id, e)
+      }
+
+      const lastReport = new Map<string, string>()
+      for (const row of (historyRes.data ?? []) as unknown as {
+        changed_at: string
+        project_stages: { project_id: string } | { project_id: string }[] | null
+      }[]) {
+        const stage = Array.isArray(row.project_stages) ? row.project_stages[0] : row.project_stages
+        if (stage) latest(lastReport, stage.project_id, row.changed_at)
+      }
+      for (const row of (photosRes.data ?? []) as { project_id: string; uploaded_at: string }[]) {
+        latest(lastReport, row.project_id, row.uploaded_at)
       }
 
       const issueCounts = new Map<string, number>()
@@ -121,7 +180,8 @@ export function useProjects(): UseProjectsResult {
           ...p,
           overallPercent: e && e.count > 0 ? Math.round(e.sum / e.count) : 0,
           activeIssueCount: issueCounts.get(p.id) ?? 0,
-          lastReportAt: e?.last ?? null,
+          lastReportAt: lastReport.get(p.id) ?? null,
+          firstWorkerName: workers.get(p.id) ?? null,
         }
       })
     }

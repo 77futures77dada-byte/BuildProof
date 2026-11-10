@@ -98,32 +98,6 @@ export function getUpdateFreshness(iso: string | null | undefined): Freshness {
   return { level: 'old', label: i18n.t('freshness.notUpdatedDays', { count }) }
 }
 
-export interface ReportFreshness {
-  /** true → risk signal (amber text), false → neutral. */
-  stale: boolean
-  label: string
-}
-
-/**
- * Compact "last field report" label for the dashboard project card:
- * updated today / yesterday / N days ago, and — as a risk signal — "no reports
- * for N days" past a week or "no reports yet" when nothing was ever reported.
- */
-export function getReportFreshness(iso: string | null | undefined): ReportFreshness {
-  const d = parse(iso)
-  if (!d) return { stale: true, label: i18n.t('reportFreshness.none') }
-
-  const now = new Date()
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const startOfUpdateDay = new Date(d.getFullYear(), d.getMonth(), d.getDate())
-  const count = Math.round((startOfToday.getTime() - startOfUpdateDay.getTime()) / DAY_MS)
-
-  if (count <= 0) return { stale: false, label: i18n.t('reportFreshness.today') }
-  if (count === 1) return { stale: false, label: i18n.t('reportFreshness.yesterday') }
-  if (count <= 7) return { stale: false, label: i18n.t('reportFreshness.daysAgo', { count }) }
-  return { stale: true, label: i18n.t('reportFreshness.noReportsDays', { count }) }
-}
-
 /** Turn an unknown thrown value into a user-facing message. */
 export function toErrorMessage(err: unknown): string {
   if (err instanceof Error) return err.message
