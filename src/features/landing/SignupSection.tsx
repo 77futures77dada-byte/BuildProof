@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { LandingCopy } from './copy'
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/
@@ -22,6 +22,13 @@ export function SignupSection({ copy }: { copy: LandingCopy }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [status, setStatus] = useState<Status>('idle')
+  const location = useLocation()
+
+  // Arriving from another route at /#start (e.g. «Начать бесплатно» on the
+  // login screen): this section mounts late (lazy chunk), so scroll here.
+  useEffect(() => {
+    if (location.hash === '#start') document.getElementById('start')?.scrollIntoView()
+  }, [location.hash])
 
   async function submit(e: FormEvent) {
     e.preventDefault()
