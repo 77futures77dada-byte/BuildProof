@@ -74,15 +74,6 @@
     "notUpdatedDays_one": "not updated for {{count}} day",
     "notUpdatedDays_other": "not updated for {{count}} days"
   },
-  "reportFreshness": {
-    "none": "no reports yet",
-    "today": "updated today",
-    "yesterday": "updated yesterday",
-    "daysAgo_one": "updated {{count}} day ago",
-    "daysAgo_other": "updated {{count}} days ago",
-    "noReportsDays_one": "no reports for {{count}} day",
-    "noReportsDays_other": "no reports for {{count}} days"
-  },
   "nav": {
     "overview": "Overview",
     "today": "Today",
@@ -98,9 +89,15 @@
     "password": "Password",
     "invalidCredentials": "Wrong email or password.",
     "profileLoadFailed": "Could not load your profile. {{error}}",
-    "notConfiguredTitle": "Profile not set up",
-    "notConfiguredText": "Your account exists, but the profile has not been set up yet. Please contact your administrator.",
-    "signedInAs": "Signed in as {{email}}"
+    "signedInAs": "Signed in as {{email}}",
+    "tagline": "Photos and stage progress from the crew, in one place for the owner and the client.",
+    "backHome": "← Back to home",
+    "noAccount": "No account?",
+    "startFree": "Start for free",
+    "emailNotConfirmed": "Your e-mail is not confirmed yet. Open the e-mail from BuildProof and confirm the address.",
+    "rateLimited": "Too many attempts. Wait a minute and try again.",
+    "network": "Cannot reach the server. Check the connection and try again.",
+    "signInFailed": "Could not sign in. Please try again a bit later."
   },
   "notFound": {
     "text": "This page does not exist.",
@@ -111,8 +108,14 @@
     "pickProject": "Choose a project",
     "createProject": "Create project",
     "loading": "Loading projects…",
-    "emptyGc": "No projects yet. Create your first one.",
-    "emptyOther": "You have not been given access to any project yet."
+    "emptyOther": "You have not been given access to any project yet.",
+    "empty": {
+      "title": "Set up your first site",
+      "step1": "Create a site: 7 standard stages are added for you.",
+      "step2": "Send the worker a link on WhatsApp.",
+      "step3": "The worker sends photos and a percentage; you see progress here.",
+      "action": "Create the first site"
+    }
   },
   "projectCard": {
     "noAddress": "No address",
@@ -144,7 +147,6 @@
     "issuesOpen_one": "open",
     "issuesOpen_other": "open",
     "updated": "Updated",
-    "notStarted": "Progress tracking has not started yet. Report progress on the first stage to begin.",
     "goToStages": "Go to stages",
     "noStages": "This project has no stages yet.",
     "recentPhotos": "Latest photos",
@@ -158,7 +160,15 @@
     "reportIssueFor": "Report an issue: {{stage}}",
     "photoHeading": "Photo · {{stage}}",
     "trendNone": "no change this week",
-    "trendWeek": "{{delta}}% this week"
+    "trendWeek": "{{delta}}% this week",
+    "next": {
+      "title": "What next",
+      "step1": "Send the worker a link on WhatsApp so they can send photos.",
+      "step2": "Mark how far along the first stage is.",
+      "step3": "Reports, photos and issues will appear on this page.",
+      "action": "Mark the first stage"
+    },
+    "notStartedReadOnly": "No reports for this site yet. Progress appears here after the first report."
   },
   "today": {
     "loadingProgress": "Loading progress…",
@@ -300,5 +310,26 @@
     "included": "Up to {{managers}} owners and managers, unlimited workers on personal links, a client page, PDF export.",
     "invoice": "One PDF invoice a month, one line per site. E-arve on request.",
     "noBilling": "There is no payment in the app yet: this page only shows the plan. Nothing is charged."
+  },
+  "onboarding": {
+    "title": "Account created. We will set up your company",
+    "text": "We will create your company and open access to your sites, usually within one working day. When it is ready, press “Check again”.",
+    "checkAgain": "Check again"
+  },
+  "reportStatus": {
+    "today": "Report today",
+    "yesterday": "Report yesterday",
+    "late_one": "{{count}} day without a report",
+    "late_other": "{{count}} days without a report",
+    "overdue_one": "{{count}} day without a report",
+    "overdue_other": "{{count}} days without a report",
+    "none": "No reports yet. Invite a worker",
+    "noneWaiting": "No reports yet, waiting for the first one from {{name}}"
+  },
+  "invite": {
+    "whatsapp": "Send the worker a link on WhatsApp",
+    "copy": "Copy the text",
+    "copied": "Copied",
+    "message": "Hello! We send photos and reports for “{{project}}” through BuildProof: {{url}}"
   }
 }
