@@ -11,6 +11,7 @@ import { FullPageSpinner, Spinner } from '../components/Spinner'
 import { CreateProjectForm } from '../components/CreateProjectForm'
 import { ProjectListCard } from '../components/ProjectListCard'
 import { WorkerProjectCard } from '../components/WorkerProjectCard'
+import { NextSteps } from '../components/NextSteps'
 import { ProfileNotConfigured } from './ProfileNotConfigured'
 
 export function Dashboard() {
@@ -63,7 +64,7 @@ export function Dashboard() {
           <h1 className="text-xl font-semibold text-slate-900">
             {isWorker ? t('dashboard.pickProject') : t('dashboard.title')}
           </h1>
-          {isGc && !creating ? (
+          {isGc && !creating && (loading || projects.length > 0) ? (
             <Button onClick={() => setCreating(true)}>{t('dashboard.createProject')}</Button>
           ) : null}
         </div>
@@ -84,11 +85,19 @@ export function Dashboard() {
         {loading ? (
           <Spinner label={t('dashboard.loading')} />
         ) : projects.length === 0 && !error ? (
-          <p className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-500">
-            {isGc
-              ? t('dashboard.emptyGc')
-              : t('dashboard.emptyOther')}
-          </p>
+          isGc ? (
+            creating ? null : (
+              <NextSteps
+                title={t('dashboard.empty.title')}
+                steps={[t('dashboard.empty.step1'), t('dashboard.empty.step2'), t('dashboard.empty.step3')]}
+                action={<Button onClick={() => setCreating(true)}>{t('dashboard.empty.action')}</Button>}
+              />
+            )
+          ) : (
+            <p className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-500">
+              {t('dashboard.emptyOther')}
+            </p>
+          )
         ) : (
           <ul className="space-y-3">
             {projects.map((project) => (

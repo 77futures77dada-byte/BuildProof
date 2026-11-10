@@ -24,6 +24,8 @@ import { IssueForm } from '../components/IssueForm'
 import { StageActionButtons } from '../components/StageActionButtons'
 import type { StageActionCapabilities, StageActionKind } from '../components/StageActionButtons'
 import { HouseModelBlock } from '../features/house3d/HouseModelBlock'
+import { NextSteps } from '../components/NextSteps'
+import { InviteWorkerLink } from '../components/InviteWorkerLink'
 
 const PRIORITY_BADGE: Record<IssuePriority, string> = {
   high: 'bg-red-100 text-red-800',
@@ -113,6 +115,7 @@ export function ProjectDashboardView({
   const freshness = getUpdateFreshness(lastUpdatedAt)
   const stagesExist = stages.length > 0
 
+  const canInvite = role === 'gc' || role === 'foreman'
   const capabilities = capabilitiesFor(role)
   const rowActionsEnabled = capabilities.photo || capabilities.task || capabilities.issue
   const [action, setAction] = useState<StageAction | null>(null)
@@ -155,16 +158,24 @@ export function ProjectDashboardView({
             </StatTile>
           </div>
 
-          {!hasStageHistory ? (
-            <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <ProgressBar value={overallPercent} />
-              <p className="text-sm text-slate-600">
-                {t('overview.notStarted')}
-              </p>
-              <Link to={`/project/${projectId}/stages`} className={linkButtonClass}>
-                {t('overview.goToStages')}
-              </Link>
-            </div>
+          {!hasStageHistory && !lastUpdatedAt ? (
+            canInvite ? (
+              <NextSteps
+                title={t('overview.next.title')}
+                steps={[t('overview.next.step1'), t('overview.next.step2'), t('overview.next.step3')]}
+                action={
+                  <Link to={`/project/${projectId}/stages`} className={linkButtonClass}>
+                    {t('overview.next.action')}
+                  </Link>
+                }
+                secondary={<InviteWorkerLink projectName={data.project.name} />}
+              />
+            ) : (
+              <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <ProgressBar value={overallPercent} />
+                <p className="text-sm text-slate-600">{t('overview.notStartedReadOnly')}</p>
+              </div>
+            )
           ) : null}
         </section>
       ) : (
