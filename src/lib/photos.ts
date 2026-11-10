@@ -60,7 +60,8 @@ export async function uploadProjectPhoto(input: UploadPhotoInput): Promise<void>
   try {
     ;({ blob } = await resizeImageToJpeg(file))
   } catch (err) {
-    throw new PhotoUploadError('resize', messageOf(err, i18n.t('photos.prepareFailed')))
+    console.warn('photo resize failed:', err)
+    throw new PhotoUploadError('resize', i18n.t('photos.prepareFailed'))
   }
 
   const path = buildStoragePath(projectId, projectStageId, file.name)
@@ -69,10 +70,8 @@ export async function uploadProjectPhoto(input: UploadPhotoInput): Promise<void>
     .from(PHOTOS_BUCKET)
     .upload(path, blob, { contentType: 'image/jpeg', upsert: false })
   if (storageError) {
-    throw new PhotoUploadError(
-      'storage',
-      i18n.t('photos.uploadFailed', { message: storageError.message }),
-    )
+    console.warn('photo upload failed:', storageError)
+    throw new PhotoUploadError('storage', i18n.t('photos.uploadFailed'))
   }
 
   const { error: dbError } = await supabase.from('photos').insert({
@@ -84,22 +83,12 @@ export async function uploadProjectPhoto(input: UploadPhotoInput): Promise<void>
   })
 
   if (dbError) {
+    // Details for support go to the console; the worker sees one plain line.
+    console.warn('photo insert failed:', dbError)
     const { error: cleanupError } = await supabase.storage
       .from(PHOTOS_BUCKET)
       .remove([path])
-    if (cleanupError) {
-      throw new PhotoUploadError(
-        'db',
-        i18n.t('photos.dbFailedOrphan', { message: dbError.message, path }),
-      )
-    }
-    throw new PhotoUploadError(
-      'db',
-      i18n.t('photos.dbFailedCleaned', { message: dbError.message }),
-    )
+    if (cleanupError) console.warn('orphaned photo left in storage:', path, cleanupError)
+    throw new PhotoUploadError('db', i18n.t('photos.saveFailed'))
   }
-}
-
-function messageOf(err: unknown, fallback: string): string {
-  return err instanceof Error ? err.message : fallback
 }

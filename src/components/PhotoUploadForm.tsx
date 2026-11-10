@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { PHOTO_MAX_EDGE } from '../lib/image'
 import { stageLabel } from '../i18n/stageLabel'
 import { useAuth } from '../hooks/useAuth'
 import { useStageOptions } from '../hooks/useStageOptions'
@@ -132,9 +131,6 @@ export function PhotoUploadForm({
           {t('common.cancel')}
         </Button>
       </div>
-      <p className="text-xs text-slate-500">
-        {t('common.photoResizeHint', { size: PHOTO_MAX_EDGE })}
-      </p>
     </form>
   )
 }
