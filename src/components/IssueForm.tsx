@@ -1,11 +1,9 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { PHOTO_MAX_EDGE } from '../lib/image'
 import { useAuth } from '../hooks/useAuth'
 import { createIssue } from '../lib/issues'
 import { toErrorMessage } from '../lib/format'
-import type { IssuePriority } from '../types'
 import { Button } from './Button'
 import { TextField } from './TextField'
 import { ErrorMessage } from './ErrorMessage'
@@ -20,15 +18,20 @@ interface IssueFormProps {
 const fieldClass =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200'
 
-const PRIORITIES: IssuePriority[] = ['low', 'medium', 'high']
-
+/**
+ * «Сообщить о проблеме», built for a phone on site: photo, one line
+ * «Что случилось», urgent / not urgent, «Отправить». Everything else sits
+ * under «Ещё»; responsible party and deadline only for the owner/foreman, who
+ * manage issues. Urgent → priority `high`, not urgent → `medium`.
+ */
 export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const { t } = useTranslation()
+  const manages = profile?.role === 'gc' || profile?.role === 'foreman'
 
   const [title, setTitle] = useState('')
+  const [urgent, setUrgent] = useState(false)
   const [description, setDescription] = useState('')
-  const [priority, setPriority] = useState<IssuePriority>('medium')
   const [responsibleParty, setResponsibleParty] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [file, setFile] = useState<File | null>(null)
@@ -52,9 +55,9 @@ export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
         projectId,
         title,
         description,
-        priority,
-        responsibleParty,
-        dueDate: dueDate || null,
+        priority: urgent ? 'high' : 'medium',
+        responsibleParty: manages ? responsibleParty : '',
+        dueDate: manages && dueDate ? dueDate : null,
         file,
         createdBy: user.id,
       })
@@ -66,12 +69,26 @@ export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
     }
   }
 
+  const choice = (active: boolean, tone: 'red' | 'sky') =>
+    `flex min-h-12 flex-1 cursor-pointer items-center justify-center rounded-lg border-2 px-3 text-sm font-semibold transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-sky-600 ${
+      active
+        ? tone === 'red'
+          ? 'border-red-600 bg-red-50 text-red-800'
+          : 'border-sky-600 bg-sky-50 text-sky-900'
+        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+    }`
+
   return (
     <form
       onSubmit={handleSubmit}
       className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
     >
       <h2 className="text-base font-semibold text-slate-900">{t('issues.formHeading')}</h2>
+
+      <div className="space-y-1">
+        <span className="text-sm font-medium text-slate-700">{t('issues.photo')}</span>
+        <ImagePicker onChange={setFile} disabled={busy} />
+      </div>
 
       <TextField
         label={t('issues.titleField')}
@@ -82,71 +99,70 @@ export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
         placeholder={t('issues.titlePlaceholder')}
       />
 
-      <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">{t('issues.description')}</span>
-        <textarea
-          value={description}
-          disabled={busy}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={3}
-          className={fieldClass}
-          placeholder={t('common.optional')}
-        />
-      </label>
+      <fieldset disabled={busy}>
+        <legend className="mb-1 text-sm font-medium text-slate-700">{t('issues.urgency')}</legend>
+        <div className="flex gap-2">
+          <label className={choice(urgent, 'red')}>
+            <input type="radio" name="urgency" className="sr-only" checked={urgent} onChange={() => setUrgent(true)} />
+            {t('issues.urgent')}
+          </label>
+          <label className={choice(!urgent, 'sky')}>
+            <input type="radio" name="urgency" className="sr-only" checked={!urgent} onChange={() => setUrgent(false)} />
+            {t('issues.notUrgent')}
+          </label>
+        </div>
+      </fieldset>
 
-      <div className="space-y-1">
-        <span className="text-sm font-medium text-slate-700">{t('issues.photo')}</span>
-        <ImagePicker onChange={setFile} disabled={busy} />
-      </div>
-
-      <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">{t('issues.priority')}</span>
-        <select
-          value={priority}
-          disabled={busy}
-          onChange={(e) => setPriority(e.target.value as IssuePriority)}
-          className={fieldClass}
-        >
-          {PRIORITIES.map((p) => (
-            <option key={p} value={p}>
-              {t(`issuePriority.${p}`)}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <TextField
-        label={t('issues.responsible')}
-        value={responsibleParty}
-        disabled={busy}
-        onChange={(e) => setResponsibleParty(e.target.value)}
-        placeholder={t('issues.responsiblePlaceholder')}
-      />
-
-      <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">{t('issues.dueDate')}</span>
-        <input
-          type="date"
-          value={dueDate}
-          disabled={busy}
-          onChange={(e) => setDueDate(e.target.value)}
-          className={fieldClass}
-        />
-      </label>
+      <details className="rounded-lg border border-slate-200 px-3 py-2">
+        <summary className="flex min-h-8 cursor-pointer items-center text-sm font-medium text-slate-600">
+          {t('issues.more')}
+        </summary>
+        <div className="mt-3 space-y-4">
+          <label className="block space-y-1">
+            <span className="text-sm font-medium text-slate-700">{t('issues.description')}</span>
+            <textarea
+              value={description}
+              disabled={busy}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              className={fieldClass}
+              placeholder={t('common.optional')}
+            />
+          </label>
+          {manages ? (
+            <>
+              <TextField
+                label={t('issues.responsible')}
+                value={responsibleParty}
+                disabled={busy}
+                onChange={(e) => setResponsibleParty(e.target.value)}
+                placeholder={t('issues.responsiblePlaceholder')}
+              />
+              <label className="block space-y-1">
+                <span className="text-sm font-medium text-slate-700">{t('issues.dueDate')}</span>
+                <input
+                  type="date"
+                  value={dueDate}
+                  disabled={busy}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  className={fieldClass}
+                />
+              </label>
+            </>
+          ) : null}
+        </div>
+      </details>
 
       <ErrorMessage message={error} />
 
       <div className="flex gap-2">
-        <Button type="submit" loading={busy}>
-          {t('issues.create')}
+        <Button type="submit" loading={busy} className="min-h-12 flex-1">
+          {t('issues.submit')}
         </Button>
-        <Button type="button" variant="secondary" onClick={onCancel} disabled={busy}>
+        <Button type="button" variant="secondary" onClick={onCancel} disabled={busy} className="min-h-12">
           {t('common.cancel')}
         </Button>
       </div>
-      <p className="text-xs text-slate-500">
-        {t('common.photoResizeHint', { size: PHOTO_MAX_EDGE })}
-      </p>
     </form>
   )
 }
