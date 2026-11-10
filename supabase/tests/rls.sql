@@ -1,7 +1,17 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(20);
+select plan(28);
+select is(
+  has_function_privilege('anon','public.create_project_with_stages(uuid,text,text,date,numeric)','EXECUTE'),
+  false,
+  'anonymous users cannot create projects through the RPC'
+);
+select is(
+  has_function_privilege('authenticated','public.create_project_with_stages(uuid,text,text,date,numeric)','EXECUTE'),
+  true,
+  'authenticated users can call the project creation RPC'
+);
 select is(
   has_column_privilege('authenticated','public.profiles','role','UPDATE'),
   false,
@@ -13,7 +23,15 @@ insert into auth.users(id,aud,role,email,encrypted_password,email_confirmed_at,r
  ('10000000-0000-4000-8000-000000000002','authenticated','authenticated','worker-a@test.invalid','',now(),'{}','{}',now(),now()),
  ('20000000-0000-4000-8000-000000000001','authenticated','authenticated','gc-b@test.invalid','',now(),'{}','{}',now(),now()),
  ('10000000-0000-4000-8000-000000000003','authenticated','authenticated','client-a@test.invalid','',now(),'{}','{}',now(),now()),
- ('10000000-0000-4000-8000-000000000004','authenticated','authenticated','foreman-a@test.invalid','',now(),'{}','{}',now(),now());
+ ('10000000-0000-4000-8000-000000000004','authenticated','authenticated','foreman-a@test.invalid','',now(),'{}','{}',now(),now()),
+ ('10000000-0000-4000-8000-000000000005','authenticated','authenticated','onboarding-a@test.invalid','',now(),
+  '{"provider":"email","providers":["email"]}',
+  '{"company_name":"Signup Company","full_name":"Signup Owner"}',now(),now());
+select is((select count(*) from public.profiles where id='10000000-0000-4000-8000-000000000005'),1::bigint,
+  'signup creates a profile');
+select is((select role::text from public.profiles where id='10000000-0000-4000-8000-000000000005'),'gc',
+  'signup profile receives the owner app role');
+delete from public.profiles where id='10000000-0000-4000-8000-000000000005';
 insert into public.companies(id,name) values
  ('30000000-0000-4000-8000-000000000001','Tenant A'),('30000000-0000-4000-8000-000000000002','Tenant B');
 insert into public.profiles(id,company_id,full_name,role) values
@@ -21,7 +39,8 @@ insert into public.profiles(id,company_id,full_name,role) values
  ('10000000-0000-4000-8000-000000000002','30000000-0000-4000-8000-000000000001','Worker A','worker'),
  ('20000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000002','GC B','gc'),
  ('10000000-0000-4000-8000-000000000003','30000000-0000-4000-8000-000000000001','Client A','client'),
- ('10000000-0000-4000-8000-000000000004','30000000-0000-4000-8000-000000000001','Foreman A','foreman');
+ ('10000000-0000-4000-8000-000000000004','30000000-0000-4000-8000-000000000001','Foreman A','foreman')
+on conflict (id) do update set company_id=excluded.company_id,full_name=excluded.full_name,role=excluded.role;
 insert into public.projects(id,company_id,name) values
  ('40000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','Project A'),
  ('40000000-0000-4000-8000-000000000002','30000000-0000-4000-8000-000000000002','Project B');
@@ -58,13 +77,33 @@ select throws_ok($$insert into public.issues(project_id,title,created_by) values
 select throws_ok($$insert into public.photos(project_id,storage_path,uploaded_by) values ('40000000-0000-4000-8000-000000000001','40000000-0000-4000-8000-000000000001/no.jpg',auth.uid())$$,'42501',null,'client cannot create photos');
 select throws_ok($$insert into public.tasks(project_id,title,created_by) values ('40000000-0000-4000-8000-000000000001','forbidden',auth.uid())$$,'42501',null,'client cannot create tasks');
 select throws_ok($$select public.update_stage_progress('50000000-0000-4000-8000-000000000001',5)$$,'P0001','forbidden','client cannot update stage progress');
+select throws_ok($$select public.create_project_with_stages('30000000-0000-4000-8000-000000000001','Client project')$$,
+  'P0001','forbidden','client cannot create projects through the RPC');
 select throws_ok($$insert into public.stage_reports(project_stage_id,project_id,reporter_id,old_percent,new_percent) values ('50000000-0000-4000-8000-000000000001','40000000-0000-4000-8000-000000000001',auth.uid(),0,5)$$,'42501',null,'client cannot write reports directly');
 
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000004',true);
 select lives_ok($$select public.update_stage_progress('50000000-0000-4000-8000-000000000001',5)$$,'foreman can update stage through RPC');
+select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000005',true);
+select is(
+  (select c.name from public.companies c
+   where c.id=public.create_company_and_profile('Recovered Company','Recovered Owner')),
+  'Recovered Company'::text,
+  'onboarding RPC creates a company and profile for an existing auth user'
+);
+select is(
+  public.create_company_and_profile('Ignored Retry Name','Ignored Retry Name'),
+  (select company_id from public.profiles where id=auth.uid()),
+  'onboarding RPC retry returns the same company without creating a duplicate'
+);
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',true);
 select is((select count(*) from public.projects where id='40000000-0000-4000-8000-000000000002'),0::bigint,'gc cannot read another tenant project');
 select throws_ok($$insert into public.project_access(project_id,user_id) values ('40000000-0000-4000-8000-000000000002','20000000-0000-4000-8000-000000000001')$$,'42501',null,'gc cannot grant another tenant access');
+select is(
+  (select count(*) from public.project_stages ps
+   where ps.project_id=public.create_project_with_stages('30000000-0000-4000-8000-000000000001','RPC project')),
+  7::bigint,
+  'company owner creates a project with all stages through the RPC'
+);
 
 reset role;
 select * from finish();
