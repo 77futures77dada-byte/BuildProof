@@ -32,5 +32,6 @@ dist-ssr
 .agents/
 .claude/
 agent/
-marketing/
+marketing/*
+!marketing/tiktok-30s/
 skills-lock.json

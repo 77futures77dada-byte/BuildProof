@@ -1,0 +1,81 @@
+{
+  "_meta": {
+    "lang": "et",
+    "status": "TODO native ET review",
+    "note": "Machine-assisted translation from RU. Every string needs a native Estonian speaker before this version is published."
+  },
+  "sub": {
+    "hook": "Mitu korda te täna objektile helistasite?",
+    "problem": "Te ei näe ehitust",
+    "report": "Tööline: foto ja protsent paari puudutusega",
+    "jump": "Suure hüppe kontrollib töödejuhataja",
+    "owner": "Kohe on näha, kus töö seisab",
+    "overview": "Kinnitatu on eraldi kontrolli ootavast",
+    "offline": "Levi pole? Aruanne ootab telefonis",
+    "client": "Tellijale — ainult kontrollitu",
+    "final": ""
+  },
+  "role": {
+    "owner": "Omanik",
+    "worker": "Tööline",
+    "foreman": "Töödejuhataja",
+    "client": "Tellija"
+  },
+  "hook": {
+    "bubble": "Kuidas läheb?",
+    "calls": "Kõnesid täna"
+  },
+  "report": {
+    "camera": "Etapi foto",
+    "title": "Aruanne",
+    "stage": "Katus",
+    "send": "Saada",
+    "sending": "Saadan…",
+    "sent": "Saadetud ✓"
+  },
+  "jump": {
+    "stage": "Aknad",
+    "tag": "hüpe +40",
+    "pending": "○ Ootab kontrolli",
+    "review": "Kontroll",
+    "confirm": "Kinnita",
+    "verified": "Kontrollitud ✓"
+  },
+  "owner": {
+    "title": "Minu objektid · 3",
+    "c1": "Tartu",
+    "s1": "Aruanne täna",
+    "c2": "Elva",
+    "s2": "2 päeva aruandeta",
+    "c3": "Võru",
+    "s3": "5 päeva aruandeta",
+    "urgent": "Kiire: torud puudu"
+  },
+  "overview": {
+    "accepted": "Kinnitatud",
+    "withPending": "koos kontrolli ootavatega",
+    "lAccepted": "Kinnitatud",
+    "lWork": "Töös",
+    "lNone": "Aruanded puudu",
+    "lTodo": "Alustamata"
+  },
+  "offline": {
+    "title": "Aruanne",
+    "saved": "Salvestatud telefoni, saatmata"
+  },
+  "client": {
+    "title": "Tööde käik",
+    "st1": "Vundament",
+    "st2": "Karkass",
+    "st3": "Katus",
+    "st4": "Aknad",
+    "note": "% näitab tööde käiku, ei ole makse alus"
+  },
+  "final": {
+    "trial": "30 päeva tasuta",
+    "price": "alates 29 € objekti kohta kuus",
+    "workers": "Töölistele — tasuta",
+    "site": "<<ADDRESS>>",
+    "cta": "Proovi"
+  }
+}

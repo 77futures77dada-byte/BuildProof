@@ -1,0 +1,131 @@
+<!doctype html>
+<html
+  lang="ru"
+  data-composition-variables='[{"id":"lang","type":"enum","label":"Language","default":"ru","options":[{"value":"ru","label":"Русский"},{"value":"en","label":"English"},{"value":"et","label":"Eesti (TODO native ET review)"}]}]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>BuildProof TikTok 30s</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "AdHead"; /* Press Start 2P, OFL */
+        src: url("assets/fonts/PressStart2P-Regular.ttf") format("truetype");
+      }
+      @font-face {
+        font-family: "AdUi"; /* Departure Mono, OFL (VT323 has no Cyrillic) */
+        src: url("assets/fonts/DepartureMono-Regular.otf") format("opentype");
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #071d34;
+      }
+      #root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+      }
+      /* 270x480 logical pixels shown at exactly x4 */
+      #ad {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        image-rendering: pixelated;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="30"
+      data-width="1080"
+      data-height="1920"
+    >
+      <canvas
+        id="ad"
+        class="clip"
+        data-start="0"
+        data-duration="30"
+        data-track-index="0"
+        data-track-kind="graphics"
+        data-layout-allow-overflow
+        width="270"
+        height="480"
+      ></canvas>
+      <audio
+        id="music"
+        class="clip"
+        data-start="0"
+        data-duration="30"
+        data-track-index="1"
+        data-volume="1"
+        src="assets/audio/music.wav"
+      ></audio>
+      <audio
+        id="sfx"
+        class="clip"
+        data-start="0"
+        data-duration="30"
+        data-track-index="2"
+        data-volume="1"
+        src="assets/audio/sfx.wav"
+      ></audio>
+    </div>
+    <script src="src/timeline.js"></script>
+    <script src="src/texts.gen.js"></script>
+    <script src="src/engine.js"></script>
+    <script src="src/scenes.js"></script>
+    <script>
+      // The frame is a pure function of time: HyperFrames seeks with "hf-seek",
+      // any other frame grabber can call window.__setT(t).
+      (function () {
+        const params = new URLSearchParams(location.search);
+        const vars =
+          (window.__hyperframes && window.__hyperframes.getVariables && window.__hyperframes.getVariables()) || {};
+        const lang = params.get("lang") || vars.lang || "ru";
+        const texts = window.AD_TEXTS[lang] || window.AD_TEXTS.ru;
+        const opts = { safe: params.get("safe") === "1" };
+        let time = 0;
+        let ready = false;
+        function draw() {
+          if (ready) window.AD.render(time, opts);
+        }
+        window.__setT = function (t) {
+          time = t;
+          draw();
+        };
+        window.addEventListener("hf-seek", function (e) {
+          window.__setT(e.detail.time);
+        });
+        Promise.all([
+          document.fonts.load('8px "AdHead"', "AЖõ€"),
+          document.fonts.load('11px "AdUi"', "AЖõ€"),
+        ]).then(function () {
+          window.PX.init(document.getElementById("ad"));
+          window.AD.setLang(texts);
+          document.documentElement.lang = lang;
+          ready = true;
+          draw();
+          const tl = gsap.timeline({ paused: true });
+          tl.to({}, { duration: 30 }, 0);
+          window.__timelines = window.__timelines || {};
+          window.__timelines["main"] = tl;
+          window.__adReady = true;
+        });
+      })();
+    </script>
+  </body>
+</html>

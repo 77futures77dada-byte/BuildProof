@@ -1,0 +1,13 @@
+{
+  "name": "buildproof-tiktok-30s",
+  "private": true,
+  "type": "module",
+  "description": "30 s pixel-art TikTok ad for BuildProof (1080x1920, 30 fps). Sources and render scripts.",
+  "scripts": {
+    "render:ad": "node scripts/render.mjs",
+    "texts": "node scripts/build-texts.mjs",
+    "audio": "node scripts/make-audio.mjs",
+    "check": "node scripts/build-texts.mjs && npx --yes hyperframes@0.9.38 check",
+    "dev": "node scripts/build-texts.mjs && npx --yes hyperframes@0.9.38 preview"
+  }
+}
