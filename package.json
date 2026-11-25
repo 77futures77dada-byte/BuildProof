@@ -12,7 +12,11 @@
     "test": "vitest run src",
     "test:house3d": "vitest run src/features/house3d/stagesToParts.test.ts",
     "test:api": "node --experimental-strip-types --test api/tests/invite.test.ts",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:tokens": "node scripts/check-tokens.mjs",
+    "check:ru": "node scripts/check-ru-latin.mjs",
+    "check:overflow": "node scripts/check-overflow.mjs",
+    "checks": "node scripts/run-checks.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.113.0",
