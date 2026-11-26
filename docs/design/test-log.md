@@ -64,3 +64,14 @@ OVERFLOW project photos /project/p1/photos @360: scrollWidth 394 > 360; header.b
 OVERFLOW project photos /project/p1/photos @390: scrollWidth 394 > 390; header.bp-nav > div.mx-auto.flex.max-w-5xl > div.flex.items-center.gap-2 (w 246, right 394)
 ```
 </details>
+
+## 2026-11-26T20:11:19Z — UI foundation: tokens, theme root, strict check-tokens
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.04s, VITE_SUPABASE_URL=fixture (13s) |
+| test | PASS | 8 passed (8); 38 passed (38) (8s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=129 allowlisted=41 temporary=36 (0s) |
+| check-ru-latin | PASS | offending=0 strings=562 (json=283, landing=279) (0s) |
+| check-overflow | PASS | routes=31 loads=248 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=191 a11y_small_text=101 (a11y = warnings; --strict-a11y to fail) (116s) |

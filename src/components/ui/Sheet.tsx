@@ -1,0 +1,107 @@
+import { useEffect, useId, useRef } from 'react'
+import type { ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { portalTarget } from './theme'
+import { cx } from './cx'
+
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+interface SheetProps {
+  open: boolean
+  onClose: () => void
+  title: ReactNode
+  children: ReactNode
+  /** Sticky footer (the sheet's main action); stays visible above the keyboard. */
+  footer?: ReactNode
+  /**
+   * `busy-locked`: Esc, backdrop and «Закрыть» do nothing (first 3 s of sending, 03 §6.2).
+   * `busy-closable`: working, but may be closed.
+   */
+  busy?: 'busy-locked' | 'busy-closable'
+  className?: string
+}
+
+/**
+ * Bottom sheet (phone) / centered dialog ≥ 1024 px, max 560 px wide, ≤ 90vh.
+ * Portals into the themed root (#bp-root) so it keeps theme + data-zone (03 Ж8).
+ * Focus moves in, is trapped, and returns to the opener on close.
+ */
+export function Sheet({ open, onClose, title, children, footer, busy, className }: SheetProps) {
+  const { t } = useTranslation()
+  const titleId = useId()
+  const panel = useRef<HTMLDivElement>(null)
+  const locked = busy === 'busy-locked'
+  const lockedRef = useRef(locked)
+  const closeRef = useRef(onClose)
+  useEffect(() => {
+    lockedRef.current = locked
+    closeRef.current = onClose
+  })
+
+  useEffect(() => {
+    if (!open) return
+    const opener = document.activeElement as HTMLElement | null
+    const node = panel.current
+    const first = node?.querySelector<HTMLElement>(FOCUSABLE)
+    ;(first ?? node)?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        if (!lockedRef.current) closeRef.current()
+        return
+      }
+      if (e.key !== 'Tab' || !node) return
+      const items = [...node.querySelectorAll<HTMLElement>(FOCUSABLE)]
+      if (!items.length) { e.preventDefault(); return }
+      const [a, z] = [items[0], items[items.length - 1]]
+      if (e.shiftKey && document.activeElement === a) { e.preventDefault(); z.focus() }
+      else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus() }
+    }
+    document.addEventListener('keydown', onKey)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prevOverflow
+      opener?.focus?.()
+    }
+  }, [open])
+
+  if (!open) return null
+  return createPortal(
+    <div className="fixed inset-0 z-[var(--z-sheet)] flex items-end justify-center bg-scrim lg:items-center lg:p-6" onClick={() => { if (!locked) onClose() }}>
+      <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-busy={busy ? true : undefined}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+        className={cx(
+          'flex max-h-[90vh] w-full flex-col overflow-hidden rounded-t-sheet bg-page text-fg shadow-sheet outline-none',
+          'lg:max-w-[560px] lg:rounded-sheet',
+          className,
+        )}
+      >
+        <header className="flex items-center justify-between gap-3 border-b-2 border-line py-1 pr-1 pl-4">
+          <h2 id={titleId} className="m-0 min-w-0 text-h3 font-bold">{title}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={locked}
+            className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-control px-3 text-field font-semibold text-fg underline-offset-4 hover:underline focus-visible:outline-3 focus-visible:outline-focus disabled:opacity-60"
+          >
+            {t('common.close')}
+          </button>
+        </header>
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">{children}</div>
+        {footer ? (
+          <footer className="border-t-2 border-line bg-page px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))]">{footer}</footer>
+        ) : null}
+      </div>
+    </div>,
+    portalTarget(),
+  )
+}
