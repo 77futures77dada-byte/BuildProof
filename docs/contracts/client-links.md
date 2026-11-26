@@ -44,12 +44,13 @@ Visible stages stay in `project_stage_client_visibility(project_id, project_stag
 ## 3. Definitions the metrics need
 
 - **Open link** (for «Успех»): `revoked_at is null` at the moment the project becomes `completed`, **and** `first_opened_at is not null`.
-- **Success:** a project with `status = 'completed'` and at least one open link.
+- **Success is counted per project, not per token** [О3-14, М3-7]. A project with `status = 'completed'` succeeds if **any** of its links is open. A replacement link (§4) does not reset the fact that the old link was opened. Proposal: compute it as `min(first_opened_at)` over all of the project's links, or store it on the project.
   - Gap: `projects` has no `completed_at`. Proposal: add it, or log status changes. Codex decides.
 
 ## 4. What the UI will do once it exists
 
-- Owner, project «⋯» → «Ссылка для заказчика». The screen has a list of stages with switches (all off), «Предпросмотр как заказчик», and «Создать ссылку» (copy / WhatsApp).
+- Owner, project «⋯» → «Ссылка для заказчика». The screen has a list of stages with switches (all off), «Предпросмотр как заказчик», and «Создать ссылку» (copy / WhatsApp). In the UI `label` is required.
+- **Lost link** [О3-14, М3-7]: the token cannot be shown again. The action is «Создать новую ссылку» with one confirmation. It creates a new link and revokes the old one in the same step. Proposal: one RPC `replace_client_link(p_link_id) returns text`, so a half-done replacement cannot happen. The owner's list shows only active links.
 - Client page: text «% — ход работ, не основание для оплаты», visible stages, photos. For a `pending` stage, a quiet «обновляется».
 - Revoked or expired link: «Ссылка больше не действует». The contractor's contact is shown only if the company has one. There is no phone field yet (K23).
 
