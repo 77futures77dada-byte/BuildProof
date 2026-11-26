@@ -34,7 +34,7 @@ export function ReportStatusBadge({
           : status.kind === 'overdue'
             ? t('reportStatus.overdue', { count: status.days ?? 0 })
             : waitingFor
-              ? t('reportStatus.noneWaiting', { name: waitingFor })
+              ? t('reportStatus.noneWaiting', { names: waitingFor })
               : t('reportStatus.none')
 
   const kind = kindOf(status)

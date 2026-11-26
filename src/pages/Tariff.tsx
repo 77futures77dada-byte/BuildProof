@@ -40,7 +40,7 @@ export function Tariff() {
               <tr key={row.objects} className={`border-t border-slate-200 ${row.capped ? 'bg-amber-50' : ''}`}>
                 <td className="px-4 py-3 text-slate-800">
                   {row.capped
-                    ? t('tariff.capRow', { from: row.objects, max: p.capMaxObjects, gb: p.capStorageGb })
+                    ? t('tariff.capRow', { from: row.objects, max: p.capMaxObjects })
                     : t('tariff.objects', { count: row.objects })}
                 </td>
                 <td className="px-4 py-3 text-right text-lg font-semibold tabular-nums text-slate-900">{row.eur} €</td>
@@ -51,8 +51,7 @@ export function Tariff() {
 
         <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-700">
           <li>{t('tariff.days', { divisor: p.daysPerMonth })}</li>
-          <li>{t('tariff.trial', { days: p.trialDays, reminder: p.trialReminderDays })}</li>
-          <li>{t('tariff.included', { managers: p.includedManagers })}</li>
+          <li>{t('tariff.trial', { days: p.trialDays })}</li>
           <li>{t('tariff.invoice')}</li>
         </ul>
 

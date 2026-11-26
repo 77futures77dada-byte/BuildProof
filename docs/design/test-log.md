@@ -97,3 +97,24 @@ OVERFLOW project photos /project/p1/photos @390: scrollWidth 394 > 390; header.b
 | check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=139 allowlisted=41 temporary=36 (0s) |
 | check-ru-latin | PASS | offending=0 strings=562 (json=283, landing=279) (0s) |
 | check-overflow | PASS | routes=31 loads=248 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=191 a11y_small_text=101 (a11y = warnings; --strict-a11y to fail) (119s) |
+
+## 2026-11-26T20:21:25Z — Тексты: 04-copy → locales
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.05s, VITE_SUPABASE_URL=fixture (13s) |
+| test | PASS | 9 passed (9); 40 passed (40) (8s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=139 allowlisted=41 temporary=36 (0s) |
+| check-ru-latin | PASS | offending=0 strings=801 (json=522, landing=279) (0s) |
+| check-overflow | FAIL | routes=31 loads=248 overflow_failures=0 render_failures=2 page_errors=1 a11y_small_targets=191 a11y_small_text=101 (a11y = warnings; --strict-a11y to fail) (6983s) |
+
+<details><summary>check-overflow: first lines of the failure</summary>
+
+```
+RENDER project settings /project/p1/settings @1440 dark: root text 0 chars, final path /project/p1/settings
+ERROR project settings /project/p1/settings: pageerror: Failed to fetch dynamically imported module: http://127.0.0.1:4390/assets/App-DzPbowl1.js
+RENDER not-found signed in /no-such-page @1440 dark: page.goto: net::ERR_NETWORK_IO_SUSPENDED at http://127.0.0.1:4390/no-such-page
+check-overflow: routes=31 loads=248 overflow_failures=0 render_failures=2 page_errors=1 a11y_small_targets=191 a11y_small_text=101 (a11y = warnings; --strict-a11y to fail)
+```
+</details>

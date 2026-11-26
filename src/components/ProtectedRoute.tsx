@@ -29,7 +29,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     return (
       <div className="mx-auto max-w-md p-6">
         <ErrorMessage
-          message={t('auth.profileLoadFailed', { error })}
+          message={t('auth.profileLoadFailed')}
           onRetry={() => void refreshProfile()}
         />
       </div>
