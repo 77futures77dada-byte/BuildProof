@@ -34,7 +34,7 @@
 8. **Честно о том, чего нет:** «Приглашение рабочих включится после настройки почты». Не «скоро», не «появится позже», не «в разработке», не даты.
 9. **Одна строка — одна роль, если действие у ролей разное** [М-M2, И-5]. Совет «сделайте X» получает только тот, кто может X. Остальным — «Скажите владельцу» / «Спросите владельца».
 10. **«Есть» пишем только про то, что работает в этой сборке** (бриф §2.2). Строка зависит от шлюза — у неё два ключа (`auth.tagline` / `auth.taglineOpen`).
-11. **Строка контакта** (`common.contact`) [М-L6, И-L3]: код собирает `{{contacts}}` только из заполненных полей `legal.ts` (`phone`, затем `email`), через «, ». Пустых частей и висящих запятых нет. Нет ни одного поля — строка не выводится.
+11. **Контакт** [М-L6, И-L3]: `common.contactPhone` и `common.contactEmail` — отдельные строки, каждая только при заполненном поле `legal.ts`. Склейки и висящих запятых нет. Нет ни одного поля — блок не выводится.
 
 ### 1.2. Запрещено
 | Что | Вместо |
@@ -86,16 +86,17 @@ EN: в существующих ключах «project» и «site» смеша�
 | `common.offline` | Нет сети | No connection | Ühendus puudub | нов. `NetBar`, только при `navigator.onLine === false` [Б-H1, И-10] |
 | `common.slow` | Долго грузится. Проверьте сеть. | Taking long to load. Check your connection. | Laadimine võtab kaua. Kontrollige ühendust. | нов. `app-loading` [И-10] |
 | `common.reload` | Обновить | Reload | Laadi uuesti | нов. кнопка к `common.slow` |
-| `common.details` | Подробнее | Details | Täpsemalt | нов. `today`, плашка черновиков [Б-M10] |
+| `send.details` | Подробнее | Details | Täpsemalt | нов. `today`, плашка черновиков [Б-M10]; [03 §12] |
 | `common.sessionMissing` | Вы вышли из аккаунта. Войдите снова. | You are signed out. Sign in again. | Olete välja logitud. Logige uuesti sisse. | изм. «Сессия» — технический термин |
 | `common.save` | Сохранить | Save | Salvesta | нов. 01 §3.1 шаг 3б |
 | `common.later` | Позже | Later | Hiljem | нов. 01 §3.1 шаг 3б |
+| `common.contactPhone` | Телефон: {{phone}} | Phone: {{phone}} | Telefon: {{phone}} | нов. **legal**, только при заполненном `phone`; своя строка — висящих запятых нет [М-L6, И-L3] [03 §12] |
+| `common.contactEmail` | Почта: {{email}} | Email: {{email}} | E-post: {{email}} | нов. **legal**, только при заполненном `email` [03 §12] |
 | `common.delete` | Удалить | Delete | Kustuta | нов. черновики, `stale` (01 §3.4) |
 | `common.undo` | Отменить | Undo | Võta tagasi | нов. плашка отмены (01 §3.3) |
 | `common.actions` | Действия | Actions | Toimingud | нов. подпись кнопки-меню «⋯» для чтения с экрана (01 §4) |
 | `common.stay` | Остаться | Stay | Jää | нов. выход с черновиками (01 §3.4 правило 6) |
 | `common.signOutAnyway` | Выйти всё равно | Sign out anyway | Logi ikkagi välja | нов. то же |
-| `common.contact` | Связь: {{contacts}} | Contact: {{contacts}} | Kontakt: {{contacts}} | нов. **legal**. Контакт в тупиках (brief §2.1б п.10). `contacts` — только заполненные поля, правило §1.1 п.11 [М-L6, И-L3] |
 
 ### 2.2. `roles`, `projectStatus`
 | Ключ | RU | EN | ET (`TODO native ET review`) | Почему |
@@ -118,7 +119,7 @@ EN: в существующих ключах «project» и «site» смеша�
 | `auth.startFree` | Начать бесплатно | Start for free | Alusta tasuta | без изм. RU; выводится только **шлюз+** (R:М4-1) |
 | `auth.signupLater` | Регистрация откроется после настройки почты. | Sign-up opens once email sending is set up. | Registreerimine avaneb, kui e-posti saatmine on seadistatud. | нов. **шлюз−**, вместо «Нет аккаунта? Начать бесплатно» (R:М4-1) |
 | `auth.forgotPassword` | Забыли пароль? | Forgot your password? | Unustasite parooli? | нов. **шлюз+** (01 §3.2 п.1) |
-| `auth.recoveryLater` | Восстановление пароля по почте включится после настройки почты. | Password recovery by email turns on once email sending is set up. | Parooli taastamine e-posti teel lülitub sisse, kui e-posti saatmine on seadistatud. | нов. **шлюз−**, вместо «Забыли пароль?» (01 §3.2 п.1); рядом `common.contact` только **legal** |
+| `auth.recoveryLater` | Восстановление пароля по почте включится после настройки почты. | Password recovery by email turns on once email sending is set up. | Parooli taastamine e-posti teel lülitub sisse, kui e-posti saatmine on seadistatud. | нов. **шлюз−**, вместо «Забыли пароль?» (01 §3.2 п.1); рядом `common.contactPhone` / `common.contactEmail` только **legal** |
 | `auth.signInPassword` | Войти с паролем | Sign in with password | Logi sisse parooliga | нов. экран `authentication_required` и `login-link-error` при **шлюз−** (R:Б4-М4, [И-4]) |
 | `auth.linkExpiredClosed` | Ссылка устарела. Войдите по паролю. | The link has expired. Sign in with your password. | Link on aegunud. Logige sisse parooliga. | нов. **шлюз−**: `#error=…otp_expired` / `access_denied`; кнопка `auth.signInPassword` [И-4] |
 
@@ -132,7 +133,7 @@ EN: в существующих ключах «project» и «site» смеша�
 | `auth.otherEmail` | Другая почта | Another email | Teine e-post | нов. 01 §0.3 |
 | `auth.haveInviteCode` | У меня есть код из приглашения | I have a code from an invitation | Mul on kutse kood | нов. R:Б4-HIGH, `verifyOtp` `type:'invite'` |
 | `auth.inviteTitle` | Вход по приглашению | Sign in with an invitation | Sisselogimine kutsega | нов. заголовок `login-invite-code` [И-10, Б-M10] |
-| `auth.inviteEmail` | Почта, на которую пришло приглашение | Email the invitation came to | E-post, kuhu kutse tuli | нов. подпись поля `login-invite-code` [И-10] |
+| `auth.inviteEmailLabel` | Почта, на которую пришло приглашение | Email the invitation came to | E-post, kuhu kutse tuli | нов. подпись поля `login-invite-code` [И-10]; [03 §12] |
 | `auth.resetTitle` | Сброс пароля | Reset password | Parooli lähtestamine | нов. `login-code-request` в режиме сброса [И-10] |
 | `auth.skipUseCode` | Пропустить, войду кодом | Skip, I will sign in with a code | Jäta vahele, login koodiga | нов. `auth-set-password`, вторично [И-10] |
 | `auth.code` | Код из письма | Code from the email | Kood e-kirjast | нов. подпись поля, `autocomplete="one-time-code"` (01 §4) |
@@ -146,8 +147,9 @@ EN: в существующих ключах «project» и «site» смеша�
 | `auth.neutralSent` | Если адрес есть в BuildProof, код придёт. Через минуту проверьте «Спам». | If this address is in BuildProof, the code will arrive. If not there in a minute, check Spam. | Kui see aadress on BuildProofis, kood tuleb. Kui minuti pärast pole, vaadake rämpsposti. | нов. адрес не найден, только публичный `/login` (01 §0.3, R:Б4-М6) |
 | `auth.sendFailed` | Не отправлено. Попробуйте ещё раз. | Not sent. Try again. | Ei saadetud. Proovige uuesti. | нов. сеть / прочее (01 §0.3) |
 | `auth.codeInvalid` | Код не подошёл или устарел. Проверьте цифры или запросите новый. | The code is wrong or expired. Check the digits or request a new one. | Kood ei sobi või on aegunud. Kontrollige numbreid või küsige uus. | нов. ответ `verifyOtp` (Supabase отдаёт `otp_expired` и на неверный, и на старый код); «запросите», не «пришлите» [Б-L5] |
-| `auth.codeInvalidInvite` | Код не подошёл. Проверьте цифры и почту выше. | The code did not work. Check the digits and the email above. | Kood ei sobinud. Kontrollige numbreid ja ülal olevat e-posti. | нов. `login-invite-code`: ошибка часто в почте [Б-M11] |
-| `auth.linkExpired` | Код или ссылка устарели. Пришлём новый. | The code or link has expired. We will send a new one. | Kood või link on aegunud. Saadame uue. | нов. **шлюз+** **K34**: `#error=…otp_expired` / `access_denied` (01 §0.3, §4); кнопка `auth.sendCode`. При **шлюз−** вместо неё `auth.linkExpiredClosed` [И-4] |
+| `auth.checkEmailAndCode` | Код не подошёл. Проверьте цифры и почту выше. | The code did not work. Check the digits and the email above. | Kood ei sobinud. Kontrollige numbreid ja ülal olevat e-posti. | нов. `login-invite-code`: ошибка часто в почте [Б-M11]; [03 §12] |
+| `auth.linkExpired` | Код или ссылка устарели. | The code or link has expired. | Kood või link on aegunud. | нов. оба состояния шлюза; дальше `auth.linkExpiredResend` + `auth.sendCode` (**шлюз+** **K34**) или `auth.linkExpiredClosed` (**шлюз−**) [И-4] [03 §12] |
+| `auth.linkExpiredResend` | Пришлём новый. | We will send a new one. | Saadame uue. | нов. **шлюз+** **K34**, рядом `auth.sendCode` [И-4] [03 §12] |
 | `auth.linkOtherBrowser` | Ссылка открылась в другом браузере. Откройте её там, где просили код, или введите код из письма. | The link opened in a different browser. Open it where you asked for the code, or enter the code from the email. | Link avanes teises brauseris. Avage see seal, kus koodi küsisite, või sisestage kood e-kirjast. | нов. ошибка `pkce` (01 §0.3) |
 | `auth.openInBrowser` | Если ссылка открылась внутри почты, откройте её в обычном браузере телефона. | If the link opened inside your mail app, open it in the phone’s normal browser. | Kui link avanes e-posti rakenduses, avage see telefoni tavalises brauseris. | нов. R:Б4-HIGH; без названий браузеров (бриф §2.4) |
 | `auth.emailInvalid` | Проверьте адрес: нужна почта вида имя@домен.ee | Check the address: it should look like name@domain.ee | Kontrollige aadressi: see peab olema kujul nimi@domeen.ee | нов. совпадает с лендингом `final.invalidEmail` |
@@ -173,7 +175,6 @@ EN: в существующих ключах «project» и «site» смеша�
 ### 2.6. `dashboard`, `reportStatus`, список объектов
 | Ключ | RU | EN | ET (`TODO native ET review`) | Почему |
 |---|---|---|---|---|
-| `dashboard.emptyOther` | Вас ещё не добавили ни на один объект. Скажите владельцу фирмы: он добавляет людей на объект. | You have not been added to any site yet. Tell the company owner: they add people to sites. | Teid pole veel ühelegi objektile lisatud. Öelge firma omanikule: tema lisab inimesi objektidele. | изм. пустое состояние называет, кто действует (brief §2.1 п.7) |
 | `dashboard.empty.step2` | Отметьте, на сколько готов первый этап. | Mark how far the first stage is. | Märkige, kui kaugel on esimene etapp. | изм. R:И4-HIGH — убрать WhatsApp; **шлюз−** |
 | `dashboard.empty.step2Open` | Пригласите рабочего по почте. Он войдёт кодом из письма, без пароля. | Invite a worker by email. They sign in with a code from the email, no password. | Kutsuge tööline e-posti teel. Ta logib sisse e-kirja koodiga, ilma paroolita. | нов. **шлюз+** **K34** (01 §3.2 п.3б) |
 | `dashboard.empty.step3` | Здесь будет видно, где работа идёт, а где стоит. | Here you will see where work moves and where it stalls. | Siin näete, kus töö käib ja kus seisab. | изм. **шлюз−**: рабочий пока отчитаться не может, не обещаем (brief §2.1 п.8) |
@@ -181,12 +182,15 @@ EN: в существующих ключах «project» и «site» смеша�
 | `dashboard.groupActive` | В работе | Active | Käimas | нов. сортировка: активные выше (01 §3.2 п.5) |
 | `dashboard.groupPaused` | На паузе | Paused | Pausil | нов. две группы, как в 03 §4.1 [М-L4, И-L5] |
 | `dashboard.groupCompleted` | Завершены | Completed | Lõpetatud | нов. то же |
+| `dashboard.emptyForeman` | Вас ещё не добавили ни на один объект. Скажите владельцу фирмы. | You have not been added to any site yet. Tell the company owner. | Teid pole veel ühelegi objektile lisatud. Öelge firma omanikule. | нов. `foreman`; замена `dashboard.emptyOther` [03 §12] |
+| `dashboard.emptyWorker` | Вас ещё не добавили ни на один объект. Скажите владельцу фирмы. | You have not been added to any site yet. Tell the company owner. | Teid pole veel ühelegi objektile lisatud. Öelge firma omanikule. | нов. `worker`; замена `dashboard.emptyOther` [03 §12] |
 | `dashboard.workerLastReport` | Ваш последний отчёт: {{date}} | Your last report: {{date}} | Teie viimane aruanne: {{date}} | нов. `dashboard-worker` [И-10] |
 | `dashboard.workerNoReport` | Вы ещё не отправляли отчётов | You have not sent any reports yet | Te pole veel aruandeid saatnud | нов. то же, без отчётов |
 | `dashboard.emptyClient` | Владелец фирмы ещё не открыл вам объект. | The company owner has not opened a site for you yet. | Firma omanik pole teile veel objekti avanud. | нов. `client`, **K8** (заказчика не приглашаем); «Подрядчик» → роль из словаря [И-L10] |
 | `reportStatus.markedByOwner` | Отметил владелец {{date}} | Marked by the owner {{date}} | Omanik märkis {{date}} | нов. **шлюз−** и без отчётов рабочих: чип карточки, свежесть по своим отметкам [М-H1], решение оркестратора п.4 |
 | `reportStatus.markedByForeman` | Отметил бригадир {{date}} | Marked by the foreman {{date}} | Brigadir märkis {{date}} | нов. то же, отметка бригадира |
-| `reportStatus.none` | Никто не приглашён | Nobody invited yet | Kedagi pole kutsutud | изм. R:И4-HIGH — убрать «Пригласите рабочего»; **шлюз−** серым, без дней (01 §3.2 п.4). Только если на объекте нет ни одной отметки; иначе `reportStatus.markedByOwner` / `markedByForeman` [М-H1] |
+| `reportStatus.none` | Никто не приглашён | Nobody invited yet | Kedagi pole kutsutud | изм. R:И4-HIGH — убрать «Пригласите рабочего». Только **шлюз+**, нет отметок; при **шлюз−** вместо неё `reportStatus.noMarks` [03 §12] |
+| `reportStatus.noMarks` | Отметок пока нет | No marks yet | Märkeid veel pole | нов. **шлюз−**, `day0`: серым, без дней [М-H1] [03 §12] |
 | `reportStatus.noneDays_one` | Никто не приглашён · {{count}} день | Nobody invited · {{count}} day | Kedagi pole kutsutud · {{count}} päev | нов. **шлюз+**, с 3-го дня (01 §3.2 п.4) |
 | `reportStatus.noneDays_few` | Никто не приглашён · {{count}} дня | — | — | нов. то же |
 | `reportStatus.noneDays_many` | Никто не приглашён · {{count}} дней | — | — | нов. то же |
@@ -209,15 +213,16 @@ EN: в существующих ключах «project» и «site» смеша�
 | `overview.next.inviteOpen` | Пригласить рабочего | Invite a worker | Kutsu tööline | нов. **шлюз+**, только `gc`: главное действие дня 0 (01 §4, [М-H2]) |
 | `overview.markStage` | Отметить этап | Mark a stage | Märgi etapp | нов. главная при `self-marked` (шлюз−, есть свои отметки, нет отчётов рабочих) и при `stale-3plus` без людей на объекте [М-H1] |
 | `overview.notStartedReadOnly` | Отчётов пока нет. Ход работ появится здесь. | No reports yet. Progress will appear here. | Aruandeid veel pole. Töö käik ilmub siia. | изм. `client` (и `worker` без отчётов): без «присылает рабочий» при **шлюз−** [М-M3] |
-| `overview.noStages` | У объекта нет этапов. | This site has no stages. | Objektil pole etappe. | изм. только `gc`; без совета «создайте заново» (дубль объекта и счёт дней) [И-5, М-M10], решение оркестратора п.6 |
 | `overview.openLastReport` | Открыть последний отчёт | Open the latest report | Ava viimane aruanne | нов. 01 §4; только если последний отчёт сделал **не** текущий пользователь [М-H1] |
 | `overview.openPeople` | Кто давно не отчитывался | Who has not reported lately | Kes pole ammu aru andnud | нов. только `gc`, 3+ дня без отчёта и есть люди на объекте (01 §3.2 п.4а); подпись говорит, что будет на экране [М-M9] |
 | `overview.staleForeman` | Давно нет отчёта от: {{names}}. Скажите владельцу. | No report for a while from: {{names}}. Tell the owner. | Ammu pole aruannet: {{names}}. Öelge omanikule. | нов. `foreman`, 3+ дня: главной кнопки нет, «Люди объекта» бригадиру недоступны [М-H2] |
 | `overview.readyPercent` | {{percent}}% готово | {{percent}}% done | {{percent}}% valmis | нов. `project-overview-owner` [И-10] |
+| `overview.updatedAt` | обновлено {{date}} | updated {{date}} | uuendatud {{date}} | нов. [03 §12] |
+| `stages.emptyOwner` | У объекта нет этапов. | This site has no stages. | Objektil pole etappe. | нов. `gc`; замена `overview.noStages` и `stages.empty`, без совета «создайте заново» [И-5, М-M10] [03 §12] |
 | `overview.showHouse` | Показать дом | Show the house | Näita maja | нов. 3D-дом свёрнут [И-10, М-L1] |
 | `overview.allPhotos` | Все фото | All photos | Kõik fotod | нов. [И-10] |
 | `overview.allIssues` | Все проблемы | All issues | Kõik probleemid | нов. [И-10] |
-| `overview.allHistory` | Вся история | Full history | Kogu ajalugu | нов. лента на мобильном [М-M11] |
+| `overview.feedAll` | Вся история | Full history | Kogu ajalugu | нов. лента на мобильном [М-M11]; [03 §12] |
 | `overview.feedTitle` | Что происходило | What happened | Mis toimus | нов. лента `project_activity` (01 §3.2 п.6) |
 | `overview.feedEmpty` | Событий пока нет. Здесь появятся отчёты рабочих и ваши отметки. | Nothing yet. Workers’ reports and your updates will appear here. | Sündmusi veel pole. Siia ilmuvad tööliste aruanded ja teie märked. | нов. пустое состояние |
 | `activity.report` | {{name}} · {{stage}}: было {{from}}%, стало {{to}}% | {{name}} · {{stage}}: was {{from}}%, now {{to}}% | {{name}} · {{stage}}: oli {{from}}%, nüüd {{to}}% | нов. без рода глагола (§1.1 п.6); без «→» |
@@ -241,6 +246,7 @@ EN: в существующих ключах «project» и «site» смеша�
 | `people.sendCode` | Отправить код входа | Send sign-in code | Saada sisselogimiskood | нов. **шлюз+** (01 §3.2 п.3в) |
 | `people.emailFor` | Почта для {{name}} | Email for {{name}} | E-post inimesele {{name}} | нов. почта вводится заново (K27); ET по смыслу «почта для» [И-L12] |
 | `people.all` | Все люди | All people | Kõik inimesed | нов. `project-people` [И-10] |
+| `people.sendCodeAgain` | Отправить код для повторного входа | Send a code to sign in again | Saada kood uuesti sisselogimiseks | нов. **шлюз+** **K34**, `/people` из `stale-3plus` [М-M9]; без рода («вошёл») [03 §12] |
 | `people.remove` | Убрать с объекта | Remove from site | Eemalda objektilt | нов. `gc`, меню строки; `project_access` delete [М-M1, И-10] |
 | `people.removeConfirm` | Убрать {{name}} с объекта? Отчёты и фото останутся в истории. Вернуть можно через «Уже работают у вас». | Remove {{name}} from this site? Reports and photos stay in the history. You can add them back from “Already working for you”. | Kas eemaldada {{name}} objektilt? Aruanded ja fotod jäävad ajalukku. Tagasi saab lisada loendist „Juba teie juures tööl“. | нов. `confirm-remove-person`: последствие; без рода |
 | `people.removed` | Убрано с объекта: {{name}} | Removed from site: {{name}} | Objektilt eemaldatud: {{name}} | нов. итог; без рода |
@@ -273,21 +279,21 @@ EN: в существующих ключах «project» и «site» смеша�
 ### 2.10. `today`, `report` — экран рабочего и лист отчёта
 | Ключ | RU | EN | ET (`TODO native ET review`) | Почему |
 |---|---|---|---|---|
-| `today.report` | Сфотографировать | Take a photo | Pildista | изм. главная кнопка, первая строка (20/600); камера сразу (01 §3.4). Этап — вторая строка `today.reportStage`, не в одной строке: на 360 не влезает [Б-M4]; в 03 = `today.cameraCta*` |
-| `today.reportStage` | Этап: {{stage}} | Stage: {{stage}} | Etapp: {{stage}} | нов. вторая строка главной кнопки (17/600), обрезка многоточием [Б-M4] |
+| `today.report` | Сфотографировать | Take a photo | Pildista | изм. главная кнопка; этап — `report.stage` над кнопкой, не в подписи: на 360 не влезает [Б-M4] [03 §12]; камера сразу (01 §3.4) |
 | `today.fromGallery` | Из галереи | From gallery | Galeriist | нов. 01 §3.4 вторично |
 | `today.otherStage` | Другой этап | Another stage | Teine etapp | нов. выбор этапа, затем камера [Б-M7, Б-M10] |
 | `today.continue` | Продолжить | Continue | Jätka | нов. черновик `editing` [Б-M10] |
-| `today.overallPercent` | Объект: {{percent}}% | Site: {{percent}}% | Objekt: {{percent}}% | нов. [Б-M10, И-10] |
+| `today.objectPercent` | Объект: {{percent}}% | Site: {{percent}}% | Objekt: {{percent}}% | нов. [Б-M10, И-10]; [03 §12] |
 | `today.myTasks` | Мои задачи | My tasks | Minu ülesanded | изм. как в каркасе 03 §6.1 [Б-L7] |
-| `today.myLastReport` | Мой последний отчёт: {{date}} | My last report: {{date}} | Minu viimane aruanne: {{date}} | нов. [Б-M10, И-10] |
-| `today.decisionNeeded_one` | {{count}} отчёт ждёт решения | {{count}} report needs a decision | {{count}} aruanne vajab otsust | нов. черновики `stale` [И-10] |
-| `today.decisionNeeded_few` | {{count}} отчёта ждут решения | — | — | нов. то же |
-| `today.decisionNeeded_many` | {{count}} отчётов ждут решения | — | — | нов. то же |
-| `today.decisionNeeded_other` | {{count}} отчёта ждут решения | {{count}} reports need a decision | {{count}} aruannet vajab otsust | нов. то же |
+| `today.lastReport` | Мой последний отчёт: {{stage}} · {{date}} | My last report: {{stage}} · {{date}} | Minu viimane aruanne: {{stage}} · {{date}} | нов. [Б-M10] [03 §12] |
+| `today.staleWaiting_one` | {{count}} отчёт ждёт решения | {{count}} report needs a decision | {{count}} aruanne vajab otsust | нов. черновики `stale` [И-10] |
+| `today.staleWaiting_few` | {{count}} отчёта ждут решения | — | — | нов. то же |
+| `today.staleWaiting_many` | {{count}} отчётов ждут решения | — | — | нов. то же |
+| `today.staleWaiting_other` | {{count}} отчёта ждут решения | {{count}} reports need a decision | {{count}} aruannet vajab otsust | нов. то же |
 | `today.allDone` | Все ваши задачи сделаны. Отчёт по этапу — кнопкой выше. | All your tasks are done. Report on a stage with the button above. | Kõik teie ülesanded on tehtud. Etapi aruanne — ülal oleva nupuga. | изм. короче [Б-L6] |
 | `today.noTasks` | Задач на вас пока нет: их ставит владелец или бригадир. Отчёт по этапу — кнопкой выше. | No tasks for you yet: the owner or foreman assigns them. Report on a stage with the button above. | Teile pole veel ülesandeid: need annab omanik või brigadir. Etapi aruanne — ülal oleva nupuga. | изм. называет, кто ставит задачи; короче [Б-L6, И-L8] |
 | `report.title` | Отчёт | Report | Aruanne | нов. заголовок листа [Б-M10, И-10] |
+| `report.addPhoto` | Добавить фото | Add photo | Lisa foto | нов. лист `gc`/`foreman` без камеры, вторичная [М-M6] [03 §12] |
 | `report.unfinished` | Вы не закончили отчёт | You did not finish the report | Te ei lõpetanud aruannet | нов. черновик `editing` (01 §3.4 правило 1) |
 | `report.wasWill` | было {{from}}%, станет {{to}}% | was {{from}}%, will be {{to}}% | oli {{from}}%, saab {{to}}% | нов. 01 §3.4 порядок п.3; без «→» |
 | `report.minus10` | −10 | −10 | −10 | нов. 01 §8 п.14 (знак минус U+2212) |
@@ -297,17 +303,17 @@ EN: в существующих ключах «project» и «site» смеша�
 | `report.noChange` | Без изменений | No change | Muutuseta | нов. по умолчанию и ссылка сброса при M ≠ N (≥ 48 px) [Б-M6]; только фото (01 §3.4 правило 3) |
 | `report.stage` | Этап: {{stage}} | Stage: {{stage}} | Etapp: {{stage}} | нов. порядок п.5 |
 | `report.changeStage` | Сменить | Change | Muuda | нов. то же; смена сбрасывает шаги в «Без изменений» [Б-M7] |
-| `report.stagePickerTitle` | Выберите этап | Choose a stage | Valige etapp | нов. лист выбора этапа `stage-picker` [Б-M7] |
+| `stagePicker.title` | Выберите этап | Choose a stage | Valige etapp | нов. лист выбора этапа `stage-picker` [Б-M7]; [03 §12] |
 | `report.yourPercent` | Ваш отчёт: {{percent}}% | Your report: {{percent}}% | Teie aruanne: {{percent}}% | нов. [Б-M10] |
 | `report.reasonTitle` | Почему меньше? | Why lower? | Miks vähem? | нов. только при снижении (порядок п.6) |
 | `report.pickReason` | Выберите причину | Choose a reason | Valige põhjus | нов. подпись неактивной «Отправить» при снижении [Б-M9, И-10] |
 | `report.reason.rework` | Переделка | Rework | Ümbertegemine | нов. decisions §5.6 |
 | `report.reason.mistake` | Ошибка в учёте | Counting mistake | Viga arvestuses | нов. то же |
 | `report.reason.demolition` | Снос | Demolition | Lammutamine | нов. то же |
-| `report.bigJump` | Большой скачок. Он будет отмечен в ленте объекта. | Big jump. It will be marked in the site feed. | Suur hüpe. See märgitakse objekti voos. | нов. скачок > 25, только `worker` (у `gc`/`foreman` плашки нет); без «владелец посмотрит» до K15 [И-M2, М-M2, Б-L4], бриф §2.4; «скачок», как в `activity.bigJump` |
+| `report.bigJump` | Большой скачок. Он будет отмечен в ленте объекта. | Big jump. It will be marked in the site feed. | Suur hüpe. See märgitakse objekti voos. | нов. **K15, не выводить** [03 §12]; без «владелец посмотрит» (бриф §2.4); только `worker` |
 | `report.paused` | Объект на паузе. Отчёт можно отправить. | The site is paused. You can still send a report. | Objekt on pausil. Aruande saab ikka saata. | нов. плашка паузы на листе и на `today` (порядок п.7); без «примут» — перекликается со скрытым «Принято» [И-L9] |
 | `report.send` | Отправить | Send | Saada | нов. sticky-кнопка листа (01 §4) |
-| `report.closeContinues` | Закрыть. Отправка продолжится, пока BuildProof открыт. | Close. Sending continues while BuildProof is open. | Sulge. Saatmine jätkub, kuni BuildProof on avatud. | нов. через 3 с после «Отправить» лист можно закрыть [Б-M1]; «пока открыт» — честно, без фона |
+| `report.closeSending` | Закрыть. Отправка продолжится, пока BuildProof открыт. | Close. Sending continues while BuildProof is open. | Sulge. Saatmine jätkub, kuni BuildProof on avatud. | нов. через 3 с после «Отправить» лист можно закрыть [Б-M1]; «пока открыт» — честно, без фона; [03 §12] |
 | `report.retake` | Переснять | Retake | Pildista uuesti | нов. явная вторичная кнопка рядом с миниатюрой (≥ 48 px); касание миниатюры фото не заменяет [Б-M8], решение п.5; и для `invalid_photo_path` |
 | `report.photoAlt` | Снимок для отчёта: {{stage}} | Report photo: {{stage}} | Aruande foto: {{stage}} | нов. `alt` миниатюры |
 
@@ -317,8 +323,9 @@ EN: в существующих ключах «project» и «site» смеша�
 | `send.sending` | Отправляется | Sending | Saadetakse | нов. brief §1; форма значка — только `02-type.md` §8 [М-M5] |
 | `send.sent` | Отправлено | Sent | Saadetud | нов. то же |
 | `send.sentEarlier` | Отправлено: дошло раньше | Sent: it arrived earlier | Saadetud: jõudis kohale varem | нов. проверка по `storage_path` (01 §3.4 «Отправка» п.2); без «✓» |
-| `send.queued` | Сохранено на телефоне, не отправлено. Откройте «Сегодня», когда будет сеть. | Saved on the phone, not sent. Open “Today” when you have signal. | Telefoni salvestatud, saatmata. Avage „Täna“, kui levi on olemas. | нов. `queued`; лист закрывается сам, плашка на «Сегодня» — экран, который рабочий найдёт [Б-M2], решение п.2; единственный текст до теста на iPhone (01 §3.4) |
+| `send.queued` | Сохранено на телефоне, не отправлено. Откройте «Сегодня» в BuildProof, когда будет сеть. | Saved on the phone, not sent. Open “Today” in BuildProof when you have signal. | Telefoni salvestatud, saatmata. Avage BuildProofis „Täna“, kui levi on olemas. | нов. `queued`; не «эту страницу» [Б-M2] [03 §12]; единственный текст до теста на iPhone (01 §3.4) |
 | `send.unknown` | Не знаем, дошёл ли отчёт. Фото сохранено на телефоне. | We do not know if the report arrived. The photo is saved on the phone. | Me ei tea, kas aruanne jõudis kohale. Foto on telefoni salvestatud. | нов. `unknown`: отвечает «дошло ли» и «где фото»; без «нет сети» и «проверим, когда появится» [Б-H1, И-3, М-M7], решение п.2 |
+| `send.unknownHint` | Откройте «Сегодня», когда будет сеть, — проверим. | Open “Today” when you have signal and we will check. | Avage „Täna“, kui levi on olemas, — kontrollime. | нов. вторая строка `unknown`: проверка только при открытой странице [Б-H1] [03 §12] |
 | `send.unknownAction` | Проверить ещё раз | Check again | Kontrolli uuesti | нов. кнопка `unknown`: проверка по `storage_path`, затем повтор [Б-H1], решение п.2 |
 | `send.stale` | Не принято: этап уже {{percent}}% | Not accepted: the stage is already {{percent}}% | Ei võetud vastu: etapp on juba {{percent}}% | нов. `stale` (01 §3.4 правило 4, R:Б4-М1) |
 | `send.staleResend` | Отправить с новым % | Send with new % | Saada uue %-ga | нов. то же |
@@ -351,7 +358,7 @@ EN: в существующих ключах «project» и «site» смеша�
 | `review.returnReason.tooHigh` | Процент завышен | Percentage too high | Protsent liiga suur | нов. **K15, не выводить** |
 | `review.returnReason.unclear` | На фото не видно работу | The work is not visible in the photo | Fotol pole tööd näha | нов. **K15, не выводить** |
 | `review.returnSend` | Вернуть с этой причиной | Send back with this reason | Saada tagasi selle põhjusega | нов. **K15, не выводить**; главная листа `review-return-reason`, если 03 оставит «выбор + кнопка» [Б-L3] |
-| `review.undoCount` | Подтверждено: {{count}} | Confirmed: {{count}} | Kinnitatud: {{count}} | нов. **K15, не выводить**; плашка-счётчик **без кнопки**: отмена только в строке (`common.undo`) [Б-M12] |
+| `review.undoN` | Отменить ({{count}}) | Undo ({{count}}) | Võta tagasi ({{count}}) | нов. **K15, не выводить**; одна кнопка плашки вместо пары счётчик + `common.undo`; отменяет последнее, окно — до конца окна последней строки [Б-M12] [03 §12] |
 | `review.confirmedRow` | Подтверждено | Confirmed | Kinnitatud | нов. **K15, не выводить**; свёрнутая строка + `common.undo`; без «✓» |
 | `review.confirmAllSmall` | Подтвердить все мелкие ({{count}}) | Confirm all small ({{count}}) | Kinnita kõik väikesed ({{count}}) | нов. **K21, не выводить**: мелких в очереди сейчас нет по определению [Б-M15] |
 | `review.closedEarly` | Не подтверждено: страница закрылась раньше. | Not confirmed: the page closed too early. | Kinnitamata: leht suleti liiga vara. | нов. **K15, не выводить** (01 §3.3 «Отправка») |
@@ -438,13 +445,13 @@ EN: в существующих ключах «project» и «site» смеша�
 | `photos.emptyStage` | Для этого этапа фото пока нет. | No photos for this stage yet. | Selle etapi fotosid veel pole. | изм. без «рабочий добавляет» при **шлюз−** [М-M3]; кнопка `photos.takePhoto` рядом |
 | `photos.takePhoto` | Сфотографировать | Take a photo | Pildista | нов. главная экрана «Фото» без этапа; этап выбирается на листе [И-10, М-M1] |
 | `photos.emptyClient` | Фото пока нет. | No photos yet. | Fotosid veel pole. | нов. `client`: без кнопки [И-6] |
-| `tasks.empty` | Задач пока нет. Запишите задачу, чтобы не забыть. | No tasks yet. Write one down so it is not forgotten. | Ülesandeid veel pole. Kirjutage ülesanne üles, et see ei ununeks. | изм. `gc`/`foreman`: без «назначьте исполнителя» — при **шлюз−** назначать некого [М-M3] |
+| `tasks.empty` | Задач пока нет. Создайте задачу и назначьте исполнителя. | No tasks yet. Create one and assign someone. | Ülesandeid veel pole. Looge ülesanne ja määrake täitja. | изм. **шлюз+**: называет действие; при **шлюз−** — `tasks.emptyClosed` [М-M3] |
+| `tasks.emptyClosed` | Задач пока нет. Запишите задачу, чтобы не забыть. | No tasks yet. Write one down so it is not forgotten. | Ülesandeid veel pole. Kirjutage ülesanne üles, et see ei ununeks. | нов. **шлюз−**: назначать некого [М-M3] [03 §12] |
 | `tasks.emptyWorker` | На вас пока нет задач. Их ставит владелец или бригадир. | No tasks for you yet. The owner or foreman assigns them. | Teile pole veel ülesandeid. Need annab omanik või brigadir. | изм. задачи ставит и бригадир [Б-L6, И-L8] |
 | `tasks.finish` | Готово | Done | Valmis | изм. как в каркасе 03 §5.5/§6.1 [Б-L7] |
 | `issues.empty` | Проблем пока нет. Если что-то мешает работе — «Сообщить о проблеме». | No issues yet. If something blocks the work, use “Report an issue”. | Probleeme veel pole. Kui miski takistab tööd, vajutage „Teata probleemist“. | изм. то же |
-| `stages.empty` | У объекта нет этапов. | This site has no stages. | Objektil pole etappe. | изм. только `gc`; без совета «создайте заново» [И-5, М-M2], решение п.6 |
 | `stages.emptyAsk` | Этапы ещё не заданы. Спросите владельца. | Stages are not set yet. Ask the owner. | Etappe pole veel määratud. Küsige omanikult. | нов. `foreman`/`worker`/`client`; также `today` и `project-overview-client` без этапов [Б-M10, И-5], решение п.6; в 03 = `today.noStages*` |
-| `client.paused` | Работы на паузе | Work is paused | Tööd on pausil | нов. `client`, **K8** [М-M1, И-10] |
+| `overview.clientPaused` | Работы на паузе | Work is paused | Tööd on pausil | нов. `client`, **K8** [М-M1, И-10]; [03 §12] |
 | `stages.progress` | Процент этапа: {{stage}} | Stage percentage: {{stage}} | Etapi protsent: {{stage}} | изм. подпись группы кнопок вместо ползунка (K5, 01 §8 п.14) |
 | `image.canvasUnavailable` | Не удалось обработать изображение в этом браузере. | This browser could not process the image. | See brauser ei suutnud pilti töödelda. | изм. EN, ET: убрать «canvas» из видимого текста |
 
@@ -462,9 +469,9 @@ ET сейчас целиком на английском (`et.json` `tariff.*` �
 | `tariff.objects_one` | {{count}} объект | {{count}} site | {{count}} objekt | изм. ET |
 | `tariff.objects_other` | {{count}} объекта | {{count}} sites | {{count}} objekti | изм. ET |
 | `tariff.capRow` | {{from}} и больше (до {{max}} объектов; больше — по договорённости) | {{from}} or more (up to {{max}} sites; more by agreement) | {{from}} või rohkem (kuni {{max}} objekti; rohkem kokkuleppel) | изм. код: убрать аргумент `gb` — объём в приложении не виден и не считается [М-M8]; ET |
-| `tariff.days` | Считаем календарные дни от создания объекта до его завершения. Неполный месяц — по дням: цена × дни ÷ {{divisor}}. | We count calendar days from creating a site to completing it. A partial month is by the day: price × days ÷ {{divisor}}. | Arvestame kalendripäevi objekti loomisest kuni lõpetamiseni. Osaline kuu päevade kaupa: hind × päevad ÷ {{divisor}}. | изм. **K19, не выводить**: правило счёта — гипотеза, биллинга нет [М-M8, И-8], решение п.8; «Пауза не считается» убрано (01 §9 п.4) |
+| `tariff.days` | Счёт по календарным дням: пауза не считается, неполный месяц — по дням (цена × дни ÷ {{divisor}}). | Billed by calendar days: paused days do not count, a partial month is by the day (price × days ÷ {{divisor}}). | Arve kalendripäevade järgi: paus ei loe, osaline kuu päevade kaupa (hind × päevad ÷ {{divisor}}). | изм. **K19, не выводить**: правило из decisions §5.9, показываем только вместе с биллингом [М-M8, И-8] [03 §12] |
 | `tariff.trial` | {{days}} дней бесплатно, без карты. | {{days}} days free, no card. | {{days}} päeva tasuta, ilma kaardita. | изм. решение владельца (decisions §1 п.3); что после пробного периода и от чего считать — ждёт владельца, не пишем [И-8], решение п.8; код: убрать аргумент `reminder` (`Tariff.tsx:53`) |
-| `tariff.invoice` | Счёт — по договорённости, напишите нам. | Invoice by agreement, write to us. | Arve kokkuleppel, kirjutage meile. | изм. 01 §9 п.3 — до K19 выводить только **legal**; иначе строки нет |
+| `tariff.invoice` | Счёт — по договорённости, напишите нам. | Invoice by agreement, write to us. | Arve kokkuleppel, kirjutage meile. | изм. **K19, не выводить** (01 §9 п.3) [03 §12] |
 | `tariff.noBilling` | Оплаты в приложении пока нет: здесь только условия. | There is no payment in the app yet: this page shows the terms only. | Rakenduses makset veel pole: siin on ainult tingimused. | изм. короче; «Ничего не списывается» уже в `tariff.trial`; ET |
 | `tariff.contact` | Написать о продолжении | Write about continuing | Kirjuta jätkamisest | нов. **legal**, `mailto:` `LEGAL.email` (01 §4 «Тариф») |
 | `tariff.toProjects` | К объектам | To sites | Objektide juurde | нов. главное действие при пустом `legal.ts` (01 §4) |
@@ -484,11 +491,14 @@ ET сейчас целиком на английском (`et.json` `tariff.*` �
 | `stages.increase` | то же |
 | `demo.badge`, `demo.projectName`, `demo.address`, `demo.overall`, `demo.lastUpdate`, `demo.activeIssues`, `demo.issue1`, `demo.issue2` (8 ключей) | в коде приложения не используются (`grep "demo\." src` — только лендинг `copy/*.ts`); в RU латиницы нет, но выдуманный объект в продукте не нужен. Перед удалением повторить поиск |
 | `photos.linksFailed` | в коде не используется; строка кончается двоеточием под текст сервера (01 §0.3). Перед удалением повторить поиск |
+| `dashboard.emptyOther` | заменён на `dashboard.emptyForeman` / `dashboard.emptyWorker` [03 §12] |
+| `overview.noStages` | заменён на `stages.emptyOwner` (владелец) / `stages.emptyAsk` (остальные) [03 §12] |
+| `stages.empty` | то же |
 | `tariff.included` | ред. 2: «до N владельцев и бригадиров» — второго владельца не пригласить (`api/invite.ts`: только `foreman`, `worker`, `client`), места не считаются [И-7]; решение оркестратора п.8. Код: убрать `<li>` и аргумент `managers` (`Tariff.tsx:54`) |
 
 Отдельно удаляются **формулировки** внутри изменённых ключей (не ключи): «и заказчика» (`auth.tagline`), «Пригласите рабочего» (`reportStatus.none`), «Рабочие и заказчики» (`tariff.lead`), «Пауза не считается» (`tariff.days`), «и {{gb}} ГБ» (`tariff.capRow`), «только чтение», «Напоминание за N дней», «Ничего не списывается» (`tariff.trial`), «PDF-файлом… E-arve» (`tariff.invoice`), «Генподрядчик», «Прораб» (`roles.*`), «Обратитесь к администратору» (`common.noCompany`), «{{error}}» (`auth.profileLoadFailed`), «Мы заведём вашу компанию… в течение рабочего дня» (`onboarding.text`), символы «←» (`auth.backHome`, `tariff.back`), «Приглашены» (`reportStatus.noneWaiting`), «Владелец посмотрит» (`report.bigJump`), «Создайте объект заново» (`overview.noStages`, `stages.empty`), «эту страницу» (`send.queued`), «проверим, когда появится» (`send.unknown`).
 
-Ред. 2 также снимает ключ, который был только в ред. 1 этого документа: `review.stub` («появится позже», [М-M7, И-L2]); `dashboard.groupQuiet` заменён на `dashboard.groupPaused` / `dashboard.groupCompleted`.
+Ред. 2 также снимает ключ, который был только в ред. 1 этого документа: `review.stub` («появится позже», [М-M7, И-L2]); `common.contact` (заменён на `common.contactPhone` / `common.contactEmail`), `review.undoCount` (заменён на `review.undoN`), `today.reportStage` (этап — `report.stage`); `dashboard.groupQuiet` заменён на `dashboard.groupPaused` / `dashboard.groupCompleted`.
 
 ---
 
@@ -536,11 +546,11 @@ ET сейчас целиком на английском (`et.json` `tariff.*` �
 2. **Вход по коду:** `auth.signInWithCode`, `auth.haveInviteCode`, `auth.code`, `auth.codeHint`, `auth.codeSent`, `auth.neutralSent`, `auth.codeInvalid`, `auth.linkExpired`, `auth.linkOtherBrowser`, `auth.openInBrowser` («rämpspost» — так ли подписана папка «Спам» в Gmail/Outlook по-эстонски).
 3. **Шлюз:** `gate.inviteLater`, `auth.recoveryLater`, `auth.signupLater` («lülitub sisse» звучит естественно?).
 4. **Отправка с телефона:** `send.queued`, `send.unknown`, `send.unknownAction`, `send.barChecking` («levi» против «võrk»), `send.stale`, `send.stageAhead`, `send.others_*`, `send.limit`, `report.closeContinues`.
-5. **Ошибки:** `errors.*`, `invite.emailTaken`, `invite.rateLimit`, `people.emailNotOurs`, `auth.codeInvalidInvite`, `auth.linkExpiredClosed`.
-6. **Лист отчёта и «Сегодня»:** `today.report` «Pildista», `today.reportStage`, `report.reason.*`, `report.bigJump` («hüpe» против «samm»), `report.paused`, `report.retake`, `today.decisionNeeded_*`.
+5. **Ошибки:** `errors.*`, `invite.emailTaken`, `invite.rateLimit`, `people.emailNotOurs`, `auth.checkEmailAndCode`, `auth.linkExpiredClosed`.
+6. **Лист отчёта и «Сегодня»:** `today.report` «Pildista», `report.stage`, `report.reason.*`, `report.bigJump` («hüpe» против «samm»), `report.paused`, `report.retake`, `today.staleWaiting_*`.
 7. **Подписи автора отметки:** `status.markedByOwner` «Omanik märkis», `status.markedByForeman`, `status.markedByCrew` «Brigaadi märgitud», `reportStatus.markedByOwner` / `markedByForeman`.
 8. **Весь `tariff.*`** (сейчас по-английски), в т.ч. «+ km» вместо «+ käibemaks»; `tariff.title` «Hind» = «цена», EN «Plan» — нужен ли «Pakett» [И-L12].
-9. Плюрали ET `_one/_other` в `auth.draftsWaiting_*`, `auth.signOutDrafts_*`, `reportStatus.noneDays_*`, `reportStatus.createdDaysAgo_*`, `send.others_*`, `errors.authRequiredDrafts_*`, `today.decisionNeeded_*`: партитив («aruannet») после числа.
+9. Плюрали ET `_one/_other` в `auth.draftsWaiting_*`, `auth.signOutDrafts_*`, `reportStatus.noneDays_*`, `reportStatus.createdDaysAgo_*`, `send.others_*`, `errors.authRequiredDrafts_*`, `today.staleWaiting_*`: партитив («aruannet») после числа.
 10. `people.emailFor` «E-post inimesele {{name}}», `people.removeConfirm`, `known.title` «Juba teie juures tööl».
 
 ---
@@ -577,7 +587,7 @@ ET сейчас целиком на английском (`et.json` `tariff.*` �
 | `overview.markFirstStage*` | `overview.next.action` |
 | `overview.inviteWorker*` | `overview.next.inviteOpen` |
 | `overview.staleForeman*` | `overview.staleForeman` |
-| `today.cameraCta*` | `today.report` + `today.reportStage` |
+| `today.cameraCta*` | `today.report` + `report.stage` над кнопкой |
 | `today.noStages*` | `stages.emptyAsk` |
 | `photos.takePhoto*` | `photos.takePhoto` |
 | `drafts.retry*` | `send.resend` |
@@ -599,9 +609,17 @@ ET сейчас целиком на английском (`et.json` `tariff.*` �
 | `common.signIn` в `login-code-enter`, `login-invite-code` | `auth.signInWithCodeSubmit` |
 | `hint-open-in-safari-chrome` | `auth.openInBrowser` |
 | «Вы вошли как {почта}» | `auth.signedInAs` (без изм.) |
-| «Добавить фото» в листе без фото (`gc`/`foreman`) | `overview.addPhoto` (без изм.) |
+| «Добавить фото» в листе без фото (`gc`/`foreman`) | `report.addPhoto` |
 | чип свежести «Отчёт сегодня», «N дней без отчёта» | `reportStatus.today`, `reportStatus.yesterday`, `reportStatus.late_*`, `reportStatus.overdue_*` (без изм.) |
 | «Подрядчик ещё не добавил этапы» (заказчик) | `stages.emptyAsk` |
-| «Работы на паузе» (заказчик) | `client.paused` |
+| `overview.noStages`, `stages.empty` (владелец) | `stages.emptyOwner` |
+| `dashboard.emptyOther` | `dashboard.emptyForeman`, `dashboard.emptyWorker` |
+| `common.contact` | `common.contactPhone`, `common.contactEmail` |
+| `review.undoCount` + `common.undo` | `review.undoN` (строка — `common.undo`) |
+| имена 03 §12, совпадающие с 04 | без изменений: ключ 04 = ключ 03 |
+| `onboarding.creating` «Готовим ваш кабинет» | `onboarding.creating` «Заводим вашу фирму…» (слово «кабинет» не используем) |
+| `overview.openPeople` «Кто молчит 3+ дня» | `overview.openPeople` «Кто давно не отчитывался» (мягче, тот же смысл) |
+| `reportStatus.noneWaiting` «На объекте: …» | «Добавлены: …» — решение оркестратора п.7 |
+| «Работы на паузе» (заказчик) | `overview.clientPaused` |
 | «Ваш последний отчёт: {дата}» | `dashboard.workerLastReport` |
-| «Мой последний отчёт» | `today.myLastReport` |
+| «Мой последний отчёт» | `today.lastReport` |
