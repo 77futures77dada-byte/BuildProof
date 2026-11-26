@@ -23,6 +23,7 @@
    в) очередь проверки, `Issues`, `Photos`, `Tasks`, `Stages`, вид заказчика;
    г) `Login` (пароль / код / код приглашения / otp_expired, за флагом `VITE_EMAIL_GATE_OPEN`), `Tariff`, `NotFound`, `ProfileNotConfigured`, онбординг.
    Обязательные пункты: `06-audit-stage1-residual.md` «Закрываем на реализации».
+   **Идёт (2026-11-27):** ветки `claude/redesign-a|b|c|d` в worktree `%TEMP%\claude\…\scratchpad\rd-a…rd-d` (node_modules — junction на этот worktree). После всех четырёх: слить в `claude/app-redesign` (конфликты ожидаются в locales, `ui/index.ts`, `check-tokens.allow.json`), удалить `legacy-bridge.css`, `data-skin-dark`, класс `bp`.
 4. Добавить в `check-overflow.mjs` DOM-проверку: «Отправить» видна на 360×553 (рост и снижение), `--strict-a11y` (касания ≥ 48, текст ≥ 17) должен быть зелёным.
 5. Финал: 0 временных исключений, все проверки зелёные, три критика по коду/DOM (Sonnet, по diff), таблица разбора внешней критики (`critique-table.md`), PR-описание + список «ждёт владельца» (brief §3).
 6. Потом PR лендинга `claude/landing-v2` по `docs/design-inputs/claude-code-landing-rewrite-v2-prompt (1).md`.
