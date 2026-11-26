@@ -8,8 +8,14 @@
 - Этап 1 (4 цикла, остаток `06-audit-stage1-residual.md`), этап 2 (закрыт, `06-audit-stage2-final-r4.md`), этапы 3+4 (закрыты, `06-audit-stage34-r4.md`).
 - Этап 5 «основа»: см. последние коммиты `feat(ui)` / `chore(fonts)` и `05-ui.md` §«Миграция» (временные исключения check-tokens по файлам).
 
+## Основа (этап 5) — сделана, все 6 проверок зелёные (коммиты 3df96ed…ff39a86)
+- 36 временных исключений в `scripts/check-tokens.allow.json` (список по группам — `05-ui.md` §«Миграция»); без них `node scripts/check-tokens.mjs --no-allow` = 509 нарушений.
+- Временный `src/styles/legacy-bridge.css` (стоковая палитра → токены) — удалить последним шагом экранов.
+- Лендинг пока освобождён от правила «текст < 17 px» — снять в PR лендинга.
+- Не сделаны компоненты из 03 §9: LinkButton (есть `buttonClass()`), FreshnessChip, ReviewRow, PercentStepper, ConfirmDialog, PhotoViewer, Skeleton, NetBar, Disclosure; `Sheet` без истории браузера. Делает агент той группы экранов, которой они нужны.
+
 ## Дальше (по порядку)
-1. Если основа не доделана — доделать по `05-ui.md` до зелёного `node scripts/run-checks.mjs`.
+1. ~~Основа~~ — готово.
 2. Перенести `04-copy.md` в `src/i18n/locales/{ru,en,et}.json` одним шагом (новые, изменённые, удалённые ключи; ET с пометкой в 04).
 3. Экраны параллельно (у каждого агента свои файлы, каждый снимает свои временные исключения из `scripts/check-tokens.allow.json`):
    а) `Dashboard`, `ProjectDashboard`/обзор, карточки;
