@@ -1,11 +1,13 @@
 {
-  "version": 1,
+  "version": 2,
   "date": "2026-11-26",
-  "source": "docs/design/03-wireframes.md",
+  "source": "docs/design/03-wireframes.md (ред. 2)",
   "legend": {
     "inventory": "row number in 00-inventory.md §4 (1 = landing, out of app PR; 20 = dev page, excluded; 12 = shell)",
-    "gate": "build flags / backend dependencies: VITE_EMAIL_GATE_OPEN; K15 = report statuses (k15-on/k15-off); null = none",
-    "mainAction": "exactly one main (yellow) button per state, or null; copy:<key> refers to 04-copy.md, * = proposed key",
+    "gate": "build flags / backend dependencies: VITE_EMAIL_GATE_OPEN (opens only with K34); K15 = report statuses (k15-on/k15-off); K19 = billing days; null = none",
+    "mainAction": "exactly one main (yellow) button per state, or null; copy:<key> = key name from 04-copy.md; * = key not yet in 04 (see 03 §12)",
+    "mainActionByRole": "per-role main action where roles differ (Ж9: foreman never routed to project-people)",
+    "navigatesToRoles": "which roles of this screen may follow the link; default = all roles of the screen. Validated: target must be open for those roles",
     "states": "vocabulary in 03-wireframes.md §0.2",
     "kind": "screen | shell | sheet | sheet-state | modal | dialog; all modal/sheet/dialog render inside the themed root (rule Ж8)"
   },
@@ -29,15 +31,40 @@
       ],
       "blocks": [
         "logo-link",
-        "tariff-link(gc)",
+        "tariff-link(gc only)",
         "language",
         "sign-out"
       ],
       "navigatesTo": [
         "dashboard-owner",
+        "dashboard-foreman",
+        "dashboard-worker",
+        "dashboard-client",
         "tariff",
         "signout-drafts-confirm"
-      ]
+      ],
+      "navigatesToRoles": {
+        "tariff": [
+          "gc"
+        ],
+        "dashboard-owner": [
+          "gc"
+        ],
+        "dashboard-foreman": [
+          "foreman"
+        ],
+        "dashboard-worker": [
+          "worker"
+        ],
+        "dashboard-client": [
+          "client"
+        ],
+        "signout-drafts-confirm": [
+          "gc",
+          "foreman",
+          "worker"
+        ]
+      }
     },
     {
       "kind": "shell",
@@ -68,6 +95,8 @@
       ],
       "navigatesTo": [
         "dashboard-owner",
+        "dashboard-foreman",
+        "dashboard-client",
         "today",
         "project-overview-owner",
         "project-overview-client",
@@ -78,7 +107,41 @@
         "project-people",
         "signout-drafts-confirm"
       ],
-      "notes": "gc tabs: overview,stages,photos,tasks,issues,people (strip scrolls inside itself); foreman: same without people; worker: today,stages,photos,issues; client: overview,stages,photos,issues"
+      "navigatesToRoles": {
+        "dashboard-owner": [
+          "gc"
+        ],
+        "dashboard-foreman": [
+          "foreman"
+        ],
+        "dashboard-client": [
+          "client"
+        ],
+        "today": [
+          "worker"
+        ],
+        "project-overview-owner": [
+          "gc",
+          "foreman"
+        ],
+        "project-overview-client": [
+          "client"
+        ],
+        "tasks": [
+          "gc",
+          "foreman",
+          "client"
+        ],
+        "project-people": [
+          "gc"
+        ],
+        "signout-drafts-confirm": [
+          "gc",
+          "foreman",
+          "worker"
+        ]
+      },
+      "notes": "gc tabs: overview,stages,photos,tasks,issues,people(/settings; strip scrolls inside itself); foreman: same without people; client: as today, no actions; worker: today,stages,photos,issues"
     },
     {
       "kind": "screen",
@@ -101,21 +164,20 @@
         "gate-closed",
         "gate-open",
         "drafts-waiting",
-        "legal-empty",
         "legal-filled",
         "hash-error"
       ],
       "blocks": [
-        "logo+copy:auth.tagline",
+        "logo + gate-closed:copy:auth.tagline | gate-open:copy:auth.taglineOpen*",
         "field-email(copy:auth.email)",
         "field-password",
         "field-error",
-        "main:sign-in",
-        "gate-open:code-login+forgot-password | gate-closed:copy:auth.recoveryLater*+legal-contact",
-        "gate-open:invite-code-link",
-        "drafts-waiting-line",
-        "gate-open:signup-link | gate-closed:copy:auth.signupLater*",
-        "back-home+language"
+        "main:copy:common.signIn",
+        "gate-open:copy:auth.signInWithCode + copy:auth.forgotPassword | gate-closed:copy:auth.recoveryLater + copy:common.contactPhone*/contactEmail*",
+        "gate-open:copy:auth.haveInviteCode",
+        "copy:auth.draftsWaiting_*",
+        "gate-open:copy:auth.startFree | gate-closed:copy:auth.signupLater",
+        "copy:auth.backHome + language"
       ],
       "navigatesTo": [
         "dashboard-owner",
@@ -124,15 +186,17 @@
         "dashboard-client",
         "today",
         "project-overview-owner",
+        "project-overview-client",
         "login-code-request",
         "login-invite-code",
         "login-link-error",
         "signup"
-      ]
+      ],
+      "notes": "legal-empty only in dev builds: prod prebuild scripts/check-placeholders.mjs fails (release blocker for gate-closed x legal-empty)"
     },
     {
       "kind": "screen",
-      "gate": "VITE_EMAIL_GATE_OPEN=true",
+      "gate": "VITE_EMAIL_GATE_OPEN=true (+K34)",
       "inventory": null,
       "id": "login-code-request",
       "route": "/login?mode=code",
@@ -140,7 +204,7 @@
         "guest"
       ],
       "component": "src/pages/Login.tsx (new mode)",
-      "mainAction": "copy:auth.sendCodeTo*",
+      "mainAction": "copy:auth.sendCodeTo | copy:auth.sendCode",
       "states": [
         "idle",
         "remembered-email",
@@ -154,11 +218,11 @@
         "drafts-waiting"
       ],
       "blocks": [
-        "title",
-        "masked-email+other-email | field-email",
-        "main:send-code",
-        "password-login-link",
-        "drafts-waiting-line"
+        "title | reset:copy:auth.resetTitle*",
+        "masked-email + copy:auth.otherEmail | field-email",
+        "main",
+        "copy:auth.signInPassword",
+        "copy:auth.draftsWaiting_*"
       ],
       "navigatesTo": [
         "login-code-enter",
@@ -167,7 +231,7 @@
     },
     {
       "kind": "screen",
-      "gate": "VITE_EMAIL_GATE_OPEN=true",
+      "gate": "VITE_EMAIL_GATE_OPEN=true (+K34)",
       "inventory": null,
       "id": "login-code-enter",
       "route": "/login?mode=code&step=enter",
@@ -175,7 +239,7 @@
         "guest"
       ],
       "component": "src/pages/Login.tsx (new mode)",
-      "mainAction": "copy:common.signIn",
+      "mainAction": "copy:auth.signInWithCodeSubmit",
       "states": [
         "idle",
         "verifying",
@@ -186,45 +250,48 @@
         "restored-from-sessionStorage"
       ],
       "blocks": [
-        "sent-to-email-line",
-        "code-field(6-10 digits, one-time-code, paste)",
-        "main:sign-in",
-        "resend(60s countdown)",
-        "other-email"
+        "copy:auth.codeSent",
+        "code-field copy:auth.code (6-10 digits, one-time-code, paste)",
+        "main",
+        "copy:auth.resend / copy:auth.resendIn (60 s)",
+        "copy:auth.otherEmail"
       ],
       "navigatesTo": [
         "login-link-error",
         "login-code-request",
         "dashboard-owner",
+        "dashboard-foreman",
         "today",
         "auth-set-password"
       ]
     },
     {
       "kind": "screen",
-      "gate": "VITE_EMAIL_GATE_OPEN=true",
+      "gate": "VITE_EMAIL_GATE_OPEN=true (+K34)",
       "inventory": null,
       "id": "login-invite-code",
-      "route": "/login?mode=invite",
+      "route": "/login?mode=invite[&email=]",
       "roles": [
         "guest"
       ],
       "component": "src/pages/Login.tsx (new mode)",
-      "mainAction": "copy:common.signIn",
+      "mainAction": "copy:auth.signInWithCodeSubmit",
       "states": [
         "idle",
+        "email-prefilled",
         "verifying",
-        "wrong-code",
+        "wrong-code-or-email",
         "expired",
         "offline"
       ],
       "blocks": [
         "title copy:auth.inviteTitle*",
-        "field-email",
+        "email: prefilled from URL (masked + copy:auth.otherEmail) | field copy:auth.inviteEmailLabel*",
         "code-field",
-        "main:sign-in (verifyOtp type=invite)",
-        "hint-open-in-safari-chrome",
-        "password-login-link"
+        "main (verifyOtp type=invite)",
+        "error copy:auth.checkEmailAndCode*",
+        "hint-open-in-browser copy:auth.openInBrowser",
+        "copy:auth.signInPassword"
       ],
       "navigatesTo": [
         "auth-set-password",
@@ -244,7 +311,7 @@
         "guest"
       ],
       "component": "src/pages/Login.tsx (new state)",
-      "mainAction": "gate-open: copy:auth.sendCode* | gate-closed: copy:common.signIn",
+      "mainAction": "gate-open: copy:auth.sendCode | gate-closed: copy:auth.signInPassword",
       "states": [
         "otp-expired",
         "access-denied",
@@ -253,11 +320,12 @@
         "gate-closed"
       ],
       "blocks": [
-        "stale-icon+message",
-        "pkce-hint",
+        "stale-icon + copy:auth.linkExpired",
+        "gate-open: copy:auth.linkExpiredResend*",
+        "pkce: copy:auth.linkOtherBrowser",
         "main",
-        "enter-code-link",
-        "password-login-link"
+        "gate-open: enter-code-link",
+        "copy:auth.signInPassword"
       ],
       "navigatesTo": [
         "login-code-request",
@@ -276,7 +344,7 @@
         "gc"
       ],
       "component": "new",
-      "mainAction": "copy:auth.savePassword*",
+      "mainAction": "copy:auth.savePassword",
       "states": [
         "idle",
         "saving",
@@ -285,16 +353,24 @@
         "offline"
       ],
       "blocks": [
-        "title",
-        "password-field(show)",
-        "length-rule",
-        "main:save",
-        "skip-use-code"
+        "copy:auth.setPasswordTitle",
+        "copy:auth.newPassword (show)",
+        "copy:auth.passwordTooShort",
+        "main",
+        "copy:auth.skipUseCode*"
       ],
       "navigatesTo": [
         "dashboard-foreman",
         "dashboard-owner"
-      ]
+      ],
+      "navigatesToRoles": {
+        "dashboard-foreman": [
+          "foreman"
+        ],
+        "dashboard-owner": [
+          "gc"
+        ]
+      }
     },
     {
       "kind": "screen",
@@ -314,7 +390,7 @@
       "blocks": [
         "logo",
         "spinner",
-        "slow:copy:common.slow*+reload"
+        "slow: copy:common.slow* + copy:common.reload*"
       ],
       "navigatesTo": [
         "(target route)"
@@ -340,8 +416,8 @@
         "retrying"
       ],
       "blocks": [
-        "error-block(no server text)",
-        "retry(secondary)",
+        "copy:auth.profileLoadFailed (no {{error}})",
+        "retry (secondary)",
         "sign-out"
       ],
       "navigatesTo": [
@@ -365,17 +441,16 @@
         "error",
         "checking",
         "offline",
-        "legal-empty",
         "legal-filled"
       ],
       "blocks": [
-        "title",
-        "one-line-cause",
-        "signed-in-as",
-        "main:check-again",
+        "copy:onboarding.title",
+        "copy:onboarding.text",
+        "copy:auth.signedInAs",
+        "main",
         "sign-out",
-        "legal-contact(if filled)",
-        "back-home"
+        "legal-filled: copy:onboarding.contact",
+        "copy:auth.backHome"
       ],
       "navigatesTo": [
         "dashboard-owner",
@@ -393,7 +468,7 @@
         "gc"
       ],
       "component": "new",
-      "mainAction": "copy:onboarding.saveName*",
+      "mainAction": "copy:common.save",
       "states": [
         "idle",
         "saving",
@@ -401,9 +476,11 @@
         "offline"
       ],
       "blocks": [
-        "field-full-name",
-        "main:save",
-        "later"
+        "copy:profile.title",
+        "copy:profile.name",
+        "copy:profile.hint",
+        "main",
+        "copy:common.later"
       ],
       "navigatesTo": [
         "dashboard-owner"
@@ -425,9 +502,8 @@
         "signed-out"
       ],
       "blocks": [
-        "title copy:notFound.text",
-        "one-line",
-        "signed-in:to-projects | signed-out:sign-in+home"
+        "copy:notFound.text",
+        "signed-in: to-projects | signed-out: sign-in + home"
       ],
       "navigatesTo": [
         "dashboard-owner",
@@ -445,11 +521,10 @@
         "guest"
       ],
       "component": "src/features/landing/SignupSection.tsx (landing PR)",
-      "mainAction": "gate-open: copy:signup.submit* | gate-closed: null",
+      "mainAction": "gate-open: create-account (landing key) | gate-closed: null",
       "states": [
         "gate-closed",
         "gate-open",
-        "legal-empty",
         "legal-filled",
         "sending",
         "invalidEmail",
@@ -459,7 +534,7 @@
         "created"
       ],
       "blocks": [
-        "gate-open:form | gate-closed:copy:signup.later*+legal-contact"
+        "gate-open: form | gate-closed: copy:auth.signupLater + legal-contact"
       ],
       "navigatesTo": [
         "dashboard-owner",
@@ -477,7 +552,7 @@
         "gc"
       ],
       "component": "src/pages/Dashboard.tsx + ProjectListCard",
-      "mainAction": "empty: copy:dashboard.empty.action | k15-on&N>0: copy:dashboard.reviewN* | else: null",
+      "mainAction": "empty: copy:dashboard.empty.action | k15-on&N>0: copy:review.checkN | else: null",
       "states": [
         "loading",
         "error",
@@ -485,6 +560,8 @@
         "empty",
         "creating",
         "creating-company",
+        "day0",
+        "self-marked",
         "no-reports",
         "paused",
         "completed",
@@ -495,12 +572,11 @@
         "gate-closed"
       ],
       "blocks": [
-        "k15:review-strip+main",
-        "unsent-banner(compact)",
-        "title+create-project(secondary)",
-        "project-list(active by freshness, worst first)",
-        "group:paused",
-        "group:completed"
+        "k15: review-strip + main",
+        "unsent-banner compact (copy:send.bar, copy:send.resend)",
+        "copy:dashboard.title + create-project (secondary)",
+        "group copy:dashboard.groupActive (worst freshness first; freshness = last worker report or own mark)",
+        "group copy:dashboard.groupQuiet (paused, then completed)"
       ],
       "navigatesTo": [
         "project-overview-owner",
@@ -509,7 +585,8 @@
         "review-queue",
         "signout-drafts-confirm",
         "onboarding-name"
-      ]
+      ],
+      "notes": "card chip: gate-closed day0 copy:reportStatus.noMarks*; gate-open only copy:reportStatus.none / noneDays_*; copy:reportStatus.noneWaiting; self-marked copy:reportStatus.markedByOwner*/markedByForeman*"
     },
     {
       "kind": "screen",
@@ -530,12 +607,12 @@
         "offline"
       ],
       "blocks": [
-        "field-name",
-        "field-address",
-        "field-deadline",
-        "stages-hint",
-        "main:create",
-        "cancel"
+        "copy:createProject.name",
+        "copy:createProject.address",
+        "copy:createProject.deadline",
+        "copy:createProject.stagesHint (ru.json text unchanged, no \"can be edited\")",
+        "main",
+        "copy:common.cancel"
       ],
       "navigatesTo": [
         "project-overview-owner",
@@ -552,7 +629,7 @@
         "foreman"
       ],
       "component": "src/pages/Dashboard.tsx + ProjectListCard",
-      "mainAction": "k15-on&N>0: copy:dashboard.reviewN* | else: null",
+      "mainAction": "k15-on&N>0: copy:review.checkN | else: null",
       "states": [
         "loading",
         "error",
@@ -561,15 +638,18 @@
         "unsent",
         "k15-on",
         "k15-off",
+        "day0",
+        "self-marked",
         "paused",
         "completed",
         "single-project-redirect"
       ],
       "blocks": [
-        "k15:review-strip+main",
+        "k15: review-strip + main",
         "unsent-banner",
-        "title",
-        "project-list"
+        "copy:dashboard.title",
+        "project-list",
+        "empty: copy:dashboard.emptyForeman*"
       ],
       "navigatesTo": [
         "project-overview-owner",
@@ -587,7 +667,7 @@
         "worker"
       ],
       "component": "src/pages/Dashboard.tsx + WorkerProjectCard",
-      "mainAction": "unsent: copy:drafts.retry* | else: null",
+      "mainAction": "unsent: copy:send.resend | else: null",
       "states": [
         "loading",
         "error",
@@ -599,8 +679,9 @@
       ],
       "blocks": [
         "unsent-banner",
-        "title copy:dashboard.pickProject",
-        "worker-project-cards(>=80px)"
+        "copy:dashboard.pickProject",
+        "worker-project-cards (>=80px, copy:dashboard.workerLastReport*)",
+        "empty: copy:dashboard.emptyWorker*"
       ],
       "navigatesTo": [
         "today",
@@ -626,8 +707,9 @@
         "single-project-redirect"
       ],
       "blocks": [
-        "title",
-        "project-list(readonly: name, address, %, updated)"
+        "copy:dashboard.title",
+        "project-list (as today, no actions)",
+        "empty: copy:dashboard.emptyClient*"
       ],
       "navigatesTo": [
         "project-overview-client"
@@ -635,7 +717,7 @@
     },
     {
       "kind": "screen",
-      "gate": null,
+      "gate": "K19 (days line only)",
       "inventory": 11,
       "id": "tariff",
       "route": "/tariff",
@@ -643,24 +725,27 @@
         "gc"
       ],
       "component": "src/pages/Tariff.tsx",
-      "mainAction": "legal-filled: copy:tariff.contact* (mailto) | legal-empty: null",
+      "mainAction": "legal-filled: copy:tariff.contact | else: null (link copy:tariff.toProjects)",
       "states": [
-        "legal-empty",
         "legal-filled",
+        "k19-on",
+        "k19-off",
         "non-gc-redirect"
       ],
       "blocks": [
         "shell-app",
-        "title",
-        "lead copy:tariff.lead",
-        "price-table(2 cols, cap row with word)",
-        "conditions(copy:tariff.trial, copy:tariff.included, copy:tariff.days, legal-filled:copy:tariff.invoice)",
+        "copy:tariff.title",
+        "copy:tariff.lead (29 EUR/object/month + VAT, workers free)",
+        "price-table (2 cols; cap row \"потолок 99 €\", no GB)",
+        "copy:tariff.trial (30 days, no card)",
+        "k19-on only: copy:tariff.days",
         "copy:tariff.noBilling",
-        "main | to-projects"
+        "main | copy:tariff.toProjects"
       ],
       "navigatesTo": [
         "dashboard-owner"
-      ]
+      ],
+      "notes": "not shown: tariff.included, tariff.invoice, trial end date"
     },
     {
       "kind": "screen",
@@ -673,7 +758,7 @@
         "gc"
       ],
       "component": "new",
-      "mainAction": "copy:review.confirm* (per row; main style only on top unprocessed row)",
+      "mainAction": "copy:review.confirm (per row; main style only on top unprocessed row)",
       "states": [
         "loading",
         "error",
@@ -689,17 +774,25 @@
         "confirmed"
       ],
       "blocks": [
-        "undo-bar(sticky top)",
+        "undo-bar sticky top: copy:review.undoN* (single, no per-row undo)",
         "filter-chips(project)",
-        "review-rows(>=120px)",
-        "confirm-all-small(<=25, secondary)"
+        "review-rows (>=120px; copy:review.wasClaimed; copy:review.confirm / copy:review.return >=16px apart; copy:review.confirmedRow during 7 s window)"
       ],
       "navigatesTo": [
         "photo-viewer",
         "review-return-reason",
         "dashboard-owner",
         "dashboard-foreman"
-      ]
+      ],
+      "navigatesToRoles": {
+        "dashboard-owner": [
+          "gc"
+        ],
+        "dashboard-foreman": [
+          "foreman"
+        ]
+      },
+      "notes": "pending confirms sent on leave, visibilitychange->hidden, pagehide (fetch keepalive). No \"confirm all small\" here (no K21 path)."
     },
     {
       "kind": "sheet",
@@ -712,7 +805,7 @@
         "gc"
       ],
       "component": "new",
-      "mainAction": "copy:review.returnSend*",
+      "mainAction": "copy:review.return",
       "states": [
         "none-selected",
         "selected",
@@ -720,7 +813,7 @@
         "error"
       ],
       "blocks": [
-        "reason-picker",
+        "reason-picker (copy:review.returnReason.tooHigh/.unclear/.wrongStage)",
         "main",
         "cancel"
       ],
@@ -739,18 +832,41 @@
         "foreman"
       ],
       "component": "src/pages/ProjectHome.tsx -> ProjectDashboard.tsx",
-      "mainAction": "no-stages: null | day0+gate-closed: copy:overview.markFirstStage* | day0+gate-open: copy:overview.inviteWorker* | review-waiting: copy:dashboard.reviewN* | stale-3plus: copy:overview.openPeople* | has-reports: copy:overview.openLastReport* | paused/completed: null | unsent: copy:drafts.retry*",
+      "mainAction": "first match: paused/completed: null | no-stages: null | unsent: copy:send.resend | k15 waiting: copy:review.checkN | day0+gate-closed: copy:overview.markStage* | day0+gate-open: gc copy:overview.next.inviteOpen, foreman copy:overview.markStage* | stale-3plus+gate-open: gc copy:overview.openPeople, foreman null (copy:overview.staleForeman*) | stale-3plus+gate-closed: copy:overview.markStage* | self-marked: copy:overview.markStage* | has-reports, last by other: copy:overview.openLastReport | has-reports, last by me: copy:overview.markStage*",
+      "mainActionByRole": {
+        "gc": {
+          "no-stages": null,
+          "day0+gate-closed": "copy:overview.markStage*",
+          "day0+gate-open": "copy:overview.next.inviteOpen",
+          "stale-3plus+gate-open": "copy:overview.openPeople",
+          "stale-3plus+gate-closed": "copy:overview.markStage*",
+          "self-marked": "copy:overview.markStage*",
+          "has-reports(other)": "copy:overview.openLastReport",
+          "has-reports(mine)": "copy:overview.markStage*"
+        },
+        "foreman": {
+          "no-stages": null,
+          "day0+gate-closed": "copy:overview.markStage*",
+          "day0+gate-open": "copy:overview.markStage*",
+          "stale-3plus+gate-open": null,
+          "stale-3plus+gate-closed": "copy:overview.markStage*",
+          "self-marked": "copy:overview.markStage*",
+          "has-reports(other)": "copy:overview.openLastReport",
+          "has-reports(mine)": "copy:overview.markStage*"
+        }
+      },
       "states": [
         "loading",
         "error",
         "offline",
         "no-stages",
         "day0",
-        "gate-open",
-        "gate-closed",
-        "no-reports",
+        "self-marked",
         "has-reports",
         "stale-3plus",
+        "gate-open",
+        "gate-closed",
+        "marked",
         "accepted",
         "pending",
         "confirmed",
@@ -762,14 +878,14 @@
       ],
       "blocks": [
         "unsent-banner",
-        "state-card(readiness 40px, freshness, next step, main)",
-        "big-jump-signal(k15-off)",
-        "already-working(day0, worker/foreman only)",
-        "stage-rows(+⋯)",
-        "recent-photos",
-        "open-issues",
-        "house-3d(collapsed on mobile)",
-        "project-menu(⋯: pause/complete/resume)"
+        "state-card (copy:overview.readyPercent*, freshness chip, next step, main; gate-closed day0: copy:gate.inviteLater)",
+        "already-working (gc only, worker/foreman only, copy:known.title, copy:known.add, copy:people.all*)",
+        "stage-rows (+⋯; marked chip by author)",
+        "activity-feed copy:overview.feedTitle (mobile too, 3 rows collapsed, copy:overview.feedAll*)",
+        "recent-photos (copy:overview.allPhotos*)",
+        "open-issues (copy:overview.allIssues*)",
+        "house-3d collapsed (copy:overview.showHouse*)",
+        "project-menu ⋯ gc only (pause/complete/resume; no-stages: complete)"
       ],
       "navigatesTo": [
         "report-sheet",
@@ -783,7 +899,16 @@
         "issue-form",
         "project-status-confirm",
         "modal-overview-photo"
-      ]
+      ],
+      "navigatesToRoles": {
+        "project-people": [
+          "gc"
+        ],
+        "project-status-confirm": [
+          "gc"
+        ]
+      },
+      "notes": "gate-closed: link to People only if already-working block is non-empty. Foreman never routed to People."
     },
     {
       "kind": "screen",
@@ -807,11 +932,14 @@
         "completed"
       ],
       "blocks": [
-        "readiness-card(% + updated)",
-        "stage-rows(readonly)",
+        "readiness-card (copy:overview.readyPercent* + copy:overview.updatedAt*)",
+        "stage-rows (readonly)",
         "recent-photos",
-        "issues(open question В3)",
-        "house-3d"
+        "issues (as today)",
+        "house-3d collapsed",
+        "day0: copy:overview.notStartedReadOnly",
+        "no-stages: copy:stages.emptyAsk*",
+        "paused: copy:overview.clientPaused*"
       ],
       "navigatesTo": [
         "photo-viewer",
@@ -820,7 +948,7 @@
         "issues",
         "dashboard-client"
       ],
-      "notes": "client link page (client-links.md) not built; no stub on screen"
+      "notes": "client link page not built; no line about it"
     },
     {
       "kind": "screen",
@@ -842,21 +970,34 @@
         "offline",
         "empty",
         "no-reports",
+        "marked",
         "accepted",
         "pending",
         "confirmed",
+        "rejected",
         "paused",
         "history-loading",
         "history-empty"
       ],
       "blocks": [
-        "stage-rows(name, %, bar, last report, k15 status chip, mark button, history disclosure)"
+        "stage-rows (name, %, bar, last report/mark, status chip, mark button, history disclosure)",
+        "empty: gc copy:stages.emptyOwner* | others copy:stages.emptyAsk*"
       ],
       "navigatesTo": [
         "report-sheet",
         "dashboard-owner"
       ],
-      "notes": "slider + 500 ms autosave removed; worker uses submit_stage_report (K14); client has no buttons"
+      "navigatesToRoles": {
+        "report-sheet": [
+          "gc",
+          "foreman",
+          "worker"
+        ],
+        "dashboard-owner": [
+          "gc"
+        ]
+      },
+      "notes": "slider + autosave removed; gc/foreman manager mode (photo optional, update_stage_progress); worker submit_stage_report (K14); client no buttons"
     },
     {
       "kind": "screen",
@@ -882,14 +1023,22 @@
         "unsent"
       ],
       "blocks": [
-        "main:take-photo + from-gallery",
+        "main + copy:today.fromGallery",
         "filter-chips(stage)",
-        "photo-grid(scrim caption)"
+        "photo-grid (scrim caption)",
+        "empty: copy:photos.empty (points to «Сфотографировать») | client copy:photos.emptyClient*"
       ],
       "navigatesTo": [
         "report-sheet",
         "photo-viewer"
-      ]
+      ],
+      "navigatesToRoles": {
+        "report-sheet": [
+          "gc",
+          "foreman",
+          "worker"
+        ]
+      }
     },
     {
       "kind": "screen",
@@ -915,9 +1064,10 @@
         "worker-redirect"
       ],
       "blocks": [
-        "main:new-task",
+        "main",
         "active-task-cards",
-        "done-disclosure"
+        "done-disclosure",
+        "empty: gate-closed copy:tasks.emptyClosed* | gate-open copy:tasks.empty"
       ],
       "navigatesTo": [
         "task-form",
@@ -925,6 +1075,23 @@
         "modal-tasks-task-photo",
         "today"
       ],
+      "navigatesToRoles": {
+        "task-form": [
+          "gc",
+          "foreman"
+        ],
+        "report-sheet": [
+          "gc",
+          "foreman"
+        ],
+        "modal-tasks-task-photo": [
+          "gc",
+          "foreman"
+        ],
+        "today": [
+          "worker"
+        ]
+      },
       "notes": "worker route redirects to today"
     },
     {
@@ -951,32 +1118,41 @@
         "card-error"
       ],
       "blocks": [
-        "main:report-issue",
-        "active-issue-cards(urgent chip, photo, who/due, status chip, next status)",
-        "resolved-disclosure"
+        "main",
+        "active-issue-cards (urgent chip, photo, who/due, status chip, next status)",
+        "resolved-disclosure",
+        "empty: copy:issues.empty"
       ],
       "navigatesTo": [
         "issue-form",
         "issue-photo-zoom"
-      ]
+      ],
+      "navigatesToRoles": {
+        "issue-form": [
+          "gc",
+          "foreman",
+          "worker"
+        ]
+      }
     },
     {
       "kind": "screen",
       "gate": "VITE_EMAIL_GATE_OPEN",
       "inventory": 19,
       "id": "project-people",
-      "route": "/project/:id/people (redirect from /settings)",
+      "route": "/project/:id/settings (tab «Люди»)",
       "roles": [
         "gc"
       ],
       "component": "src/pages/Settings.tsx -> People",
-      "mainAction": "gate-open: copy:people.inviteN* (enabled with >=1 filled row) | gate-closed: null",
+      "mainAction": "gate-open: copy:invite.submit (enabled with >=1 filled row) | gate-closed: null",
       "states": [
         "loading",
         "error",
         "offline",
         "empty-people",
         "empty-company",
+        "focus-silent",
         "gate-open",
         "gate-closed",
         "inviting",
@@ -990,14 +1166,15 @@
         "adding",
         "add-error",
         "no-company",
-        "no-reports"
+        "no-reports",
+        "non-gc-redirect"
       ],
       "blocks": [
-        "people-on-project(name, role, last report | no reports, send-login-code, ⋯ remove)",
-        "already-working(worker/foreman only, add-to-project)",
-        "gate-open:invite-rows+main | gate-closed:copy:people.inviteLater*",
+        "people-on-project copy:people.title (copy:people.lastReport | copy:people.noReportsYet; gate-open copy:people.sendCode | focus-silent copy:people.sendCodeAgain*; ⋯ copy:people.remove*)",
+        "already-working copy:known.title (worker/foreman only; copy:known.add)",
+        "gate-open: invite-rows (copy:invite.*) + main | gate-closed: copy:gate.inviteLater",
         "invite-results-per-row",
-        "invite-foreman-link"
+        "gate-open: copy:invite.foreman"
       ],
       "navigatesTo": [
         "send-login-code",
@@ -1007,15 +1184,15 @@
     },
     {
       "kind": "sheet",
-      "gate": "VITE_EMAIL_GATE_OPEN=true",
+      "gate": "VITE_EMAIL_GATE_OPEN=true (+K34)",
       "inventory": null,
       "id": "send-login-code",
-      "route": "/project/:id/people (sheet)",
+      "route": "/project/:id/settings (sheet)",
       "roles": [
         "gc"
       ],
       "component": "new",
-      "mainAction": "copy:people.sendCode*",
+      "mainAction": "copy:people.sendCode",
       "states": [
         "idle",
         "sending",
@@ -1027,10 +1204,11 @@
         "error"
       ],
       "blocks": [
-        "title(name)",
-        "field-email(session hint)",
+        "copy:people.emailFor",
+        "field-email (session hint)",
         "main",
-        "cancel"
+        "cancel",
+        "errors: copy:people.emailNotOurs, copy:auth.retryAfter, copy:auth.projectLimit"
       ],
       "navigatesTo": [
         "project-people"
@@ -1041,7 +1219,7 @@
       "gate": null,
       "inventory": null,
       "id": "confirm-remove-person",
-      "route": "/project/:id/people (dialog)",
+      "route": "/project/:id/settings (dialog)",
       "roles": [
         "gc"
       ],
@@ -1055,7 +1233,7 @@
       ],
       "blocks": [
         "title",
-        "consequence-line",
+        "copy:people.removeConfirm*",
         "main",
         "cancel"
       ],
@@ -1073,7 +1251,7 @@
         "gc"
       ],
       "component": "ConfirmDialog",
-      "mainAction": "copy:project.pause* | copy:project.complete* | copy:project.resume*",
+      "mainAction": "copy:project.pause | copy:project.complete | copy:project.resume",
       "states": [
         "idle",
         "saving",
@@ -1082,7 +1260,7 @@
       ],
       "blocks": [
         "title",
-        "consequence-line",
+        "copy:project.pauseConfirm | copy:project.completeConfirm",
         "main",
         "cancel"
       ],
@@ -1100,7 +1278,7 @@
         "worker"
       ],
       "component": "src/pages/Today.tsx",
-      "mainAction": "unsent: copy:drafts.retry* | else: copy:today.cameraCta*",
+      "mainAction": "unsent: copy:send.resend | else: copy:today.report («Сфотографировать», stage line copy:report.stage above)",
       "states": [
         "loading",
         "error",
@@ -1116,21 +1294,25 @@
         "foreign-drafts",
         "no-stages",
         "auth-required",
+        "marked",
         "accepted",
         "pending",
-        "confirmed"
+        "confirmed",
+        "rejected"
       ],
       "blocks": [
-        "unsent-banner",
-        "resume-draft-card",
-        "main:camera + from-gallery + other-stage",
-        "object-readiness-line",
+        "unsent-banner (copy:send.bar, copy:send.barChecking, copy:send.lastPhoto, copy:send.lastAttempt, copy:send.details*, copy:send.itemReason, copy:send.resend)",
+        "resume-draft (copy:report.unfinished + copy:today.continue*)",
+        "k15 rejected: my-last-report raised (copy:status.returned*)",
+        "copy:report.stage + main + copy:today.fromGallery + copy:today.otherStage*",
+        "copy:today.objectPercent*",
         "my-tasks",
-        "my-last-report",
-        "foreign-drafts-line"
+        "copy:today.lastReport* + status chip",
+        "copy:send.others_*"
       ],
       "navigatesTo": [
         "report-sheet",
+        "stage-picker",
         "modal-today-task-photo",
         "stages",
         "photos",
@@ -1153,15 +1335,20 @@
         "gc"
       ],
       "component": "new ReportSheet (replaces PhotoUploadForm, StageProgressControl)",
-      "mainAction": "copy:report.send* (sticky, >=56px) | stale: copy:report.sendNewPercent*",
+      "mainAction": "copy:report.send (sticky, >=56px; disabled label copy:report.pickReason*) | stale: copy:send.staleResend",
+      "modes": {
+        "worker": "camera before sheet; submit_stage_report",
+        "manager": "gc/foreman: no camera, optional copy:report.addPhoto*; without photo update_stage_progress"
+      },
       "states": [
         "editing",
+        "no-photo",
         "no-change",
         "increase",
         "decrease-needs-reason",
-        "big-jump",
         "paused",
         "sending",
+        "sending-closable",
         "sent",
         "unknown",
         "queued",
@@ -1173,17 +1360,17 @@
         "forbidden",
         "photo-required",
         "nothing-to-report",
-        "invalid-photo-path"
+        "invalid-photo-path",
+        "already-sent"
       ],
       "blocks": [
-        "sheet-header(close)",
-        "1 object+name line",
-        "2 thumbnail <=25% (15% when reasons shown)",
-        "3 was -> will be",
-        "4 percent-stepper(-10 +10 +25 100%)",
-        "5 stage + change",
-        "6 decrease reasons (only on decrease)",
-        "7 one-line banners: pause, big jump, drafts",
+        "sheet-header (close; copy:report.title*)",
+        "1-3 row: thumbnail 72x72 fixed (tap = preview) | add-photo tile; object+name; copy:report.wasWill",
+        "actions row: copy:report.retake, copy:report.noChange (moves into header when reasons shown)",
+        "4 percent-stepper 2x2 (>=56 tall, gap >=12): +10 +25 / −10(secondary) 100%; default no-change",
+        "5 copy:report.stage + copy:report.changeStage (keeps photo, resets % to new stage)",
+        "6 decrease reasons (copy:report.reasonTitle, copy:report.reason.*)",
+        "7 single banner line (pause, drafts); no big-jump message before K15",
         "sticky send"
       ],
       "navigatesTo": [
@@ -1192,15 +1379,69 @@
         "photos",
         "tasks",
         "project-overview-owner",
+        "stage-picker",
         "login-code-request",
         "login-password",
-        "stale-draft"
+        "stale-draft",
+        "photo-viewer"
       ],
+      "navigatesToRoles": {
+        "today": [
+          "worker"
+        ],
+        "project-overview-owner": [
+          "gc",
+          "foreman"
+        ],
+        "tasks": [
+          "gc",
+          "foreman"
+        ]
+      },
       "constraints": [
-        "sticky send visible at 360x640 and 375x667 in all states",
+        "sticky send visible and no essential control under it at 360x560 and 375x553 in all states",
         "fixed DOM order 1-7",
+        "thumbnail never resizes",
+        "close enabled 3 s after send, sending continues",
+        "queued/unknown: sheet closes to today (worker) or source (manager) with unsent banner",
         "rendered inside themed root"
       ]
+    },
+    {
+      "kind": "sheet",
+      "gate": null,
+      "inventory": null,
+      "id": "stage-picker",
+      "route": "(sheet over report-sheet|today)",
+      "roles": [
+        "worker",
+        "foreman",
+        "gc"
+      ],
+      "component": "new StagePicker",
+      "mainAction": null,
+      "states": [
+        "loading",
+        "error",
+        "offline",
+        "empty"
+      ],
+      "blocks": [
+        "copy:stagePicker.title*",
+        "stage rows >=56px (name, current % tnum, current marked with icon+word)",
+        "close",
+        "empty: copy:stages.emptyAsk*"
+      ],
+      "navigatesTo": [
+        "report-sheet",
+        "today"
+      ],
+      "navigatesToRoles": {
+        "today": [
+          "worker"
+        ]
+      },
+      "notes": "from sheet: keeps photo, M = stage %; from today: pick then camera"
     },
     {
       "kind": "sheet-state",
@@ -1214,24 +1455,29 @@
         "gc"
       ],
       "component": "ReportSheet mode=stale-resolution",
-      "mainAction": "copy:report.sendNewPercent*",
+      "mainAction": "copy:send.staleResend",
       "states": [
         "stale-draft",
         "sending",
         "delete-confirm"
       ],
       "blocks": [
-        "stale-icon + copy:drafts.staleTitle*",
+        "stale-icon + copy:send.stale",
         "thumbnail",
         "your report M%",
         "percent-stepper from N",
         "main",
-        "delete(secondary, confirm)"
+        "delete (secondary, copy:send.deleteConfirm)"
       ],
       "navigatesTo": [
         "today",
         "report-sheet"
-      ]
+      ],
+      "navigatesToRoles": {
+        "today": [
+          "worker"
+        ]
+      }
     },
     {
       "kind": "dialog",
@@ -1245,14 +1491,14 @@
         "gc"
       ],
       "component": "ConfirmDialog",
-      "mainAction": "copy:drafts.stay*",
+      "mainAction": "copy:common.stay",
       "states": [
         "idle"
       ],
       "blocks": [
-        "N unsent text",
-        "main:stay",
-        "sign-out-anyway"
+        "copy:auth.signOutDrafts_*",
+        "main",
+        "copy:common.signOutAnyway"
       ],
       "navigatesTo": [
         "login-password",
@@ -1269,8 +1515,8 @@
         "gc",
         "foreman"
       ],
-      "component": "ProjectDashboard.tsx Modal -> ReportSheet",
-      "mainAction": "copy:report.send*",
+      "component": "ProjectDashboard.tsx Modal -> ReportSheet (manager mode)",
+      "mainAction": "copy:report.send",
       "states": [
         "(as report-sheet)"
       ],
@@ -1280,7 +1526,7 @@
       "navigatesTo": [
         "project-overview-owner"
       ],
-      "notes": "PhotoUploadForm replaced by report-sheet; rendered inside themed root"
+      "notes": "PhotoUploadForm replaced; rendered inside themed root"
     },
     {
       "kind": "modal",
@@ -1302,10 +1548,10 @@
         "offline"
       ],
       "blocks": [
-        "field-name",
-        "select-assignee(56px)",
-        "select-stage",
-        "field-deadline",
+        "copy:tasks.name",
+        "copy:tasks.assignee (select 56px)",
+        "copy:tasks.stage",
+        "copy:tasks.deadline",
         "main",
         "cancel"
       ],
@@ -1338,10 +1584,10 @@
         "offline"
       ],
       "blocks": [
-        "field-title",
-        "urgent/not-urgent toggle buttons(>=48)",
-        "photo(camera first)",
-        "more-disclosure(description, responsible, due)",
+        "copy:issues.titleField",
+        "copy:issues.urgent / copy:issues.notUrgent toggle buttons (>=48)",
+        "copy:issues.photo (camera first)",
+        "copy:issues.more disclosure",
         "main",
         "cancel"
       ],
@@ -1349,6 +1595,12 @@
         "project-overview-owner",
         "issues"
       ],
+      "navigatesToRoles": {
+        "project-overview-owner": [
+          "gc",
+          "foreman"
+        ]
+      },
       "notes": "rendered inside themed root"
     },
     {
@@ -1360,8 +1612,8 @@
       "roles": [
         "worker"
       ],
-      "component": "Today.tsx Modal -> ReportSheet",
-      "mainAction": "copy:report.send*",
+      "component": "Today.tsx Modal -> ReportSheet (worker mode)",
+      "mainAction": "copy:report.send",
       "states": [
         "(as report-sheet)",
         "task-close-failed"
@@ -1372,7 +1624,7 @@
       "navigatesTo": [
         "today"
       ],
-      "notes": "PhotoUploadForm replaced by report-sheet; task closes after send; rendered inside themed root"
+      "notes": "task closes after send; rendered inside themed root"
     },
     {
       "kind": "modal",
@@ -1384,8 +1636,8 @@
         "gc",
         "foreman"
       ],
-      "component": "Tasks.tsx Modal -> ReportSheet",
-      "mainAction": "copy:report.send*",
+      "component": "Tasks.tsx Modal -> ReportSheet (manager mode)",
+      "mainAction": "copy:report.send",
       "states": [
         "(as report-sheet)",
         "task-close-failed"
@@ -1396,14 +1648,14 @@
       "navigatesTo": [
         "tasks"
       ],
-      "notes": "worker no longer reaches /tasks (redirect to today); rendered inside themed root"
+      "notes": "worker no longer reaches /tasks; rendered inside themed root"
     },
     {
       "kind": "modal",
       "gate": null,
       "inventory": 26,
       "id": "photo-viewer",
-      "route": "/project/:id/photos | overview | review (viewer)",
+      "route": "/project/:id/photos | overview | review | sheet (viewer)",
       "roles": [
         "gc",
         "foreman",
@@ -1416,15 +1668,17 @@
         "loading",
         "image-failed",
         "offline",
+        "marked",
         "accepted",
         "pending",
-        "confirmed"
+        "confirmed",
+        "rejected"
       ],
       "blocks": [
-        "close(>=48, top right)",
+        "close (>=48, top right)",
         "photo on --scrim",
-        "caption(taken · uploaded, name, stage, k15 chip)",
-        "prev/next(>=48)"
+        "caption: \"отправлено {date}\" · name · stage · status chip (taken_at only after K15)",
+        "prev/next (>=48)"
       ],
       "navigatesTo": [
         "(source screen)"
@@ -1452,7 +1706,7 @@
       "blocks": [
         "close",
         "photo on --scrim",
-        "caption(issue title)"
+        "caption (issue title)"
       ],
       "navigatesTo": [
         "issues"
