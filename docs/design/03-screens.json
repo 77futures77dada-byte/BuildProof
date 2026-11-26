@@ -1404,7 +1404,7 @@
         "fixed DOM order 1-7",
         "thumbnail never resizes",
         "close enabled 3 s after send, sending continues",
-        "queued/unknown: sheet closes to today (worker) or source (manager) with unsent banner; copy:send.resend only in queued, copy:send.unknownAction (single button) in unknown [r2-Q9]; worker variant copy:send.queued/unknownHint names Today, owner/foreman variant copy:send.queued.owner/unknownHint.owner names project overview [r2-Q1]",
+        "queued/unknown: sheet closes to today (worker) or source (manager) with unsent banner; copy:send.resend only in queued, copy:send.unknownAction (single button) in unknown [r2-Q9]; worker variant copy:send.queued/unknownHint names Today, owner/foreman variant copy:send.queuedOwner/unknownHintOwner names project overview [r2-Q1]",
         "rendered inside themed root"
       ]
     },
