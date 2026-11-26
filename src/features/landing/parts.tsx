@@ -8,8 +8,8 @@ export function LogoMark() {
   return (
     <i aria-hidden="true">
       <svg width="18" height="18" viewBox="0 0 18 18">
-        <path d="M2 16V8l7-6 7 6v8" fill="none" stroke="#ffc72c" strokeWidth="2.2" strokeLinejoin="round" />
-        <path d="M6.2 11l2.2 2.2 4-4.4" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M2 16V8l7-6 7 6v8" fill="none" stroke="var(--accent)" strokeWidth="2.2" strokeLinejoin="round" />
+        <path d="M6.2 11l2.2 2.2 4-4.4" fill="none" stroke="var(--inverse-fg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </i>
   )

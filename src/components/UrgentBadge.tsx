@@ -9,7 +9,7 @@ export function UrgentBadge({ priority }: { priority: IssuePriority }) {
   const { t } = useTranslation()
   if (priority !== 'high') return null
   return (
-    <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-800">
+    <span className="inline-flex shrink-0 items-center rounded-chip border-2 border-stale px-2 text-body font-semibold text-fg">
       {t('issues.urgent')}
     </span>
   )

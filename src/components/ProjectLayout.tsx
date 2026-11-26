@@ -50,13 +50,13 @@ export function ProjectLayout() {
   const isWorker = profile?.role === 'worker'
   const tabs = tabsFor(profile?.role)
   // The landing skin's dark theme is switched on only for the overview tab;
-  // the other tabs are not redrawn yet and stay light (see app-skin.css).
+  // the other tabs are not redrawn yet (see styles/legacy-bridge.css).
   const onOverview = useMatch('/project/:id') !== null
 
   return (
     <div className="bp" data-skin-dark={onOverview ? '' : undefined}>
       <header className="bp-nav">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-2">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-2">
           <NavLink to="/dashboard" className="bp-logo">
             BuildProof
           </NavLink>

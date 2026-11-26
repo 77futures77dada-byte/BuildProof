@@ -10,6 +10,7 @@ import { ProgressBar } from './ProgressBar'
 export function WorkerProjectCard({ project }: { project: DashboardProject }) {
   return (
     <Link
+      data-zone="field"
       to={`/project/${project.id}/today`}
       className="flex min-h-20 items-center gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-slate-300 hover:shadow-md active:bg-slate-50"
     >

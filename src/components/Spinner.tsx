@@ -11,13 +11,13 @@ export function Spinner({ label, className = '' }: SpinnerProps) {
     <span
       role="status"
       aria-live="polite"
-      className={`inline-flex items-center gap-2 text-slate-500 ${className}`}
+      className={`inline-flex items-center gap-2 text-fg ${className}`}
     >
       <span
         aria-hidden="true"
-        className="size-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600"
+        className="size-5 animate-spin rounded-full border-[3px] border-line border-t-fg motion-reduce:animate-none"
       />
-      {label ? <span className="text-sm">{label}</span> : null}
+      {label ? <span className="text-body font-medium">{label}</span> : null}
       <span className="sr-only">{label ?? t('common.loading')}</span>
     </span>
   )

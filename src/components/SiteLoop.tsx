@@ -97,7 +97,7 @@ export function SiteLoop({ lang = 'en', className = '' }: SiteLoopProps) {
 
   return (
     <div className={`site-loop ${className}`}>
-      <div className="overflow-hidden rounded-2xl border border-sky-300/30 bg-[#0b2a4a] leading-[0] shadow-xl shadow-sky-900/20">
+      <div className="overflow-hidden rounded-2xl border border-inverse-line bg-[var(--illu-plan)] leading-[0] shadow-card">
         <svg
           ref={svgRef}
           viewBox="0 0 1280 720"
@@ -203,7 +203,7 @@ export function SiteLoop({ lang = 'en', className = '' }: SiteLoopProps) {
         </svg>
       </div>
 
-      <div className="mt-3 flex items-center gap-3 font-mono text-sm">
+      <div className="mt-3 flex items-center gap-3 font-mono text-body">
         <button
           type="button"
           onClick={() => setPausedByViewer(!paused)}

@@ -6,10 +6,10 @@ import type { DemoObjectKey, DemoStage, StageState } from './demoObjects'
 import { Pill } from './parts'
 
 /** Solid fills per state on the night-blue plan (no hatching). "none" is a dashed outline. */
-const FILL: Record<StageState, string> = { ok: '#2fb67e', part: '#d9962b', bad: '#ff6b6b', none: 'rgba(125,211,252,.06)' }
-const LINE: Record<StageState, string> = { ok: '#2fb67e', part: '#ffb547', bad: '#ff6b6b', none: '#7dd3fc' }
-const OUTLINE: Record<StageState, string> = { ok: '#0b2a4a', part: '#0b2a4a', bad: '#ffd0d0', none: '#7dd3fc' }
-const LABEL: Record<StageState, string> = { ok: '#06281a', part: '#fff', bad: '#4a0b0b', none: '#9db7d0' }
+const FILL: Record<StageState, string> = { ok: 'var(--illu-ok)', part: 'var(--illu-part)', bad: 'var(--illu-bad)', none: 'var(--illu-none-fill)' }
+const LINE: Record<StageState, string> = { ok: 'var(--illu-ok)', part: 'var(--illu-part-line)', bad: 'var(--illu-bad)', none: 'var(--illu-blueprint)' }
+const OUTLINE: Record<StageState, string> = { ok: 'var(--illu-plan)', part: 'var(--illu-plan)', bad: 'var(--illu-bad-edge)', none: 'var(--illu-blueprint)' }
+const LABEL: Record<StageState, string> = { ok: 'var(--illu-label-ok)', part: 'var(--illu-label-part)', bad: 'var(--illu-label-bad)', none: 'var(--illu-label-none)' }
 
 type Rect = { x: number; y: number; w: number; h: number; rx?: number }
 type Shape =
@@ -148,9 +148,9 @@ export function DemoObjectSection({ copy }: { copy: LandingCopy }) {
 
             <svg viewBox="0 0 400 290" role="group" aria-label={d.planLabel}>
               {objectKey === 'flat' ? (
-                <rect x="34" y="34" width="332" height="244" rx="3" fill="none" stroke="#7dd3fc" strokeOpacity=".4" strokeWidth="2" />
+                <rect x="34" y="34" width="332" height="244" rx="3" fill="none" stroke="var(--illu-blueprint)" strokeOpacity=".4" strokeWidth="2" />
               ) : (
-                <path d="M20 274H380" stroke="#7dd3fc" strokeOpacity=".4" strokeWidth="2" />
+                <path d="M20 274H380" stroke="var(--illu-blueprint)" strokeOpacity=".4" strokeWidth="2" />
               )}
               {object.stages.map((stage, i) => {
                 const shape = PLAN[objectKey][stage.id]
@@ -177,7 +177,7 @@ export function DemoObjectSection({ copy }: { copy: LandingCopy }) {
                         fontSize={stage.id === 'i' ? 12 : 14}
                         fontWeight="600"
                         fill={LABEL[stage.state]}
-                        stroke={stage.state === 'part' ? '#3b2a08' : 'none'}
+                        stroke={stage.state === 'part' ? 'var(--illu-label-part-edge)' : 'none'}
                         strokeWidth="3"
                         paintOrder="stroke"
                         aria-hidden="true"
@@ -194,7 +194,7 @@ export function DemoObjectSection({ copy }: { copy: LandingCopy }) {
               <span><i style={{ background: FILL.ok }} />{d.legend.ok}</span>
               <span><i style={{ background: FILL.part }} />{d.legend.part}</span>
               <span><i style={{ background: FILL.bad }} />{d.legend.bad}</span>
-              <span><i style={{ border: '1px dashed #7dd3fc' }} />{d.legend.none}</span>
+              <span><i style={{ border: '1px dashed var(--illu-blueprint)' }} />{d.legend.none}</span>
             </div>
           </div>
 

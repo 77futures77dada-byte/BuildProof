@@ -1,29 +1,14 @@
 import { useTranslation } from 'react-i18next'
 import { getReportStatus } from '../lib/reportStatus'
 import type { ReportStatus } from '../lib/reportStatus'
+import { StatusChip } from './ui/StatusChip'
+import type { StatusKind } from './ui/StatusIcon'
 
-const TONE_TEXT: Record<ReportStatus['tone'], string> = {
-  ok: 'text-green-800',
-  neutral: 'text-slate-600',
-  warn: 'text-amber-800',
-  alert: 'font-semibold text-red-700',
-}
-
-/** Shape carries the meaning together with the text, so colour is never alone. */
-function Shape({ status }: { status: ReportStatus }) {
-  const base = 'inline-block size-2.5 shrink-0'
-  if (status.kind === 'today') return <span aria-hidden="true" className={`${base} rounded-full bg-green-600`} />
-  if (status.kind === 'overdue' && status.tone === 'alert')
-    return <span aria-hidden="true" className={`${base} rounded-[2px] bg-red-600`} />
-  if (status.kind === 'late' || status.kind === 'overdue')
-    return (
-      <span
-        aria-hidden="true"
-        className={`${base} ${status.tone === 'warn' ? 'bg-amber-500' : 'bg-slate-400'}`}
-        style={{ clipPath: 'polygon(50% 0, 100% 100%, 0 100%)' }}
-      />
-    )
-  return <span aria-hidden="true" className={`${base} rounded-full border-2 border-slate-400`} />
+/** Shape from 02-type §8: `stale` for days without a report (active only — pause turns red off), `noreports` for none. */
+function kindOf(status: ReportStatus): StatusKind | null {
+  if (status.kind === 'none') return 'noreports'
+  if ((status.kind === 'late' || status.kind === 'overdue') && status.tone !== 'neutral') return 'stale'
+  return null
 }
 
 export function ReportStatusBadge({
@@ -52,10 +37,11 @@ export function ReportStatusBadge({
               ? t('reportStatus.noneWaiting', { name: waitingFor })
               : t('reportStatus.none')
 
+  const kind = kindOf(status)
+  if (kind) return <StatusChip kind={kind} className="min-w-0">{label}</StatusChip>
   return (
-    <span className={`bp-pill bp-pill-${status.tone} inline-flex min-w-0 items-center gap-1.5 text-xs ${TONE_TEXT[status.tone]}`}>
-      <Shape status={status} />
-      <span className="min-w-0">{label}</span>
+    <span className="inline-flex min-h-8 min-w-0 items-center rounded-chip border-2 border-line px-3 text-body font-semibold text-fg">
+      {label}
     </span>
   )
 }
