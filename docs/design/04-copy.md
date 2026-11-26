@@ -180,7 +180,7 @@ EN: в существующих ключах «project» и «site» смеша�
 | `dashboard.empty.step3` | Здесь будет видно, где работа идёт, а где стоит. | Here you will see where work moves and where it stalls. | Siin näete, kus töö käib ja kus seisab. | изм. **шлюз−**: рабочий пока отчитаться не может, не обещаем (brief §2.1 п.8) |
 | `dashboard.empty.step3Open` | Рабочий присылает фото и процент. Вы видите, где работа стоит. | The worker sends a photo and a percentage. You see where work stalls. | Tööline saadab foto ja protsendi. Näete, kus töö seisab. | нов. **шлюз+** |
 | `dashboard.groupActive` | В работе | Active | Käimas | нов. сортировка: активные выше (01 §3.2 п.5) |
-| `dashboard.groupPaused` | На паузе | Paused | Pausil | нов. две группы, как в 03 §4.1 [М-L4, И-L5] |
+| `dashboard.groupPaused` | На паузе | Paused | Pausil | нов. отдельная группа «На паузе» [М-L4, И-L5] [r2-Q3] |
 | `dashboard.groupCompleted` | Завершены | Completed | Lõpetatud | нов. то же |
 | `dashboard.emptyForeman` | Вас ещё не добавили ни на один объект. Скажите владельцу фирмы. | You have not been added to any site yet. Tell the company owner. | Teid pole veel ühelegi objektile lisatud. Öelge firma omanikule. | нов. `foreman`; замена `dashboard.emptyOther` [03 §12] |
 | `dashboard.emptyWorker` | Вас ещё не добавили ни на один объект. Скажите владельцу фирмы. | You have not been added to any site yet. Tell the company owner. | Teid pole veel ühelegi objektile lisatud. Öelge firma omanikule. | нов. `worker`; замена `dashboard.emptyOther` [03 §12] |
@@ -313,7 +313,7 @@ EN: в существующих ключах «project» и «site» смеша�
 | `report.bigJump` | Большой скачок. Он будет отмечен в ленте объекта. | Big jump. It will be marked in the site feed. | Suur hüpe. See märgitakse objekti voos. | нов. **K15, не выводить** [03 §12]; без «владелец посмотрит» (бриф §2.4); только `worker` |
 | `report.paused` | Объект на паузе. Отчёт можно отправить. | The site is paused. You can still send a report. | Objekt on pausil. Aruande saab ikka saata. | нов. плашка паузы на листе и на `today` (порядок п.7); без «примут» — перекликается со скрытым «Принято» [И-L9] |
 | `report.send` | Отправить | Send | Saada | нов. sticky-кнопка листа (01 §4) |
-| `report.closeSending` | Закрыть. Отправка продолжится, пока BuildProof открыт. | Close. Sending continues while BuildProof is open. | Sulge. Saatmine jätkub, kuni BuildProof on avatud. | нов. через 3 с после «Отправить» лист можно закрыть [Б-M1]; «пока открыт» — честно, без фона; [03 §12] |
+| `report.closeSending` | Закрыть. Отчёт сохранён на телефоне. | Close. The report is saved on the phone. | Sulge. Aruanne on telefoni salvestatud. | нов. через 3 с после «Отправить» лист можно закрыть [Б-M1]; без «пока открыт» [r2-Q6]; [03 §12] |
 | `report.retake` | Переснять | Retake | Pildista uuesti | нов. явная вторичная кнопка рядом с миниатюрой (≥ 48 px); касание миниатюры фото не заменяет [Б-M8], решение п.5; и для `invalid_photo_path` |
 | `report.photoAlt` | Снимок для отчёта: {{stage}} | Report photo: {{stage}} | Aruande foto: {{stage}} | нов. `alt` миниатюры |
 
@@ -323,10 +323,12 @@ EN: в существующих ключах «project» и «site» смеша�
 | `send.sending` | Отправляется | Sending | Saadetakse | нов. brief §1; форма значка — только `02-type.md` §8 [М-M5] |
 | `send.sent` | Отправлено | Sent | Saadetud | нов. то же |
 | `send.sentEarlier` | Отправлено: дошло раньше | Sent: it arrived earlier | Saadetud: jõudis kohale varem | нов. проверка по `storage_path` (01 §3.4 «Отправка» п.2); без «✓» |
-| `send.queued` | Сохранено на телефоне, не отправлено. Откройте «Сегодня» в BuildProof, когда будет сеть. | Saved on the phone, not sent. Open “Today” in BuildProof when you have signal. | Telefoni salvestatud, saatmata. Avage BuildProofis „Täna“, kui levi on olemas. | нов. `queued`; не «эту страницу» [Б-M2] [03 §12]; единственный текст до теста на iPhone (01 §3.4) |
+| `send.queued` | Сохранено на телефоне, не отправлено. Откройте «Сегодня» в BuildProof, когда будет сеть. | Saved on the phone, not sent. Open “Today” in BuildProof when you have signal. | Telefoni salvestatud, saatmata. Avage BuildProofis „Täna“, kui levi on olemas. | нов. `queued`; не «эту страницу» [Б-M2] [03 §12]; единственный текст до теста на iPhone (01 §3.4); **вариант рабочего** («Сегодня») [r2-Q1] |
+| `send.queued.owner` | Сохранено на телефоне, не отправлено. Откройте «Обзор объекта» в BuildProof, когда будет сеть. | Saved on the phone, not sent. Open “Project overview” in BuildProof when you have signal. | Telefoni salvestatud, saatmata. Avage BuildProofis „Objekti ülevaade“, kui levi on olemas. | нов. [r2-Q1] вариант владельца/бригадира: у них нет «Сегодня» |
 | `send.unknown` | Не знаем, дошёл ли отчёт. Фото сохранено на телефоне. | We do not know if the report arrived. The photo is saved on the phone. | Me ei tea, kas aruanne jõudis kohale. Foto on telefoni salvestatud. | нов. `unknown`: отвечает «дошло ли» и «где фото»; без «нет сети» и «проверим, когда появится» [Б-H1, И-3, М-M7], решение п.2 |
-| `send.unknownHint` | Откройте «Сегодня», когда будет сеть, — проверим. | Open “Today” when you have signal and we will check. | Avage „Täna“, kui levi on olemas, — kontrollime. | нов. вторая строка `unknown`: проверка только при открытой странице [Б-H1] [03 §12] |
-| `send.unknownAction` | Проверить ещё раз | Check again | Kontrolli uuesti | нов. кнопка `unknown`: проверка по `storage_path`, затем повтор [Б-H1], решение п.2 |
+| `send.unknownHint` | Откройте «Сегодня», когда будет сеть, — проверим. | Open “Today” when you have signal and we will check. | Avage „Täna“, kui levi on olemas, — kontrollime. | нов. вторая строка `unknown`, **вариант рабочего** («Сегодня») [Б-H1] [03 §12] [r2-Q1] |
+| `send.unknownHint.owner` | Откройте «Обзор объекта», когда будет сеть, — проверим. | Open “Project overview” when you have signal and we will check. | Avage „Objekti ülevaade“, kui levi on olemas, — kontrollime. | нов. [r2-Q1] вариант владельца/бригадира |
+| `send.unknownAction` | Проверить ещё раз | Check again | Kontrolli uuesti | нов. кнопка `unknown`: проверка по `storage_path`, затем повтор [Б-H1], решение п.2; **единственная** кнопка `unknown` [r2-Q9] |
 | `send.stale` | Не принято: этап уже {{percent}}% | Not accepted: the stage is already {{percent}}% | Ei võetud vastu: etapp on juba {{percent}}% | нов. `stale` (01 §3.4 правило 4, R:Б4-М1) |
 | `send.staleResend` | Отправить с новым % | Send with new % | Saada uue %-ga | нов. то же |
 | `send.stageAhead` | Этап уже {{percent}}%. Ваше фото добавлено. | The stage is already {{percent}}%. Your photo was added. | Etapp on juba {{percent}}%. Teie foto lisati. | нов. автоматический случай правила 4; не при снижении с причиной (R:Б4-М1) |
@@ -334,7 +336,7 @@ EN: в существующих ключах «project» и «site» смеша�
 | `send.barChecking` | Не знаем, дошли ли: {{count}} | Not sure if they arrived: {{count}} | Pole teada, kas jõudsid: {{count}} | нов. то же; говорит, что именно неизвестно [Б-H1] |
 | `send.lastPhoto` | последний снимок {{time}} | last photo {{time}} | viimane foto {{time}} | нов. то же |
 | `send.lastAttempt` | последняя попытка {{time}} | last attempt {{time}} | viimane katse {{time}} | нов. то же |
-| `send.resend` | Отправить снова | Send again | Saada uuesti | нов. единственная главная кнопка при черновиках (01 §3.4) |
+| `send.resend` | Отправить снова | Send again | Saada uuesti | нов. единственная главная кнопка при черновиках (01 §3.4); только в состоянии `queued`, не в `unknown` [r2-Q9] |
 | `send.itemReason` | {{stage}}: {{reason}} | {{stage}}: {{reason}} | {{stage}}: {{reason}} | нов. причина по каждому черновику (R:Б4-М2); `reason` — строка из `send.*` / `errors.*` |
 | `send.others_one` | На телефоне {{count}} отчёт другого человека. Уйдёт после входа этого человека. | This phone has {{count}} report from another person. It will go when they sign in. | Telefonis on {{count}} teise inimese aruanne. See läheb teele, kui ta sisse logib. | нов. 01 §3.4 правило 5; без «Удалить»; без рода [И-L1] |
 | `send.others_few` | На телефоне {{count}} отчёта другого человека. Уйдут после входа этого человека. | — | — | нов. то же |
@@ -358,7 +360,7 @@ EN: в существующих ключах «project» и «site» смеша�
 | `review.returnReason.tooHigh` | Процент завышен | Percentage too high | Protsent liiga suur | нов. **K15, не выводить** |
 | `review.returnReason.unclear` | На фото не видно работу | The work is not visible in the photo | Fotol pole tööd näha | нов. **K15, не выводить** |
 | `review.returnSend` | Вернуть с этой причиной | Send back with this reason | Saada tagasi selle põhjusega | нов. **K15, не выводить**; главная листа `review-return-reason`, если 03 оставит «выбор + кнопка» [Б-L3] |
-| `review.undoN` | Отменить ({{count}}) | Undo ({{count}}) | Võta tagasi ({{count}}) | нов. **K15, не выводить**; одна кнопка плашки вместо пары счётчик + `common.undo`; отменяет последнее, окно — до конца окна последней строки [Б-M12] [03 §12] |
+| `review.undoN` | Отменить все ({{count}}) | Undo all ({{count}}) | Võta kõik tagasi ({{count}}) | нов. **K15, не выводить**; одна кнопка плашки вместо пары счётчик + `common.undo`; отменяет **все** ожидающие подтверждения текущей плашки; число обновляется только после окончания касания; окно — до конца окна последней строки [Б-M12] [03 §12] [r2-Q7] |
 | `review.confirmedRow` | Подтверждено | Confirmed | Kinnitatud | нов. **K15, не выводить**; свёрнутая строка + `common.undo`; без «✓» |
 | `review.confirmAllSmall` | Подтвердить все мелкие ({{count}}) | Confirm all small ({{count}}) | Kinnita kõik väikesed ({{count}}) | нов. **K21, не выводить**: мелких в очереди сейчас нет по определению [Б-M15] |
 | `review.closedEarly` | Не подтверждено: страница закрылась раньше. | Not confirmed: the page closed too early. | Kinnitamata: leht suleti liiga vara. | нов. **K15, не выводить** (01 §3.3 «Отправка») |
@@ -377,7 +379,9 @@ EN: в существующих ключах «project» и «site» смеша�
 | `status.pending` | Ждёт проверки | Waiting for check | Ootab kontrolli | нов. **K15, не выводить** |
 | `status.withPending` | с учётом ждущих проверки: {{percent}}% | including waiting for check: {{percent}}% | koos kontrolli ootavatega: {{percent}}% | нов. **K15, не выводить** (brief §2.1 п.4) |
 | `status.returned` | Вернули: {{reason}} | Sent back: {{reason}} | Tagasi saadetud: {{reason}} | нов. **K15, не выводить**: строка `rejected` у рабочего, `reason` — из `review.returnReason.*` [Б-M14], решение п.5 |
-| `status.returnedHint` | Переснимите и отправьте снова. | Retake the photo and send again. | Pildistage uuesti ja saatke uuesti. | нов. **K15, не выводить**; под `status.returned` на «Сегодня» |
+| `status.returnedHint.photo` | Переснимите фото. | Retake the photo. | Pildistage uuesti. | нов. **K15, не выводить**; причина возврата «фото неясное» [r2-Q8] |
+| `status.returnedHint.percent` | Поставьте процент заново. | Set the percent again. | Määrake protsent uuesti. | нов. **K15, не выводить**; причина «процент слишком высокий» [r2-Q8] |
+| `status.returnedHint.other` | Посмотрите причину и отправьте заново. | Read the reason and send again. | Vaadake põhjus üle ja saatke uuesti. | нов. **K15, не выводить**; прочие причины; под `status.returned` на «Сегодня» [r2-Q8] |
 | `project.pause` | Поставить на паузу | Pause | Peata | нов. меню «⋯» (01 §3.2 п.9) |
 | `project.pauseConfirm` | Поставить объект на паузу? Он уйдёт вниз списка без красных отметок. Отчёты по нему всё равно принимаются. | Pause this site? It moves down the list without red marks. Reports are still accepted. | Kas peatada objekt? See liigub loendis alla, punaseid märke pole. Aruandeid võetakse ikka vastu. | нов. подтверждение (01 §4 «Пауза / завершение») |
 | `project.resume` | Вернуть в работу | Back to work | Taasta töö | нов. 01 §3.2 п.9 |

@@ -576,7 +576,8 @@
         "unsent-banner compact (copy:send.bar, copy:send.resend)",
         "copy:dashboard.title + create-project (secondary)",
         "group copy:dashboard.groupActive (worst freshness first; freshness = last worker report or own mark)",
-        "group copy:dashboard.groupQuiet (paused, then completed)"
+        "group copy:dashboard.groupPaused [r2-Q3]",
+        "group copy:dashboard.groupCompleted (after paused) [r2-Q3]"
       ],
       "navigatesTo": [
         "project-overview-owner",
@@ -774,7 +775,7 @@
         "confirmed"
       ],
       "blocks": [
-        "undo-bar sticky top: copy:review.undoN* (single, no per-row undo)",
+        "undo-bar sticky top: copy:review.undoN* \"Undo all (N)\" cancels ALL pending confirms of the bar; count updates after touch end (single, no per-row undo) [r2-Q7]",
         "filter-chips(project)",
         "review-rows (>=120px; copy:review.wasClaimed; copy:review.confirm / copy:review.return >=16px apart; copy:review.confirmedRow during 7 s window)"
       ],
@@ -832,13 +833,13 @@
         "foreman"
       ],
       "component": "src/pages/ProjectHome.tsx -> ProjectDashboard.tsx",
-      "mainAction": "first match: paused/completed: null | no-stages: null | unsent: copy:send.resend | k15 waiting: copy:review.checkN | day0+gate-closed: copy:overview.markStage* | day0+gate-open: gc copy:overview.next.inviteOpen, foreman copy:overview.markStage* | stale-3plus+gate-open: gc copy:overview.openPeople, foreman null (copy:overview.staleForeman*) | stale-3plus+gate-closed: copy:overview.markStage* | self-marked: copy:overview.markStage* | has-reports, last by other: copy:overview.openLastReport | has-reports, last by me: copy:overview.markStage*",
+      "mainAction": "first match: paused/completed: null | no-stages: null | unsent: copy:send.resend | k15 waiting: copy:review.checkN | day0+gate-closed: copy:overview.markStage* | day0+gate-open: gc copy:overview.next.inviteOpen, foreman copy:overview.markStage* | stale-3plus+gate-open: with people: gc copy:overview.openPeople, foreman null (copy:overview.staleForeman*); no people: copy:overview.markStage* [r2-Q2] | stale-3plus+gate-closed: copy:overview.markStage* | self-marked (any gate, no people): copy:overview.markStage* [r2-Q2] | has-reports, last by other: copy:overview.openLastReport | has-reports, last by me: copy:overview.markStage*",
       "mainActionByRole": {
         "gc": {
           "no-stages": null,
           "day0+gate-closed": "copy:overview.markStage*",
           "day0+gate-open": "copy:overview.next.inviteOpen",
-          "stale-3plus+gate-open": "copy:overview.openPeople",
+          "stale-3plus+gate-open": "copy:overview.openPeople (people exist) | copy:overview.markStage* (no people) [r2-Q2]",
           "stale-3plus+gate-closed": "copy:overview.markStage*",
           "self-marked": "copy:overview.markStage*",
           "has-reports(other)": "copy:overview.openLastReport",
@@ -848,7 +849,7 @@
           "no-stages": null,
           "day0+gate-closed": "copy:overview.markStage*",
           "day0+gate-open": "copy:overview.markStage*",
-          "stale-3plus+gate-open": null,
+          "stale-3plus+gate-open": "null (people exist, copy:overview.staleForeman*) | copy:overview.markStage* (no people) [r2-Q2]",
           "stale-3plus+gate-closed": "copy:overview.markStage*",
           "self-marked": "copy:overview.markStage*",
           "has-reports(other)": "copy:overview.openLastReport",
@@ -1364,12 +1365,12 @@
         "already-sent"
       ],
       "blocks": [
-        "sheet-header (close; copy:report.title*)",
+        "sheet-header (close; copy:report.title*; header icon buttons = icon + visible word, not aria-label only) [r2-Q5]",
         "1-3 row: thumbnail 72x72 fixed (tap = preview) | add-photo tile; object+name; copy:report.wasWill",
-        "actions row: copy:report.retake, copy:report.noChange (moves into header when reasons shown)",
-        "4 percent-stepper 2x2 (>=56 tall, gap >=12): +10 +25 / −10(secondary) 100%; default no-change",
+        "actions row: copy:report.retake, copy:report.noChange (stays in place; nothing moves when reasons shown) [r2-Q4]",
+        "4 percent-stepper [r2-Q4]: row 1 +10 +25 100% (each >=56 tall, gap >=12); row 2 alone: −10 secondary (>=48 tall), vertical gap from row 1 >=24; default no-change; height 128",
         "5 copy:report.stage + copy:report.changeStage (keeps photo, resets % to new stage)",
-        "6 decrease reasons (copy:report.reasonTitle, copy:report.reason.*)",
+        "6 decrease reasons BELOW the −10 row (so −10 never moves): copy:report.reasonTitle + copy:report.reason.* as one horizontally scrollable chip row inside the sheet, no page-level h-scroll; height 64; sheet 530 <= 553-16 [r2-Q4]",
         "7 single banner line (pause, drafts); no big-jump message before K15",
         "sticky send"
       ],
@@ -1403,7 +1404,7 @@
         "fixed DOM order 1-7",
         "thumbnail never resizes",
         "close enabled 3 s after send, sending continues",
-        "queued/unknown: sheet closes to today (worker) or source (manager) with unsent banner",
+        "queued/unknown: sheet closes to today (worker) or source (manager) with unsent banner; copy:send.resend only in queued, copy:send.unknownAction (single button) in unknown [r2-Q9]; worker variant copy:send.queued/unknownHint names Today, owner/foreman variant copy:send.queued.owner/unknownHint.owner names project overview [r2-Q1]",
         "rendered inside themed root"
       ]
     },
