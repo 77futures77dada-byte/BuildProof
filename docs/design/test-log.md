@@ -86,3 +86,14 @@ OVERFLOW project photos /project/p1/photos @390: scrollWidth 394 > 390; header.b
 | check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=139 allowlisted=41 temporary=36 (0s) |
 | check-ru-latin | PASS | offending=0 strings=562 (json=283, landing=279) (0s) |
 | check-overflow | PASS | routes=31 loads=248 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=191 a11y_small_text=101 (a11y = warnings; --strict-a11y to fail) (118s) |
+
+## 2026-11-26T20:16:55Z — UI foundation: 05-ui.md
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (3s) |
+| build | PASS | built in 1.01s, VITE_SUPABASE_URL=fixture (14s) |
+| test | PASS | 9 passed (9); 40 passed (40) (8s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=139 allowlisted=41 temporary=36 (0s) |
+| check-ru-latin | PASS | offending=0 strings=562 (json=283, landing=279) (0s) |
+| check-overflow | PASS | routes=31 loads=248 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=191 a11y_small_text=101 (a11y = warnings; --strict-a11y to fail) (119s) |
