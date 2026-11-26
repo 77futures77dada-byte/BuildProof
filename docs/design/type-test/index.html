@@ -5,24 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Шрифты: тест рендера</title>
 <!--
-  Тест шрифтов BuildProof (Исследователь, этап 2). Полностью локальный: никаких запросов к Google Fonts / CDN.
-  Файлы: ./fonts/*.woff2 — @fontsource-variable/manrope@5.3.0, @fontsource-variable/onest@5.3.1,
-  @fontsource-variable/geologica@5.3.0 (cdn.jsdelivr.net/npm), лицензия OFL-1.1 (./fonts/OFL-*.txt).
+  Тест шрифтов BuildProof (Исследователь, этап 2, доработка r2 2026-11-26). Полностью локальный: никаких запросов к Google Fonts / CDN.
+  Файлы ./fonts/*.woff2:
+    @fontsource-variable/onest@5.3.1, @fontsource-variable/geologica@5.3.0, @fontsource-variable/manrope@5.3.0
+    (скачаны с cdn.jsdelivr.net/npm), лицензия OFL-1.1 (./fonts/OFL-*.txt).
   unicode-range скопированы из index.css тех же пакетов.
+  Метрики запасных шрифтов (size-adjust / ascent / descent) посчитаны fontTools'ом, см. 02-type.md §7.
+  Значки статусов — inline SVG: в subset-ах нет ○ ● ✓ ✗ → (02-type.md §8).
 -->
 <style>
-  /* ---------- Manrope (variable wght 200–800) ---------- */
-  @font-face { font-family: "T Manrope"; font-style: normal; font-display: swap; font-weight: 200 800;
-    src: url(./fonts/manrope-cyrillic-wght-normal.woff2) format("woff2");
-    unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
-  @font-face { font-family: "T Manrope"; font-style: normal; font-display: swap; font-weight: 200 800;
-    src: url(./fonts/manrope-latin-ext-wght-normal.woff2) format("woff2");
-    unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
-  @font-face { font-family: "T Manrope"; font-style: normal; font-display: swap; font-weight: 200 800;
-    src: url(./fonts/manrope-latin-wght-normal.woff2) format("woff2");
-    unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-
-  /* ---------- Onest (variable wght 100–900) ---------- */
+  /* ---------- Onest (variable wght 100–900) — ФАВОРИТ ---------- */
   @font-face { font-family: "T Onest"; font-style: normal; font-display: swap; font-weight: 100 900;
     src: url(./fonts/onest-cyrillic-wght-normal.woff2) format("woff2");
     unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
@@ -33,7 +25,7 @@
     src: url(./fonts/onest-latin-wght-normal.woff2) format("woff2");
     unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
 
-  /* ---------- Geologica (variable wght 100–900, только ось wght) ---------- */
+  /* ---------- Geologica (variable wght 100–900, только ось wght) — ЗАПАСНОЙ ---------- */
   @font-face { font-family: "T Geologica"; font-style: normal; font-display: swap; font-weight: 100 900;
     src: url(./fonts/geologica-cyrillic-wght-normal.woff2) format("woff2");
     unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
@@ -44,97 +36,203 @@
     src: url(./fonts/geologica-latin-wght-normal.woff2) format("woff2");
     unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
 
-  :root { --bg: #ffffff; --fg: #111418; --muted: #5b636e; --line: #d9dde2; --soft: #f3f4f6; --warn: #8a5a00; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #121417; --fg: #f1f3f5; --muted: #a3abb5; --line: #2c3138; --soft: #1b1e22; --warn: #f0b429; } }
-  :root[data-theme="dark"] { --bg: #121417; --fg: #f1f3f5; --muted: #a3abb5; --line: #2c3138; --soft: #1b1e22; --warn: #f0b429; }
+  /* ---------- Manrope (variable wght 200–800) — выбыл, оставлен для сравнения ---------- */
+  @font-face { font-family: "T Manrope"; font-style: normal; font-display: swap; font-weight: 200 800;
+    src: url(./fonts/manrope-cyrillic-wght-normal.woff2) format("woff2");
+    unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: "T Manrope"; font-style: normal; font-display: swap; font-weight: 200 800;
+    src: url(./fonts/manrope-latin-ext-wght-normal.woff2) format("woff2");
+    unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+  @font-face { font-family: "T Manrope"; font-style: normal; font-display: swap; font-weight: 200 800;
+    src: url(./fonts/manrope-latin-wght-normal.woff2) format("woff2");
+    unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+
+  /* ---------- Метрически подогнанные запасные (02-type.md §7) ---------- */
+  @font-face { font-family: "T Onest Fallback Arial"; src: local("Arial"), local("ArialMT");
+    size-adjust: 103.56%; ascent-override: 93.66%; descent-override: 29.45%; line-gap-override: 0%; }
+  @font-face { font-family: "T Geologica Fallback Arial"; src: local("Arial"), local("ArialMT");
+    size-adjust: 107.03%; ascent-override: 91.10%; descent-override: 25.69%; line-gap-override: 0%; }
+
+  /* Предлагаемые токены (решает UI-дизайнер в 05-ui.md; здесь — для проверки контраста) */
+  :root {
+    --bg: #FFFFFF; --surface: #F3F4F6; --fg: #111418;
+    --muted: #5B636E;          /* только владелец/десктоп: 6.08:1, AA */
+    --muted-strong: #3D434B;   /* рабочий и бригадир: 9.99:1, AAA */
+    --warn-bg: #FFE08A; --warn-ink: #3D2E00;
+    --pending-ink: #7A4B00; --ok-ink: #0F5C2B; --stale-ink: #9E1C1C;
+    --accent: #F5C518; --on-accent: #111418; --line: #D9DDE2;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #121417; --surface: #1B1E22; --fg: #F1F3F5; --muted: #A3ABB5; --muted-strong: #C9CED5;
+    --warn-bg: #3A2C00; --warn-ink: #FFE08A; --pending-ink: #F0B429; --ok-ink: #5FD08A; --stale-ink: #FF8A80; --line: #2C3138; } }
+  :root[data-theme="dark"] {
+    --bg: #121417; --surface: #1B1E22; --fg: #F1F3F5; --muted: #A3ABB5; --muted-strong: #C9CED5;
+    --warn-bg: #3A2C00; --warn-ink: #FFE08A; --pending-ink: #F0B429; --ok-ink: #5FD08A; --stale-ink: #FF8A80; --line: #2C3138; }
+
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.4 system-ui, sans-serif; }
   main { max-width: 1240px; margin: 0 auto; padding: 16px; }
   h1 { font-size: 22px; margin: 8px 0 4px; }
-  .note { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
-  section.font { border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
-  section.font > h2 { font: 600 14px/1.2 system-ui, sans-serif; color: var(--muted); margin: 0 0 12px; text-transform: uppercase; letter-spacing: .04em; }
-  .phone { max-width: 390px; }
-  .s17 { font-size: 17px; } .s20 { font-size: 20px; } .s28 { font-size: 28px; line-height: 1.2; }
-  .row { margin: 0 0 10px; overflow-wrap: anywhere; }
-  .lbl { display: block; font: 12px/1.2 system-ui, sans-serif; color: var(--muted); margin-bottom: 2px; }
-  .w4 { font-weight: 400; } .w6 { font-weight: 600; } .w7 { font-weight: 700; }
-  table { border-collapse: collapse; width: 100%; font-size: 20px; margin: 8px 0 12px; }
-  th { font: 12px/1.2 system-ui, sans-serif; color: var(--muted); text-align: right; padding: 4px 6px; }
-  td { text-align: right; padding: 3px 6px; border-top: 1px solid var(--line); }
-  td:first-child, th:first-child { text-align: left; }
-  .tnum { font-variant-numeric: tabular-nums; }
+  h3 { font: 600 13px/1.2 system-ui, sans-serif; color: var(--muted-strong); margin: 18px 0 6px; text-transform: uppercase; letter-spacing: .04em; }
+  .note { color: var(--muted-strong); font-size: 14px; margin: 0 0 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(358px, 1fr)); gap: 16px; }
+  section.font { border: 1px solid var(--line); border-radius: 10px; padding: 12px; min-width: 0; }
+  section.font > h2 { font: 600 14px/1.2 system-ui, sans-serif; color: var(--muted-strong); margin: 0 0 8px; text-transform: uppercase; letter-spacing: .04em; }
+  .phone { width: 334px; max-width: 100%; }  /* 390 − 2×16 поля − 2×12 padding карточки */
+  .row { margin: 0 0 8px; overflow-wrap: anywhere; line-height: 1.4; }
+  .lbl { display: block; font: 12px/1.2 system-ui, sans-serif; color: var(--muted-strong); margin-bottom: 2px; }
+  .w4 { font-weight: 400; } .w5 { font-weight: 500; } .w6 { font-weight: 600; } .w7 { font-weight: 700; }
+  .s17 { font-size: 17px; } .s18 { font-size: 18px; } .s20 { font-size: 20px; } .s28 { font-size: 28px; line-height: 1.3; } .s40 { font-size: 40px; line-height: 1.2; }
+  .muted { color: var(--muted-strong); }
+  .num-col { font-variant-numeric: tabular-nums; }
   .pnum { font-variant-numeric: proportional-nums; }
-  .glyphs { font-size: 34px; letter-spacing: .06em; margin: 6px 0; }
-  .glare { background: #fafafa; color: #3a3f45; filter: contrast(.55) brightness(1.18); padding: 10px; border-radius: 8px; }
-  .card { background: var(--soft); border-radius: 10px; padding: 12px; margin: 10px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 18px; font-weight: 600; margin: 4px 0 8px; }
+  th { font: 12px/1.2 system-ui, sans-serif; color: var(--muted-strong); text-align: right; padding: 4px 6px; }
+  td { text-align: right; padding: 3px 6px; border-top: 1px solid var(--line); }
+  td:first-child, th:first-child { text-align: left; font-weight: 500; }
+  .glyphs { font-size: 34px; letter-spacing: .06em; margin: 4px 0; }
+  .card { background: var(--surface); border-radius: 10px; padding: 12px; margin: 8px 0; }
+  .status { display: flex; align-items: center; gap: 6px; font-size: 17px; font-weight: 600; line-height: 1.3; margin-top: 4px; }
+  .status svg { flex: none; width: 20px; height: 20px; }
+  .btn { display: flex; align-items: center; justify-content: center; min-height: 56px; padding: 8px 16px; border-radius: 10px;
+         background: var(--accent); color: var(--on-accent); font-size: 20px; font-weight: 600; line-height: 1.2; margin: 8px 0; }
+  .plate { background: var(--warn-bg); color: var(--warn-ink); border-radius: 10px; padding: 10px 12px; font-size: 18px; font-weight: 600; line-height: 1.3; min-height: 56px; display: flex; align-items: center; gap: 8px; }
+  .glare-wrap { position: relative; border-radius: 10px; overflow: hidden; }
+  .glare-wrap::after { content: ""; position: absolute; inset: 0; background: rgba(255,255,255,.35); pointer-events: none; }
+  .ctab { font: 12px/1.3 system-ui, sans-serif; width: 100%; margin-top: 4px; }
+  .ctab td, .ctab th { font: 12px/1.3 system-ui, sans-serif; padding: 2px 4px; }
+  .fb { margin: 4px 0; white-space: nowrap; font-size: 18px; font-weight: 400; }
+  .meas { font: 12px/1.3 system-ui, sans-serif; color: var(--muted-strong); }
+  .fam-onest { font-family: "T Onest", "T Onest Fallback Arial", system-ui, sans-serif; }
+  .fam-geologica { font-family: "T Geologica", "T Geologica Fallback Arial", system-ui, sans-serif; }
   .fam-manrope { font-family: "T Manrope", system-ui, sans-serif; }
-  .fam-onest { font-family: "T Onest", system-ui, sans-serif; }
-  .fam-geologica { font-family: "T Geologica", system-ui, sans-serif; }
+  .fam-onest .fbx { font-family: "T Onest Fallback Arial"; }
+  .fam-geologica .fbx { font-family: "T Geologica Fallback Arial"; }
+  .fam-manrope .only-short { display: none; }
+  div.only-short { overflow-x: auto; }
 </style>
 </head>
 <body>
 <main>
-  <h1>BuildProof — тест шрифтов (шорт-лист: Manrope, Onest, Geologica)</h1>
-  <p class="note">Ширина колонки ≈ 390 px (телефон). Размеры 17 / 20 / 28 px, веса 400 и 600. Строки «○ ✓» берутся из системного шрифта: в латинских/кириллических subset-файлах этих символов нет (см. 02-type.md). Блок «блик» — грубая имитация солнца на экране (contrast 0.55).</p>
-
+  <h1>BuildProof — тест шрифтов: Onest (фаворит), Geologica (запасной), Manrope (выбыл)</h1>
+  <p class="note">
+    Колонка 334 px = полезная ширина карточки на телефоне 390 px.
+    Блок «блик» — модель: белая вуаль 35 % поверх продуктовых цветов (не замер солнца). Контраст до и после считается в этой же странице по формуле WCAG 2.x.
+    ET-строки — черновик, <b>TODO native ET review</b>.
+    Значки — inline SVG, не символы шрифта.
+  </p>
   <div class="grid" id="grid"></div>
 </main>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-pending" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="2.5"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 20 20"><path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-stale" viewBox="0 0 20 20"><path d="M10 2.5l8 14.5H2z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M10 8v4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-unsent" viewBox="0 0 20 20"><path d="M10 3v9m-4-4l4 4 4-4M4 16h12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
 
 <template id="tpl">
   <section class="font">
     <h2 data-name></h2>
     <div class="phone">
-      <p class="row s17 w4"><span class="lbl">RU · 17 px · 400</span>Элва, Кооли 5 · кровля 60% · ждёт проверки ○ · 5 дней без отчёта</p>
-      <p class="row s20 w4"><span class="lbl">RU · 20 px · 400</span>Элва, Кооли 5 · кровля 60% · ждёт проверки ○ · 5 дней без отчёта</p>
-      <p class="row s28 w6"><span class="lbl">RU · 28 px · 600</span>Элва, Кооли 5 · кровля 60%</p>
 
-      <p class="row s17 w4"><span class="lbl">ET · 17 px · 400</span>Ülemiste õhtune töö · šahti žürii · 60% valmis</p>
-      <p class="row s20 w4"><span class="lbl">ET · 20 px · 400</span>Ülemiste õhtune töö · šahti žürii · 60% valmis</p>
-      <p class="row s28 w6"><span class="lbl">ET · 28 px · 600</span>ÕHTU ÄRA ÖÖ ÜLE ŠAHT ŽÜRII · õäöüšž</p>
+      <h3>Русский · 17 / 20 px · 400 / 500 / 600</h3>
+      <p class="row s17 w4"><span class="lbl">17 · 400 (только длинный текст владельца)</span>Элва, Кооли 5 · кровля 60% · ждёт проверки · 5 дней без отчёта</p>
+      <p class="row s17 w5"><span class="lbl">17 · 500 (основной текст рабочего/бригадира)</span>Элва, Кооли 5 · кровля 60% · ждёт проверки · 5 дней без отчёта</p>
+      <p class="row s17 w6"><span class="lbl">17 · 600 (чипы, цифры)</span>Элва, Кооли 5 · кровля 60% · ждёт проверки · 5 дней без отчёта</p>
+      <p class="row s20 w5"><span class="lbl">20 · 500</span>Элва, Кооли 5 · кровля 60% · 5 дней без отчёта</p>
+      <p class="row s20 w6"><span class="lbl">20 · 600</span>Элва, Кооли 5 · кровля 60% · 5 дней без отчёта</p>
+      <p class="row s28 w6"><span class="lbl">28 · 600</span>Элва, Кооли 5 · кровля 60%</p>
 
-      <p class="row s17 w4"><span class="lbl">EN · 17 px · 400</span>Elva, Kooli 5 · roof 60% · awaiting check ○ · 5 days without a report</p>
-      <p class="row s20 w4"><span class="lbl">EN · 20 px · 400</span>Elva, Kooli 5 · roof 60% · awaiting check ○ · 5 days without a report</p>
-      <p class="row s28 w6"><span class="lbl">EN · 28 px · 600</span>Roof 60% · checked ✓</p>
+      <h3>Eesti · 17 / 20 px (TODO native ET review)</h3>
+      <p class="row s17 w4"><span class="lbl">17 · 400 · буквы</span>Ülemiste õhtune töö · šahti žürii · ÕÄÖÜŠŽ</p>
+      <p class="row s17 w5"><span class="lbl">17 · 500 · реальные строки</span>Vundamenditööd · Katusetööd 60% valmis · 5 päeva ilma aruandeta · Ootab kontrolli</p>
+      <p class="row s20 w5"><span class="lbl">20 · 500</span>Katusetööd 60% valmis · 5 päeva ilma aruandeta</p>
+      <p class="row s20 w6"><span class="lbl">20 · 600</span>Vundamenditööd · Ootab kontrolli</p>
 
-      <div class="card s17">
-        <span class="lbl">Карточка объекта · 17/20 px · 400/600</span>
+      <h3>English · 17 / 20 px</h3>
+      <p class="row s17 w5"><span class="lbl">17 · 500</span>Elva, Kooli 5 · roof 60% · awaiting check · 5 days without a report</p>
+      <p class="row s20 w6"><span class="lbl">20 · 600</span>Roof 60% · checked</p>
+
+      <h3>Экран рабочего «Сегодня» (17/18/20/40 px; 500/600/700)</h3>
+      <div class="card">
+        <div class="s18 w6">Сегодня · Элва, Кооли 5</div>
+        <div class="s18 w5">Этап: Кровля</div>
+        <div class="s40 w7 pnum">60%</div>
+        <div class="s17 w5 muted">снято <span class="num-col">08:30</span> · отправлено <span class="num-col">08:31</span></div>
+        <div class="btn">Отправить отчёт</div>
+        <div class="plate"><svg width="20" height="20"><use href="#i-unsent"/></svg>Сохранено на телефоне, не отправлено</div>
+        <div class="status" style="color:var(--pending-ink)"><svg><use href="#i-pending"/></svg>Ждёт проверки</div>
+        <div class="status" style="color:var(--ok-ink)"><svg><use href="#i-ok"/></svg>Проверено</div>
+        <div class="status" style="color:var(--stale-ink)"><svg><use href="#i-stale"/></svg>5 дней без отчёта</div>
+      </div>
+      <p class="meas" data-lines></p>
+
+      <h3>Карточка объекта (владелец)</h3>
+      <div class="card">
         <div class="s20 w6">Элва, Кооли 5</div>
-        <div class="w4">Готово <b class="w6 tnum">42%</b> · с учётом ждущих проверки <span class="tnum">51%</span></div>
-        <div class="w6" style="color:var(--warn)">● 5 дней без отчёта</div>
+        <div class="s17 w5">Готово <b class="w7 pnum">42%</b> · с учётом ждущих проверки <span class="w6 pnum">51%</span></div>
+        <div class="status" style="color:var(--stale-ink)"><svg><use href="#i-stale"/></svg>5 дней без отчёта</div>
       </div>
 
-      <span class="lbl">Проценты · 20 px · tabular-nums ВКЛ (слева) / ВЫКЛ (справа)</span>
+      <h3>Одиночные крупные числа · 40 px · 700: без tnum (норма) / с tnum</h3>
+      <div class="s40 w7 pnum">11% · 71% · 100%</div>
+      <div class="s40 w7 num-col">11% · 71% · 100%</div>
+
+      <h3>Столбцы · 18 px · 600 · tnum ВКЛ (слева) / ВЫКЛ (справа)</h3>
       <table>
         <thead><tr><th>Этап</th><th>tnum</th><th>без tnum</th></tr></thead>
         <tbody>
-          <tr><td>Фундамент</td><td class="tnum">100%</td><td class="pnum">100%</td></tr>
-          <tr><td>Стены</td><td class="tnum">11%</td><td class="pnum">11%</td></tr>
-          <tr><td>Кровля</td><td class="tnum">60%</td><td class="pnum">60%</td></tr>
-          <tr><td>Окна</td><td class="tnum">7%</td><td class="pnum">7%</td></tr>
-          <tr><td>Отделка</td><td class="tnum">88%</td><td class="pnum">88%</td></tr>
-          <tr><td>Дата</td><td class="tnum">01.11.2026</td><td class="pnum">01.11.2026</td></tr>
-          <tr><td>Дата</td><td class="tnum">18.09.2026</td><td class="pnum">18.09.2026</td></tr>
+          <tr><td>Фундамент</td><td class="num-col">100%</td><td class="pnum">100%</td></tr>
+          <tr><td>Стены</td><td class="num-col">11%</td><td class="pnum">11%</td></tr>
+          <tr><td>Кровля</td><td class="num-col">60%</td><td class="pnum">60%</td></tr>
+          <tr><td>Окна</td><td class="num-col">7%</td><td class="pnum">7%</td></tr>
+          <tr><td>Дата</td><td class="num-col">01.11.2026</td><td class="pnum">01.11.2026</td></tr>
+          <tr><td>Дата</td><td class="num-col">18.09.2026</td><td class="pnum">18.09.2026</td></tr>
+          <tr><td>Время</td><td class="num-col">08:30</td><td class="pnum">08:30</td></tr>
         </tbody>
       </table>
 
-      <span class="lbl">Путаемые знаки · 34 px · 400 / 600</span>
-      <div class="glyphs w4">1 l I | 0 O o | 3 8 | 6 9 | 5 S</div>
+      <h3>Путаемые знаки · 34 px · 500 / 600</h3>
+      <div class="glyphs w5">1 l I | 0 O | 5 S | 2 Z | 8 B | 6 G</div>
       <div class="glyphs w6">Il1 0O 38 69 rn m</div>
-      <div class="glyphs w4 s20" style="font-size:20px;letter-spacing:0">Ill1|O0O · ID-kaart 1101 · Ilmar Illi 11.11</div>
+      <div class="row s20 w6"><span class="lbl">алфавит кодов (02-type.md §9) · 20 · 600 · tnum</span><span class="num-col">3 4 7 9 A C D E F H K M N P R T W X Y</span><br><span class="num-col">K7R 9WH</span></div>
 
-      <span class="lbl">Блик (имитация солнца) · 17 px · 400</span>
-      <div class="glare s17 w4">Элва, Кооли 5 · кровля 60% · 5 дней без отчёта<br>Ülemiste õhtune töö · 60% valmis</div>
+      <h3>Блик: вуаль 35 % · продуктовые цвета · 400 / 500 / 600</h3>
+      <div class="glare-wrap">
+        <div class="card" style="margin:0;background:var(--bg)">
+          <div class="s17 w4">400 · Элва, Кооли 5 · кровля 60%</div>
+          <div class="s17 w5">500 · Элва, Кооли 5 · кровля 60%</div>
+          <div class="s17 w6">600 · Элва, Кооли 5 · кровля 60%</div>
+          <div class="s17 w5" style="color:var(--muted)">500 · --muted: снято 08:30 (владелец)</div>
+          <div class="s17 w5" style="color:var(--muted-strong)">500 · --muted-strong: снято 08:30 (рабочий)</div>
+          <div class="s17 w5">Ülemiste õhtune töö · Katusetööd 60% valmis</div>
+          <div class="status" style="color:var(--pending-ink)"><svg><use href="#i-pending"/></svg>Ждёт проверки</div>
+          <div class="status" style="color:var(--ok-ink)"><svg><use href="#i-ok"/></svg>Проверено</div>
+          <div class="status" style="color:var(--stale-ink)"><svg><use href="#i-stale"/></svg>5 дней без отчёта</div>
+          <div class="plate" style="margin-top:6px"><svg width="20" height="20"><use href="#i-unsent"/></svg>Сохранено на телефоне, не отправлено</div>
+          <div class="btn">Отправить отчёт</div>
+        </div>
+      </div>
+      <table class="ctab" data-contrast></table>
+
+      <h3 class="only-short">Запасной шрифт (Arial с подгонкой) против веб-шрифта · 18 px · 400</h3>
+      <div class="only-short">
+        <div class="fb" data-fb="web">Элва, Кооли 5 · кровля 60% · 5 дней без отчёта</div>
+        <div class="fb fbx" data-fb="fallback">Элва, Кооли 5 · кровля 60% · 5 дней без отчёта</div>
+        <div class="fb" data-fb="web">Katusetööd 60% valmis · 5 päeva ilma aruandeta</div>
+        <div class="fb fbx" data-fb="fallback">Katusetööd 60% valmis · 5 päeva ilma aruandeta</div>
+        <p class="meas" data-fbres></p>
+      </div>
     </div>
   </section>
 </template>
 
 <script>
   const fonts = [
-    ["fam-manrope", "Manrope · @fontsource-variable/manrope@5.3.0"],
-    ["fam-onest", "Onest · @fontsource-variable/onest@5.3.1"],
-    ["fam-geologica", "Geologica · @fontsource-variable/geologica@5.3.0"],
+    ["fam-onest", "Onest · фаворит · @fontsource-variable/onest@5.3.1"],
+    ["fam-geologica", "Geologica · запасной · @fontsource-variable/geologica@5.3.0"],
+    ["fam-manrope", "Manrope · выбыл · @fontsource-variable/manrope@5.3.0"],
   ];
   const grid = document.getElementById("grid");
   const tpl = document.getElementById("tpl");
@@ -144,6 +242,57 @@
     node.querySelector("[data-name]").textContent = name;
     grid.appendChild(node);
   }
+
+  // WCAG 2.x контраст, до и после белой вуали 35 % (смешение в sRGB, как рисует браузер).
+  const hex = h => [1, 3, 5].map(i => parseInt(h.trim().slice(i, i + 2), 16) / 255);
+  const lin = c => c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  const L = c => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+  const cr = (a, b) => { const x = L(a), y = L(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+  const veil = c => c.map(v => v * 0.65 + 0.35);
+  const css = getComputedStyle(document.documentElement);
+  const v = n => hex(css.getPropertyValue(n));
+  const pairs = [
+    ["--fg / --bg", "--fg", "--bg", 7],
+    ["--muted / --bg (владелец)", "--muted", "--bg", 4.5],
+    ["--muted-strong / --bg (рабочий)", "--muted-strong", "--bg", 7],
+    ["--muted-strong / --surface", "--muted-strong", "--surface", 7],
+    ["--warn-ink / --warn-bg (плашка)", "--warn-ink", "--warn-bg", 7],
+    ["--pending-ink / --bg", "--pending-ink", "--bg", 7],
+    ["--ok-ink / --bg", "--ok-ink", "--bg", 7],
+    ["--stale-ink / --bg", "--stale-ink", "--bg", 7],
+    ["--on-accent / --accent (кнопка)", "--on-accent", "--accent", 7],
+  ];
+  document.querySelectorAll("[data-contrast]").forEach(t => {
+    t.innerHTML = "<tr><th style='text-align:left'>пара</th><th>контраст</th><th>норма</th><th>под вуалью</th></tr>" +
+      pairs.map(([n, f, b, need]) => {
+        const c = cr(v(f), v(b)), g = cr(veil(v(f)), veil(v(b)));
+        return `<tr><td style="text-align:left">${n}</td><td>${c.toFixed(2)}:1 ${c >= need ? "ок" : "НИЖЕ"}</td><td>${need}:1</td><td>${g.toFixed(2)}:1</td></tr>`;
+      }).join("");
+  });
+
+  document.fonts.ready.then(() => {
+    document.querySelectorAll("section.font").forEach(sec => {
+      const p = sec.querySelector("[data-fbres]");
+      if (p && getComputedStyle(p.parentElement).display !== "none") {
+        const web = [...sec.querySelectorAll('[data-fb="web"]')];
+        const fb = [...sec.querySelectorAll('[data-fb="fallback"]')];
+        const rng = el => { const r = document.createRange(); r.selectNodeContents(el); return r.getBoundingClientRect().width; };
+        p.textContent = "Ширина запасного против веб-шрифта: " + web.map((w, i) => {
+          const a = rng(w), b = rng(fb[i]);
+          return `${a.toFixed(1)} → ${b.toFixed(1)} px (${((b / a - 1) * 100).toFixed(1)} %)`;
+        }).join("; ");
+      }
+      const m = sec.querySelector("[data-lines]");
+      if (m) {
+        const rows = [...sec.querySelectorAll(".phone > .row")].filter(r => r.querySelector(".lbl"));
+        m.textContent = "Строк в 334 px: " + rows.map(r => {
+          const lbl = r.querySelector(".lbl"); const lh = parseFloat(getComputedStyle(r).lineHeight);
+          const txt = r.textContent.replace(lbl.textContent, "").slice(0, 4);
+          return `${lbl.textContent.split(" (")[0]} «${txt}…»=${Math.round((r.getBoundingClientRect().height - lbl.getBoundingClientRect().height - 2) / lh)}`;
+        }).join(", ");
+      }
+    });
+  });
 </script>
 </body>
 </html>
