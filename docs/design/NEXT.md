@@ -16,7 +16,7 @@
 
 ## Дальше (по порядку)
 1. ~~Основа~~ — готово.
-2. Перенести `04-copy.md` в `src/i18n/locales/{ru,en,et}.json` одним шагом (новые, изменённые, удалённые ключи; ET с пометкой в 04).
+2. ~~Тексты в locales~~ — готово (40d18aa). Ключи, оставленные из-за ссылок в коде (удалить вместе с использованием): `invite.whatsapp/copy/copied/message`, `overview.next.step3`, `stages.decrease/increase`, `dashboard.emptyOther`, `overview.noStages`, `stages.empty`.
 3. Экраны параллельно (у каждого агента свои файлы, каждый снимает свои временные исключения из `scripts/check-tokens.allow.json`):
    а) `Dashboard`, `ProjectDashboard`/обзор, карточки;
    б) `Today` рабочего + лист отчёта + черновики IndexedDB (01 §3.4, brief §2.1б п.4, §2.5 режим «Снижение»);

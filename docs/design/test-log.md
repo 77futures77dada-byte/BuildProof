@@ -118,3 +118,8 @@ RENDER not-found signed in /no-such-page @1440 dark: page.goto: net::ERR_NETWORK
 check-overflow: routes=31 loads=248 overflow_failures=0 render_failures=2 page_errors=1 a11y_small_targets=191 a11y_small_text=101 (a11y = warnings; --strict-a11y to fail)
 ```
 </details>
+
+## 2026-11-27 — повтор check-overflow после шага «Тексты»
+
+Предыдущий FAIL (render_failures=2, page_errors=1, ERR_NETWORK_IO_SUSPENDED, 6983 s) — машина уходила в сон. Повтор: PASS — routes=31 loads=248 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=191 a11y_small_text=101.
+
