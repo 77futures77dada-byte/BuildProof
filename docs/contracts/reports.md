@@ -1,6 +1,6 @@
 # Contract: stage reports (UI ↔ backend)
 
-Status: **proposal from the UI side, waiting for Codex.** Nothing here exists in the database yet, and the UI for reports is not built. The UI PR starts once these fields and RPCs exist under these names, or under names agreed in this file. Migrations and RLS are Codex's.
+Status: backend schema and RPCs are implemented by migrations 006–007. `stage_reports.reporter_id` is nullable for link-only reports; `worker_link_id` identifies the worker credential. UI integration remains separate.
 
 Source of the rules: `buildproof-decisions.md` §2, §5.
 
@@ -27,6 +27,8 @@ Source of the rules: `buildproof-decisions.md` §2, §5.
 | `reviewed_at` | timestamptz, null | |
 | `review_note` | text, null | reason when returned (`rejected`) |
 | `client_request_id` | uuid unique | generated on the phone. Makes retries from the offline queue idempotent |
+
+The deployed schema retains the original `old_percent` / `new_percent` / `reporter_id` columns and adds `claimed_percent`, `previous_confirmed_percent`, `worker_link_id`, EXIF/device/server timestamps, `phash`, `duplicate_of`, and `client_request_id`. A worker link has no `profiles` row; its reports are queried by its own `worker_link_id` only. See [worker-links.md](worker-links.md) for endpoints and limits.
 
 ## 2. Settings
 
@@ -56,7 +58,7 @@ There is no automatic confirmation. **Escalation** (backend trigger or cron): a 
 - Labels: `accepted` → «Принято», `pending` → «Ждёт проверки ○», `confirmed` → «Проверено ✓». The ✓ appears only for `confirmed`.
 - Report card: «снято {taken_at} · отправлено {uploaded_at}», plus «был офлайн» when `uploaded_at − device_time` > 15 min. If `taken_at` is null: «время съёмки неизвестно».
 - Freshness of a stage or project, from the latest `uploaded_at`: today / 1–2 days / 3–6 / 7+. A planned pause (`project_stages.paused_until` or a pause reason) turns red off.
-- Client page: only `visible` stages; only `confirmed` and `accepted`. For a stage with a pending report it shows the last confirmed value and a quiet «обновляется».
+- Client page: only explicitly `visible` stages; only `confirmed` reports. `accepted` and `pending` reports are not returned. Photos require separate `photos_visible` consent. No internal comments are included. See [client-links.md](client-links.md).
 
 ## 5. Open questions for Codex
 
