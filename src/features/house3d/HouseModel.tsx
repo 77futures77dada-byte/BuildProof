@@ -31,7 +31,8 @@ interface HouseModelProps {
   selection?: [SelectionState, Dispatch<SelectionAction>]
   onRendererDispose?: (snapshot: HouseRendererSnapshot) => void
   /** Overview variant B: the model sits in a ~460 px middle column next to the stage list,
-      so the stage card goes under the canvas and the chips and own stage list are left out. */
+      so the stage card goes under the canvas and the own stage list is left out (the column
+      beside is the list); the stage chips stay: colour legend and keyboard selection. */
   compact?: boolean
 }
 
@@ -128,16 +129,16 @@ export function HouseModel({ stages, height, interactive = true, initialAngle = 
             </div>
           : <StageCard stage={selectedStage} part={selected} counts={counts}
               doneStages={modelStages.filter(stage => stage.percent >= 100).length} totalStages={modelStages.length}
-              onClose={() => dispatch({ type: 'clear' })} compact={compact} />}
+              onClose={() => dispatch({ type: 'clear' })} />}
       </aside>
     </div>
     <div className="space-y-4 border-t border-inverse-line p-4">
-      {compact ? null : <div role="group" aria-label={t.stageLegend} className="flex flex-wrap gap-1.5">
+      <div role="group" aria-label={t.stageLegend} className="flex flex-wrap gap-1.5">
         {modelStages.map(stage => <button key={stage.key} type="button" aria-pressed={selected === stage.part} onClick={() => toggle(stage.part as StagePart)}
           className="inline-flex min-h-12 cursor-pointer items-center gap-1.5 rounded-full border border-inverse-line px-2.5 text-body text-on-inverse transition-colors hover:border-on-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-inverse aria-pressed:border-on-inverse aria-pressed:bg-inverse-line">
           <span className="size-2.5 shrink-0 rounded-full" style={{ background: STAGE_COLORS[stage.part as StagePart] }} aria-hidden />{stage.name}
         </button>)}
-      </div>}
+      </div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <ul aria-label={t.stateLegend} className="flex flex-wrap gap-x-4 gap-y-1 text-body text-on-inverse">
           <li className="flex items-center gap-1.5"><span className="h-0.5 w-5 rounded bg-on-inverse shadow-[0_0_6px_1px_rgba(255,255,255,.7)]" aria-hidden />{t.ready} <span className="text-on-inverse">({t.readyHint})</span></li>

@@ -9,13 +9,13 @@ export interface StageCounts { done: number; total: number }
 const stateLabel = (percent: number) => (percent >= 100 ? t.ready : percent > 0 ? t.working : t.notStarted)
 
 /** Details of the selected stage; without one, a short hint and the overall count. */
-export function StageCard({ stage, part, counts, doneStages, totalStages, onClose, compact = false }: {
+export function StageCard({ stage, part, counts, doneStages, totalStages, onClose }: {
   stage: MappedStage | null; part: StagePart | null; counts: StageCounts | null
-  doneStages: number; totalStages: number; onClose: () => void; compact?: boolean
+  doneStages: number; totalStages: number; onClose: () => void
 }) {
   if (!stage || !part) return <div className="space-y-2 text-body text-on-inverse">
     <p className="font-medium text-on-inverse">{t.doneStages(doneStages, totalStages)}</p>
-    <p>{compact ? t.hintCompact : t.hint}</p>
+    <p>{t.hint}</p>
   </div>
   const color = STAGE_COLORS[part], percent = Math.round(stage.percent), unit = elementUnits[part]
   return <div className="space-y-3">

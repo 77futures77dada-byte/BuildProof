@@ -11,8 +11,6 @@ export const houseStrings = {
   empty: 'Добавьте этапы строительства, чтобы увидеть модель объекта.',
   stages: 'Этапы строительства', other: 'Прочее',
   hint: 'Нажмите на этап или на часть дома, чтобы увидеть подробности.',
-  /** compact model (overview variant B): no stage chips under the model, only the house itself is clickable */
-  hintCompact: 'Нажмите на часть дома, чтобы увидеть подробности.',
   doneStages: (done: number, total: number) => `Завершено этапов: ${done} из ${total}`,
   updated: 'Обновлено',
   countOf: (done: number, total: number) => `${done} из ${total}`,

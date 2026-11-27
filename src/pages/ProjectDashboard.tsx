@@ -23,6 +23,8 @@ import { StageActionButtons } from '../components/StageActionButtons'
 import type { StageActionCapabilities, StageActionKind } from '../components/StageActionButtons'
 import { StageProgressControl } from '../components/StageProgressControl'
 import { HouseModelBlock } from '../features/house3d/HouseModelBlock'
+import { stageColor } from '../features/house3d/palette'
+import { stagesToParts } from '../features/house3d/stagesToParts'
 import { ContactLines } from '../components/ContactLines'
 import { hasLegalContact } from '../lib/emailGate'
 import { UrgentBadge } from '../components/UrgentBadge'
@@ -215,6 +217,8 @@ export function ProjectDashboardView({
     </section>
   )
 
+  // Same colour as the stage's lines in the 3D model: the list beside the model is its legend.
+  const partByStage = new Map(stagesToParts(stages.map((stage) => ({ key: stage.id, name: stage.name, percent: stage.progressPercent, sortOrder: stage.sortOrder }))).map((m) => [m.key, m.part]))
   const stagesBlock = stagesExist ? (
     <Section title={t('overview.stages')}>
       <ul className="m-0 flex flex-col p-0">
@@ -222,7 +226,12 @@ export function ProjectDashboardView({
           <StageRow
             key={stage.id}
             variant={isManager ? 'overview' : 'readonly'}
-            name={stageLabel(stage.name)}
+            name={
+              <span className="inline-flex items-baseline gap-2">
+                <span aria-hidden="true" className="inline-block size-3 shrink-0 rounded-full" style={{ background: stageColor(partByStage.get(stage.id) ?? 'other') }} />
+                {stageLabel(stage.name)}
+              </span>
+            }
             percent={stage.progressPercent}
             onPress={isManager && status === 'active' ? () => setMarkStageId(stage.id) : undefined}
             meta={stage.lastChangeAt ? formatDateTimeSmart(stage.lastChangeAt) : undefined}
@@ -310,7 +319,8 @@ export function ProjectDashboardView({
 
   // Overview, variant B.
   // Desktop (≥ 1024 px): three columns in reading order = DOM order = Tab order —
-  //   panel 33 % (state + main action, issues, people, feed, photos) │ 3D model │ stage list.
+  //   panel 33 % (state + main action, issues, people, feed, photos) │ 3D model │ stage list;
+  //   4/4/4 up to 1279 px (a 3/12 list broke «Фундамент» mid-word at 1024), 4/5/3 from 1280 px.
   // Phone: panel, stages right under the main action, the rest, then the 3D model
   //   folded at the very end (on a phone it pushed the main action down: «Март» MED 8).
   // The model mounts only where it is shown, so a phone never loads the three.js chunk
@@ -332,10 +342,10 @@ export function ProjectDashboardView({
       </div>
       {desktop ? (
         <>
-          <div className="min-w-0 lg:col-span-5">
+          <div className="min-w-0 lg:col-span-4 xl:col-span-5">
             {stagesExist ? <HouseModelBlock stages={houseStages} compact /> : null}
           </div>
-          <div className="min-w-0 lg:col-span-3">{stagesBlock}</div>
+          <div className="min-w-0 lg:col-span-4 xl:col-span-3">{stagesBlock}</div>
         </>
       ) : null}
 
