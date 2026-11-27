@@ -30,9 +30,13 @@ interface HouseModelProps {
   /** Lifted selection state, for callers that drive the selection themselves. */
   selection?: [SelectionState, Dispatch<SelectionAction>]
   onRendererDispose?: (snapshot: HouseRendererSnapshot) => void
+  /** Overview variant B: the model sits in a ~460 px middle column next to the stage list,
+      so the stage card goes under the canvas and the own stage list is left out (the column
+      beside is the list); the stage chips stay: colour legend and keyboard selection. */
+  compact?: boolean
 }
 
-export function HouseModel({ stages, height, interactive = true, initialAngle = 35, reducedMotion, selection, onRendererDispose }: HouseModelProps) {
+export function HouseModel({ stages, height, interactive = true, initialAngle = 35, reducedMotion, selection, onRendererDispose, compact = false }: HouseModelProps) {
   const host = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<HouseScene | null>(null)
   const ownSelection = useReducer(selectionReducer, initialSelection)
@@ -112,11 +116,11 @@ export function HouseModel({ stages, height, interactive = true, initialAngle = 
   const rows = stages.map(stage => `${stage.name}: ${Math.round(stage.percent)}%`).join(', ')
 
   return <section aria-label={t.title} className="overflow-hidden rounded-2xl border border-inverse-line text-on-inverse shadow-sm" style={{ background: HOUSE_BG }}>
-    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_17rem]">
+    <div className={compact ? undefined : "lg:grid lg:grid-cols-[minmax(0,1fr)_17rem]"}>
       {!failed
         ? <div ref={host} className="house3d-canvas w-full" style={height ? { height } : undefined} role="img" aria-label={t.modelLabel(rows)} />
         : <p className="p-4 text-body text-on-inverse">{t.fallback}</p>}
-      <aside aria-live="polite" className="min-h-24 border-t border-inverse-line p-4 lg:border-l lg:border-t-0">
+      <aside aria-live="polite" className={compact ? "min-h-24 border-t border-inverse-line p-4" : "min-h-24 border-t border-inverse-line p-4 lg:border-l lg:border-t-0"}>
         {playingStage
           ? <div className="space-y-1">
               <p className="text-body text-on-inverse">{t.playing}</p>
@@ -146,7 +150,7 @@ export function HouseModel({ stages, height, interactive = true, initialAngle = 
           <Play className="size-4" aria-hidden />{t.play}
         </button> : null}
       </div>
-      <StageRows stages={stages} selected={selected} onSelect={toggle} />
+      {compact ? null : <StageRows stages={stages} selected={selected} onSelect={toggle} />}
     </div>
   </section>
 }

@@ -13,7 +13,7 @@ import { formatDate, formatDateTimeSmart, toErrorMessage } from '../lib/format'
 import { daysSince, freshnessView, isGateOpen, lastActivityAt, STALE_DAYS } from '../lib/freshness'
 import { updateStageProgress } from '../lib/stages'
 import { issueBorder } from '../lib/issues'
-import { Button, Disclosure, FreshnessChip, ProgressBar, Sheet, Skeleton, StageRow, buttonClass } from '../components/ui'
+import { Button, Disclosure, FreshnessChip, LG_QUERY, ProgressBar, Sheet, Skeleton, StageRow, buttonClass, useMediaQuery } from '../components/ui'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { Modal } from '../components/Modal'
 import { PhotoUploadForm } from '../components/PhotoUploadForm'
@@ -23,6 +23,8 @@ import { StageActionButtons } from '../components/StageActionButtons'
 import type { StageActionCapabilities, StageActionKind } from '../components/StageActionButtons'
 import { StageProgressControl } from '../components/StageProgressControl'
 import { HouseModelBlock } from '../features/house3d/HouseModelBlock'
+import { stageColor } from '../features/house3d/palette'
+import { stagesToParts } from '../features/house3d/stagesToParts'
 import { ContactLines } from '../components/ContactLines'
 import { hasLegalContact } from '../lib/emailGate'
 import { UrgentBadge } from '../components/UrgentBadge'
@@ -215,6 +217,10 @@ export function ProjectDashboardView({
     </section>
   )
 
+  // Same colour as the stage's lines in the 3D model: on desktop the list beside the model is its
+  // legend; on a phone the model is folded away, so no dots there.
+  const desktop = useMediaQuery(LG_QUERY)
+  const partByStage = new Map(stagesToParts(stages.map((stage) => ({ key: stage.id, name: stage.name, percent: stage.progressPercent, sortOrder: stage.sortOrder }))).map((m) => [m.key, m.part]))
   const stagesBlock = stagesExist ? (
     <Section title={t('overview.stages')}>
       <ul className="m-0 flex flex-col p-0">
@@ -222,7 +228,15 @@ export function ProjectDashboardView({
           <StageRow
             key={stage.id}
             variant={isManager ? 'overview' : 'readonly'}
-            name={stageLabel(stage.name)}
+            name={
+              desktop ? (
+                <span className="inline-flex items-baseline gap-2">
+                  {/* stage colour on the model's own navy (3:1 checked there); the navy ring keeps it visible on the light theme */}
+                  <span aria-hidden="true" className="inline-block size-3.5 shrink-0 rounded-full" style={{ background: stageColor(partByStage.get(stage.id) ?? 'other'), boxShadow: '0 0 0 3px var(--house-bg)' }} />
+                  {stageLabel(stage.name)}
+                </span>
+              ) : stageLabel(stage.name)
+            }
             percent={stage.progressPercent}
             onPress={isManager && status === 'active' ? () => setMarkStageId(stage.id) : undefined}
             meta={stage.lastChangeAt ? formatDateTimeSmart(stage.lastChangeAt) : undefined}
@@ -300,35 +314,44 @@ export function ProjectDashboardView({
     </Section>
   )
 
-  // Desktop only: on a phone the stage list already answers «where is the work» (critic «Март» MED 8).
-  const houseBlock = stagesExist ? (
-    <div className="hidden lg:block">
-      <Disclosure label={t('overview.showHouse')}>
-        <HouseModelBlock
-          stages={stages.map((stage) => ({
-            key: stage.id,
-            name: stage.name,
-            percent: stage.progressPercent,
-            sortOrder: stage.sortOrder,
-          }))}
-        />
-      </Disclosure>
-    </div>
-  ) : null
+  const houseStages = stages.map((stage) => ({
+    key: stage.id,
+    name: stage.name,
+    percent: stage.progressPercent,
+    sortOrder: stage.sortOrder,
+  }))
 
+  // Overview, variant B.
+  // Desktop (≥ 1024 px): three columns in reading order = DOM order = Tab order —
+  //   panel 33 % (state + main action, issues, people, feed, photos) │ 3D model │ stage list;
+  //   4/4/4 up to 1279 px (a 3/12 list broke «Фундамент» mid-word at 1024), 4/5/3 from 1280 px.
+  // Phone: panel, stages right under the main action, the rest, then the 3D model
+  //   folded at the very end (on a phone it pushed the main action down: «Март» MED 8).
+  // The model mounts only where it is shown, so a phone never loads the three.js chunk
+  // unless «Показать дом» is opened.
   return (
-    <div className="flex flex-col gap-8 lg:grid lg:grid-cols-12 lg:items-start lg:gap-8">
-      <div className="flex min-w-0 flex-col gap-8 lg:col-span-7">
+    <div className="flex flex-col gap-8 lg:grid lg:grid-cols-12 lg:items-start lg:gap-6">
+      <div className="flex min-w-0 flex-col gap-8 lg:col-span-4">
         {stateCard}
-        {stagesBlock}
-        {feedBlock}
-      </div>
-      <div className="flex min-w-0 flex-col gap-8 lg:col-span-5">
-        {knownBlock}
+        {desktop ? null : stagesBlock}
         {issuesBlock}
+        {knownBlock}
+        {feedBlock}
         {photosBlock}
-        {houseBlock}
+        {!desktop && stagesExist ? (
+          <Disclosure label={t('overview.showHouse')}>
+            <HouseModelBlock stages={houseStages} compact />
+          </Disclosure>
+        ) : null}
       </div>
+      {desktop ? (
+        <>
+          <div className="min-w-0 lg:col-span-4 xl:col-span-5">
+            {stagesExist ? <HouseModelBlock stages={houseStages} compact /> : null}
+          </div>
+          <div className="min-w-0 lg:col-span-4 xl:col-span-3">{stagesBlock}</div>
+        </>
+      ) : null}
 
       <Sheet
         open={markStage !== null}

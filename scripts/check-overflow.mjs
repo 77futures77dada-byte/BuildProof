@@ -1,5 +1,5 @@
 // Layout check by DOM (no screenshots): every app route, as each role, at
-// 360 / 390 / 768 / 1440 px wide (900 high), light and dark.
+// 360 / 390 / 768 / 1024 / 1440 px wide (900 high), light and dark.
 //
 // Serves the existing dist/ (it does not build). dist/ must be built against the
 // fixture Supabase, which scripts/run-checks.mjs does:
@@ -31,7 +31,7 @@ const STRICT_A11Y = argv.includes('--strict-a11y')
 const VERBOSE = argv.includes('--verbose')
 const ONLY = argv.includes('--only') ? argv[argv.indexOf('--only') + 1] : null
 const CONCURRENCY = Number(process.env.CHECK_CONCURRENCY ?? 4)
-const WIDTHS = [360, 390, 768, 1440]
+const WIDTHS = [360, 390, 768, 1024, 1440] // 1024: narrowest desktop (overview variant B, three columns)
 const HEIGHT = 900
 const SCHEMES = ['light', 'dark']
 
