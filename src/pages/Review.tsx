@@ -10,6 +10,7 @@ import { resolvePhotoUrls } from '../lib/storage'
 import { withTimeout } from '../lib/withTimeout'
 import { UNDO_WINDOW_MS, isReportReviewOn } from '../lib/reportReview'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
+import { ThemeSwitcher } from '../components/ThemeSwitcher'
 import { Spinner } from '../components/Spinner'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { Button, FilterChips, NetBar, PhotoViewer, Sheet, StatusChip, UndoBar, buttonClass, cx, useOnline } from '../components/ui'
@@ -249,9 +250,12 @@ function ReviewQueue({ myId }: { myId: string | null }) {
   return (
     <div className="min-h-dvh bg-page text-fg">
       <header className="border-b-2 border-line">
-        <div className="mx-auto flex max-w-[720px] items-center justify-between gap-3 px-4 py-1">
+        <div className="mx-auto flex max-w-[720px] flex-wrap items-center justify-between gap-3 px-4 py-1">
           <Link to="/dashboard" className={buttonClass({ variant: 'ghost' }, 'px-3')}>{t('notFound.toProjects')}</Link>
-          <LanguageSwitcher />
+          <div className="flex flex-wrap items-center gap-2">
+            <ThemeSwitcher />
+            <LanguageSwitcher />
+          </div>
         </div>
       </header>
       <main className="mx-auto flex max-w-[720px] flex-col gap-4 px-4 py-4">

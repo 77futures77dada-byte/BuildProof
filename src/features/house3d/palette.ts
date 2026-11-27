@@ -52,5 +52,8 @@ export function stageColor(part: HousePart): string {
 export function resolveColor(color: string, el: Element = document.documentElement): string {
   const m = color.match(/^var\((--[\w-]+)\)$/)
   if (!m) return color
-  return getComputedStyle(el).getPropertyValue(m[1]).trim()
+  const value = getComputedStyle(el).getPropertyValue(m[1]).trim()
+  // a missing token would silently paint black in three.js
+  if (!value && import.meta.env.DEV) console.warn(`house3d: token ${m[1]} is not defined in tokens.css`)
+  return value
 }

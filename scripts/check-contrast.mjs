@@ -2,6 +2,7 @@
 //
 //   node scripts/check-contrast.mjs [--verbose]
 //
+// Also: index.html theme-color values equal --bg of each theme.
 // Thresholds (owner brief 2026-11-28; a failing pair changes the colour, never the threshold):
 //   text           ≥ 4.5 : 1   (muted text, links)
 //   worker text    ≥ 7   : 1   (--fg on every page/card background: the worker screen uses them)
@@ -55,17 +56,23 @@ const PAIRS = [
   ...['--bg', '--surface', '--surface-2'].map((bg) => ['--fg', bg, WORKER, 'text, worker screen']),
   ['--muted-strong', '--bg', TEXT, 'secondary text'], ['--muted-strong', '--surface', TEXT, 'secondary text'],
   ['--muted', '--bg', TEXT, 'long owner text'], ['--muted', '--surface', TEXT, 'long owner text'],
-  ['--link', '--bg', TEXT, 'link'], ['--link', '--surface', TEXT, 'link'],
+  ...['--bg', '--surface', '--surface-2'].map((bg) => ['--link', bg, WORKER, 'link / text action (worker screen too)']),
+  ['--muted-strong', '--surface-2', TEXT, 'secondary text'], ['--muted', '--surface-2', TEXT, 'long owner text'],
+  ['--muted-strong', '--warn-bg', TEXT, 'secondary text in banner'],
+  ['--inverse-muted', '--inverse-field', TEXT, 'dark band secondary'], ['--inverse-muted', '--inverse-deep', TEXT, 'dark band secondary'],
+  ['--inverse-fg', '--inverse-field', WORKER, 'dark band field'], ['--inverse-warn', '--inverse-bg', TEXT, 'dark band warning text'],
+  // status inks are also used as words on the landing (landing.css) — text threshold, not 3
+  ...['--ok-ink', '--pending-ink', '--stale-ink'].flatMap((ink) => ['--bg', '--surface', '--warn-bg'].map((bg) => [ink, bg, TEXT, 'status word'])),
   ['--on-accent', '--accent', MAIN, 'main button'], ['--on-accent', '--accent-pressed', MAIN, 'main button pressed'],
   ['--fg', '--warn-bg', WORKER, '«не отправлено» banner'],
   ['--on-scrim', '--scrim', TEXT, 'caption on photo scrim'],
   ['--inverse-fg', '--inverse-bg', WORKER, 'dark band text'], ['--inverse-muted', '--inverse-bg', TEXT, 'dark band secondary'],
   ...['--ok-ink', '--pending-ink', '--stale-ink'].flatMap((ink) => ['--bg', '--surface', '--surface-2'].map((bg) => [ink, bg, NONTEXT, 'status icon / chip edge'])),
-  ['--focus', '--bg', NONTEXT, 'focus ring'], ['--focus', '--surface', NONTEXT, 'focus ring'],
+  ...['--bg', '--surface', '--surface-2', '--warn-bg'].map((bg) => ['--focus', bg, NONTEXT, 'focus ring']),
   ['--fg', '--bg', NONTEXT, 'field / secondary-button border'],
   ['--accent-border', '--bg', NONTEXT, 'main button edge'],
   ['--warn-border', '--warn-bg', NONTEXT, 'banner edge'],
-  ...['--house-foundation', '--house-frame', '--house-roof', '--house-windows', '--house-electric', '--house-plumbing', '--house-finish', '--house-contour']
+  ...['--house-foundation', '--house-frame', '--house-roof', '--house-windows', '--house-electric', '--house-plumbing', '--house-finish', '--house-contour', '--house-other']
     .map((v) => [v, '--house-bg', NONTEXT, '3D line on model background']),
 ]
 
@@ -81,6 +88,14 @@ for (const [name, theme] of [['light', light], ['dark', dark]]) {
     if (r < min) failures.push(line)
     else if (VERBOSE) console.log(`ok    ${line}`)
   }
+}
+// index.html theme-color (meta + first-paint script) must equal --bg of each theme
+const indexHtml = readFileSync(fileURLToPath(new URL('../index.html', import.meta.url)), 'utf8')
+const metaDark = indexHtml.match(/content="(#[0-9A-Fa-f]{6})" media="\(prefers-color-scheme: dark\)"/)?.[1]
+const metaLight = indexHtml.match(/content="(#[0-9A-Fa-f]{6})" media="\(prefers-color-scheme: light\)"/)?.[1]
+const inlineColors = indexHtml.match(/p==="dark"\?"(#[0-9A-Fa-f]{6})":"(#[0-9A-Fa-f]{6})"/)
+for (const [where, got, want] of [['meta dark', metaDark, dark['--bg']], ['meta light', metaLight, light['--bg']], ['first-paint dark', inlineColors?.[1], dark['--bg']], ['first-paint light', inlineColors?.[2], light['--bg']]]) {
+  if (!got || got.toUpperCase() !== want.toUpperCase()) failures.push(`index.html ${where} theme-color ${got ?? 'missing'} ≠ --bg ${want}`)
 }
 const drift = Object.keys({ ...darkForced, ...darkMedia }).filter((k) => darkForced[k] !== darkMedia[k])
 for (const k of drift) failures.push(`drift: ${k} is ${darkMedia[k]} under @media dark but ${darkForced[k]} under [data-theme="dark"]`)

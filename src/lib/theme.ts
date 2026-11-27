@@ -15,6 +15,8 @@ export type ThemeRole = 'gc' | 'foreman' | 'worker' | 'client' | null | undefine
 
 const PREF_KEY = 'bp-theme'
 const ROLE_KEY = 'bp-theme-role'
+/** Fired on window after every applyTheme(); detail = the effective ThemePref. Keeps every switcher in step. */
+export const THEME_EVENT = 'bp-theme-change'
 const PREFS: readonly ThemePref[] = ['light', 'dark', 'system']
 
 function read(key: string): string | null {
@@ -53,6 +55,7 @@ export function applyTheme(pref: ThemePref | null = storedThemePref(), role: The
   if (p === 'system') delete html.dataset.theme
   else html.dataset.theme = p
   syncThemeColor()
+  window.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: p }))
   const mq = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-color-scheme: dark)') : null
   if (mq && systemListener) mq.removeEventListener('change', systemListener)
   systemListener = null
@@ -71,6 +74,12 @@ export function setThemePref(pref: ThemePref, role: ThemeRole = rememberedRole()
 export function applyRoleTheme(role: ThemeRole) {
   write(ROLE_KEY, role ?? null)
   applyTheme(storedThemePref(), role)
+}
+
+/** On sign-out: forget the role so the next person on a shared device starts from the default. The own choice stays. */
+export function forgetRole() {
+  write(ROLE_KEY, null)
+  applyTheme(storedThemePref(), null)
 }
 
 function syncThemeColor() {

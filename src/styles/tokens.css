@@ -51,7 +51,7 @@
   --muted-strong: #2E4B6B;   /* owner secondary text; not for worker text */
   --muted: #4A6582;          /* owner long text only */
   --line: #C9D7E6;
-  --link: #1560A8;           /* links and text actions */
+  --link: #0A4478;           /* links and text actions (≥ 7:1: the worker sees them) */
   --accent: #FFC72C;         /* brand yellow, main button only */
   --accent-pressed: #F0B400;
   --on-accent: #0B2A4A;
@@ -63,7 +63,7 @@
   --warn-border: #5A2E00;
   --scrim: rgba(4, 16, 30, .72);
   --on-scrim: #FFFFFF;
-  --focus: #1560A8;
+  --focus: #0A4478;
   --elev-card: 0 1px 2px rgba(11, 42, 74, .06), 0 8px 24px -12px rgba(11, 42, 74, .22);
   --elev-sheet: 0 -8px 32px rgba(11, 42, 74, .22);
   --elev-press: 0 2px 0 rgba(11, 42, 74, .22);

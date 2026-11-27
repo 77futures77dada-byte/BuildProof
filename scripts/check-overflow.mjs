@@ -314,6 +314,32 @@ if (!ONLY || 'report-send'.includes(ONLY) || 'worker today'.includes(ONLY)) {
   console.log(`report-send: checks=${sendChecks} failures=${sendFailures.length}${sendFailures.length ? `\n  ${sendFailures.join('\n  ')}` : ''}`)
 }
 
+// Default theme with no stored choice (src/lib/theme.ts): navy dark for owner,
+// client and signed-out pages; light for worker and foreman. Checked under both
+// OS schemes, because the default must not depend on the OS setting.
+const DEFAULTS = [[null, '/login', 'dark'], ['gc', '/dashboard', 'dark'], ['client', '/dashboard', 'dark'], ['w1', `${P}/today`, 'light'], ['foreman', P, 'light']]
+const defaultFailures = []
+let defaultChecks = 0
+if (!ONLY || 'theme-default'.includes(ONLY)) {
+  for (const [as, path, want] of DEFAULTS) for (const scheme of SCHEMES) {
+    const ctx = await browser.newContext({ viewport: { width: 390, height: HEIGHT }, colorScheme: scheme, locale: 'ru-RU' })
+    await installFixtures(ctx, { as, extended: true })
+    const page = await ctx.newPage()
+    defaultChecks++
+    try {
+      await page.goto(`${base}${path}`, { waitUntil: 'networkidle' })
+      await page.waitForTimeout(300)
+      const got = await page.evaluate(() => document.documentElement.dataset.theme ?? 'system')
+      if (got !== want) defaultFailures.push(`THEME-DEFAULT ${as ?? 'signed-out'} ${path} (OS ${scheme}): ${got}, want ${want}`)
+    } catch (e) {
+      defaultFailures.push(`THEME-DEFAULT ${as ?? 'signed-out'} ${path}: ${String(e.message ?? e).split('\n')[0]}`)
+    }
+    await ctx.close()
+  }
+  console.log(`theme-default: checks=${defaultChecks} failures=${defaultFailures.length}${defaultFailures.length ? `\n  ${defaultFailures.join('\n  ')}` : ''}`)
+}
+
+
 const queue = [...jobs]
 await Promise.all(Array.from({ length: CONCURRENCY }, async () => {
   while (queue.length) await runJob(queue.shift())
@@ -333,7 +359,7 @@ let a11yTargets = 0
 let a11yText = 0
 let landingTargets = 0
 let landingText = 0
-const failLines = [...sendFailures]
+const failLines = [...sendFailures, ...defaultFailures]
 // One theme on every screen: data-theme = the chosen one, and the same #bp-root background on all routes.
 let themeFailures = 0
 for (const scheme of SCHEMES) {
@@ -374,6 +400,6 @@ for (const [k, list] of byRoute) {
 }
 if (failLines.length) console.log(`\nFAILURES:\n${failLines.join('\n')}`)
 const a11yNote = STRICT_A11Y ? '' : ' (a11y = warnings; --strict-a11y to fail)'
-console.log(`\ncheck-overflow: routes=${byRoute.size} loads=${results.length} overflow_failures=${overflowFailures} render_failures=${renderFailures} page_errors=${pageErrors} a11y_small_targets=${a11yTargets} a11y_small_text=${a11yText} theme_failures=${themeFailures} send_checks=${sendChecks} send_failures=${sendFailures.length} landing_small_targets=${landingTargets} landing_small_text=${landingText}${a11yNote}`)
-const failed = overflowFailures || renderFailures || pageErrors || themeFailures || sendFailures.length || (STRICT_A11Y && (a11yTargets || a11yText))
+console.log(`\ncheck-overflow: routes=${byRoute.size} loads=${results.length} overflow_failures=${overflowFailures} render_failures=${renderFailures} page_errors=${pageErrors} a11y_small_targets=${a11yTargets} a11y_small_text=${a11yText} theme_failures=${themeFailures + defaultFailures.length} send_checks=${sendChecks} send_failures=${sendFailures.length} landing_small_targets=${landingTargets} landing_small_text=${landingText}${a11yNote}`)
+const failed = overflowFailures || renderFailures || pageErrors || themeFailures || defaultFailures.length || sendFailures.length || (STRICT_A11Y && (a11yTargets || a11yText))
 process.exit(failed ? 1 : 0)

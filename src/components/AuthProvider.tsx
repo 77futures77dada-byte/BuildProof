@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { syncProfileLocale } from '../lib/locale'
-import { applyRoleTheme } from '../lib/theme'
+import { applyRoleTheme, forgetRole } from '../lib/theme'
 import { supabase } from '../lib/supabaseClient'
 import { toErrorMessage } from '../lib/format'
 import type { Profile } from '../types'
@@ -95,6 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return
     }
     activeUserId.current = null
+    forgetRole()
     setSession(null)
     setProfile(null)
   }, [])

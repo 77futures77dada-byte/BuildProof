@@ -240,3 +240,15 @@ OVERFLOW not-found signed in /no-such-page @390: scrollWidth 477 > 390; div.flex
 | check-contrast | PASS | pairs=74 failures=0 drift=0 (0s) |
 | check-ru-latin | PASS | offending=0 strings=823 (json=544, landing=279) (0s) |
 | check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 theme_failures=0 send_checks=8 send_failures=0 landing_small_targets=8 landing_small_text=95 (138s) |
+
+## 2026-11-27T14:15:21Z — navy r1: правки критиков
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=1 errors=0 (3s) |
+| build | PASS | built in 2.08s, VITE_SUPABASE_URL=fixture (23s) |
+| test | PASS | 14 passed (14); 105 passed (105) (13s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=171 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=114 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=824 (json=545, landing=279) (1s) |
+| check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 theme_failures=0 send_checks=8 send_failures=0 landing_small_targets=8 landing_small_text=95 (160s) |

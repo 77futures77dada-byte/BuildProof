@@ -42,7 +42,7 @@ export function ProjectCard({ to, name, subtitle, percent, percentLabel, chips, 
       to={to}
       className={cx(
         'group flex min-h-12 flex-col gap-3 rounded-card border-2 border-line bg-surface p-4 text-fg no-underline shadow-card',
-        'hover:border-fg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus active:border-fg',
+        'hover:border-fg hover:bg-surface-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus active:border-fg',
         layout === 'row' && 'lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,2fr)] lg:items-center',
         className,
       )}

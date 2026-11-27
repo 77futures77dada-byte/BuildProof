@@ -40,9 +40,10 @@
   },
   "theme": {
     "label": "Teema",
-    "light": "Hele",
-    "dark": "Tume",
-    "system": "Nagu seadmes"
+    "light": "hele",
+    "dark": "tume",
+    "system": "nagu seadmes",
+    "option": "Teema: {{value}}"
   },
   "roles": {
     "client": "Tellija",
