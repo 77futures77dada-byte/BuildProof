@@ -390,3 +390,16 @@ OVERFLOW not-found signed in /no-such-page @390: scrollWidth 477 > 390; div.flex
 | ссылки заказчиков | HIGH 0 / MED 0 — фильтр status=confirmed и видимость этапа проверены; фото требуют отдельного согласия | HIGH 0 / MED 0 — preview использует ту же RPC-фильтрацию; данные комментариев и соседних фирм не возвращаются |
 
 Ограничение проверки: из-за отсутствия pgTAP runtime выводы по SQL основаны на чтении миграций и тестового сценария, а не на выполнении в PostgreSQL.
+
+## 2026-11-27 — worker link pgcrypto and decrease threshold correction
+
+| check | result | details |
+|---|---|---|
+| `npm run lint` | PASS | oxlint and token scan passed |
+| `ALLOW_PLACEHOLDERS=1 npm run build` | PASS | production build completed; Vite emitted only chunk-size and mixed-import warnings |
+| `npm test` | PASS | 14 files, 105 tests |
+| API tests | PASS | 5 tests |
+| `git diff --check` | PASS | no whitespace errors |
+| `supabase/tests/worker_client_links.sql` | NOT RUN | pgTAP test updated to 19 assertions; psql, Docker, and Supabase CLI are unavailable. No migrations were applied. |
+
+Added pgTAP coverage for worker-token authorization under `search_path=public,extensions` and a 30-point decrease with threshold 25 remaining `pending` while accepted progress remains unchanged.

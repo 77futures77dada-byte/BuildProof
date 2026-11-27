@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path=public,extensions;
-select plan(17);
+select plan(19);
 
 insert into public.companies(id,name) values
  ('90000000-0000-4000-8000-000000000001','Link tenant A'),
@@ -55,12 +55,22 @@ select is(has_function_privilege('anon','public.submit_worker_link_report(text,u
 
 set local role service_role;
 select set_config('request.jwt.claims','{"role":"service_role"}',true);
+select set_config('search_path','public,extensions',true);
+select is((select project_id from public.authorize_worker_link('worker-good-token')),
+ '92000000-0000-4000-8000-000000000001'::uuid,'worker token authorization resolves digest with public,extensions search_path');
 select is(public.worker_link_stages('worker-good-token')->>'project_id','92000000-0000-4000-8000-000000000001','worker token lists only its assigned object');
 select throws_ok($$select public.worker_link_stages('worker-revoked-token')$$,'P0001','invalid_worker_link','revoked worker token is rejected');
 select throws_ok($$select public.worker_link_stages('worker-expired-token')$$,'P0001','invalid_worker_link','expired worker token is rejected');
 select throws_ok($$select public.submit_worker_link_report('worker-good-token','93000000-0000-4000-8000-000000000003',10,null,now(),array['92000000-0000-4000-8000-000000000001/worker-links/94000000-0000-4000-8000-000000000001/photo.jpg'],null,'97000000-0000-4000-8000-000000000001',null)$$,
  'P0001','stage_not_found','worker link cannot submit to a stage in another object');
 select is(jsonb_array_length(public.worker_link_reports('worker-good-token')),1,'worker link reads only its own recent reports');
+update public.project_stages set progress_percent=50 where id='93000000-0000-4000-8000-000000000001';
+select is(
+  (public.submit_worker_link_report('worker-good-token','93000000-0000-4000-8000-000000000001',20,now(),now(),
+    array['92000000-0000-4000-8000-000000000001/worker-links/94000000-0000-4000-8000-000000000001/decrease.jpg'],
+    null,'97000000-0000-4000-8000-000000000002','rework')->>'status'='pending'
+   and (select progress_percent from public.project_stages where id='93000000-0000-4000-8000-000000000001')=50),
+  true,'large decrease enters pending and leaves accepted progress unchanged');
 select is(has_function_privilege('anon','public.review_stage_report(uuid,boolean,text)','EXECUTE'),false,
  'bearer links have no report-confirmation RPC grant');
 select is(public.client_project_view('client-good-token',null,null)->>'project_id','92000000-0000-4000-8000-000000000001','client token returns only its object');

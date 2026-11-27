@@ -39,7 +39,7 @@ Errors: `unauthorized`, `forbidden`, `invalid_action`, `invalid_project_id`, `in
 {"stage_id":"uuid","claimed_percent":0,"taken_at":"ISO-8601 or null","device_time":"ISO-8601","client_request_id":"uuid","decrease_reason":"rework|count_error|demolition or null","photos":[{"content_type":"image/jpeg","base64":"..."}]}
 ```
 
-`taken_at` is EXIF `DateTimeOriginal` read before compression; `device_time` is the device clock; `uploaded_at` is set by the server at receipt. They are stored separately. A decrease requires `decrease_reason`. Small increases up to the project's `review_threshold` are `accepted` and advance the stage. Larger increases are `pending` and do not advance it. A repeated `client_request_id` returns the existing report without duplicating it.
+`taken_at` is EXIF `DateTimeOriginal` read before compression; `device_time` is the device clock; `uploaded_at` is set by the server at receipt. They are stored separately. A decrease requires `decrease_reason`. A change whose absolute difference from the current stage value is at most the project's `review_threshold` is `accepted` and advances the stage. A larger increase or decrease is `pending` and does not advance it until review. A repeated `client_request_id` returns the existing report without duplicating it.
 
 Response includes `report_id`, `status`, `duplicate_of`, and `duplicate_request`. Errors: `invalid_worker_link`, `invalid_report`, `invalid_percent`, `invalid_time`, `invalid_decrease_reason`, `decrease_reason_required`, `invalid_photo_count`, `invalid_photo`, `photo_size_or_type_invalid`, `total_photo_size_exceeded`, `photo_upload_failed`, `worker_link_rate_limit`, `stage_not_found`, `invalid_photo_path`, `request_failed`.
 
