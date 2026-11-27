@@ -249,7 +249,7 @@ function ReviewQueue({ myId }: { myId: string | null }) {
 
   return (
     <div className="min-h-dvh bg-page text-fg">
-      <header className="border-b-2 border-line">
+      <header className="border-b border-line">
         <div className="mx-auto flex max-w-[720px] flex-wrap items-center justify-between gap-3 px-4 py-1">
           <Link to="/dashboard" className={buttonClass({ variant: 'ghost' }, 'px-3')}>{t('notFound.toProjects')}</Link>
           <div className="flex flex-wrap items-center gap-2">
@@ -277,7 +277,7 @@ function ReviewQueue({ myId }: { myId: string | null }) {
         ) : error ? (
           <ErrorMessage message={error} onRetry={() => setNonce((n) => n + 1)} />
         ) : visible.length === 0 ? (
-          <div className="flex flex-col items-start gap-3 rounded-card border-2 border-dashed border-line p-5">
+          <div className="flex flex-col items-start gap-3 rounded-card border border-dashed border-line p-5">
             <p className="m-0 text-field font-medium">{t('review.empty')}</p>
             <Link to="/dashboard" className={buttonClass({ variant: 'secondary' })}>{t('notFound.toProjects')}</Link>
           </div>
@@ -297,7 +297,7 @@ function ReviewQueue({ myId }: { myId: string | null }) {
                   )}
                 >
                   <div className="min-h-0">
-                    <div className="flex min-h-[120px] flex-col gap-3 rounded-card border-2 border-line p-3">
+                    <div className="flex min-h-[120px] flex-col gap-3 rounded-card border border-line p-3">
                       <div className="flex gap-3">
                         <button
                           type="button"
@@ -429,7 +429,7 @@ function ReturnSheet({ item, onClose, onSent, token }: {
             aria-checked={reason === r}
             onClick={() => setReason(r)}
             className={cx(
-              'inline-flex min-h-12 items-center rounded-control border-2 px-4 text-left text-field font-medium',
+              'inline-flex min-h-12 items-center rounded-control border px-4 text-left text-field font-medium',
               'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus',
               reason === r ? 'border-fg bg-fg text-page' : 'border-line bg-page text-fg',
             )}

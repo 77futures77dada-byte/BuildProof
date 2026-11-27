@@ -60,13 +60,13 @@ export default function House3DDevPage() {
       <button data-testid="preset-zero" className={`${button} bg-fg text-page`} onClick={() => setPercents(BASE_STAGES.map(() => 0))}>{d.zero}</button>
       <button data-testid="preset-mixed" className={`${button} bg-fg text-page`} onClick={() => setPercents([100, 60, 30, 50, 25, 50, 0])}>{d.mixed}</button>
       <button data-testid="preset-complete" className={`${button} bg-fg text-page`} onClick={() => setPercents(BASE_STAGES.map(() => 100))}>{d.complete}</button>
-      <label className={`${button} flex items-center gap-2 border border-fg`}><input data-testid="reduced-motion" type="checkbox" checked={reduced} onChange={event => setReduced(event.target.checked)} />{d.reducedMotion}</label>
+      <label className={`${button} flex items-center gap-2 border border-line`}><input data-testid="reduced-motion" type="checkbox" checked={reduced} onChange={event => setReduced(event.target.checked)} />{d.reducedMotion}</label>
     </section>
     <section className="grid gap-3 rounded-xl border border-line bg-page p-4 sm:grid-cols-2">
       {BASE_STAGES.map((stage, index) => <label key={stage.key} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 text-body"><span>{stage.name}</span><output>{percents[index]}%</output><input className="col-span-2 w-full accent-[var(--fg)]" aria-label={d.percentLabel(stage.name)} type="range" min="0" max="100" step="5" value={percents[index]} onChange={event => setPercents(current => current.map((value, i) => i === index ? Number(event.target.value) : value))} /></label>)}
     </section>
     <section className="flex flex-wrap gap-2" aria-label={d.select}>
-      <button data-testid="select-none" className={`${button} border border-fg`} aria-pressed={selected === null} onClick={() => dispatch({ type: 'clear' })}>{d.none}</button>
+      <button data-testid="select-none" className={`${button} border border-line`} aria-pressed={selected === null} onClick={() => dispatch({ type: 'clear' })}>{d.none}</button>
       {STAGE_PARTS.map((part, index) => <button key={part} data-testid={`select-${part}`} aria-pressed={selected === part} className={`${button} border border-fg aria-pressed:bg-fg aria-pressed:text-page`} style={{ borderLeft: `4px solid ${STAGE_COLORS[part]}` }}
         onClick={() => dispatch({ type: 'toggle', part })}>{BASE_STAGES[index].name}</button>)}
     </section>

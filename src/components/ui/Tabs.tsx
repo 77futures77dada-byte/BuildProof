@@ -32,7 +32,7 @@ const tabClass = ({ isActive }: { isActive: boolean }) =>
 /** Section navigation (links with aria-current, not ARIA tabs: each tab is a route). */
 export function Tabs({ items, label, variant = 'owner', className }: TabsProps) {
   return (
-    <nav aria-label={label} className={cx('border-b-2 border-line', className)}>
+    <nav aria-label={label} className={cx('border-b border-line', className)}>
       <ul className={cx('m-0 flex list-none gap-1 p-0', variant === 'owner' ? 'overflow-x-auto overscroll-x-contain' : '')}>
         {items.map((item) => (
           <li key={item.key} className={variant === 'worker' ? 'flex min-w-0 flex-auto' : 'flex'}>

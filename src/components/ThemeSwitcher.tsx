@@ -37,7 +37,7 @@ export function ThemeSwitcher({ className = '' }: { className?: string }) {
         id={id}
         value={value}
         onChange={(e) => setThemePref(e.target.value as ThemePref, role)}
-        className="min-h-12 rounded-control border-2 border-fg bg-page px-3 text-body font-medium text-fg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        className="min-h-12 rounded-control border border-line-strong bg-page px-3 text-body font-medium text-fg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >
         {OPTIONS.map((o) => <option key={o} value={o}>{t('theme.option', { value: t(`theme.${o}`) })}</option>)}
       </select>

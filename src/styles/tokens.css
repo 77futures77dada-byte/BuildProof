@@ -46,6 +46,7 @@
   --muted-strong: #2E4B6B;   /* owner secondary text; not for worker text */
   --muted: #4A6582;          /* owner long text only */
   --line: #C9D7E6;
+  --line-strong: #6B829C;    /* form-field edges and hover: still muted, ≥ 3:1 (check-contrast) */
   --link: #0A4478;           /* links and text actions (≥ 7:1: the worker sees them) */
   --accent: #FFC72C;         /* brand yellow, main button only */
   --accent-pressed: #F0B400;
@@ -122,7 +123,7 @@
   :root:not([data-theme="light"]) {
     color-scheme: dark;
     --bg: #08213B; --surface: #0B2A4A; --surface-2: #12365C; --fg: #EEF3F9;
-    --muted-strong: #C3D3E4; --muted: #9DB3CC; --line: #24476F; --link: #7DD3FC;
+    --muted-strong: #C3D3E4; --muted: #9DB3CC; --line: #24476F; --line-strong: #58779C; --link: #7DD3FC;
     --accent-pressed: #FFD45C; --accent-border: #FFC72C; --focus: #7DD3FC;
     --pending-ink: #D9962B; --ok-ink: #2FB67E; --stale-ink: #FF6B6B;
     --warn-bg: #3A2408; --warn-border: #FF9A4D;
@@ -138,7 +139,7 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
   --bg: #08213B; --surface: #0B2A4A; --surface-2: #12365C; --fg: #EEF3F9;
-  --muted-strong: #C3D3E4; --muted: #9DB3CC; --line: #24476F; --link: #7DD3FC;
+  --muted-strong: #C3D3E4; --muted: #9DB3CC; --line: #24476F; --line-strong: #58779C; --link: #7DD3FC;
   --accent-pressed: #FFD45C; --accent-border: #FFC72C; --focus: #7DD3FC;
   --pending-ink: #D9962B; --ok-ink: #2FB67E; --stale-ink: #FF6B6B;
   --warn-bg: #3A2408; --warn-border: #FF9A4D;
@@ -160,6 +161,7 @@
   --color-muted-strong: var(--muted-strong);
   --color-muted: var(--muted);
   --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
   --color-accent: var(--accent);
   --color-accent-pressed: var(--accent-pressed);
   --color-on-accent: var(--on-accent);

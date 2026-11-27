@@ -123,7 +123,7 @@ export function Sheet({ open, onClose, title, children, footer, busy, closeLabel
           className,
         )}
       >
-        <header className="flex items-center justify-between gap-3 border-b-2 border-line py-1 pr-3 pl-4">
+        <header className="flex items-center justify-between gap-3 border-b border-line py-1 pr-3 pl-4">
           <h2 id={titleId} className="m-0 min-w-0 text-h3 font-medium">{title}</h2>
           <button
             type="button"
@@ -136,7 +136,7 @@ export function Sheet({ open, onClose, title, children, footer, busy, closeLabel
         </header>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">{children}</div>
         {footer ? (
-          <footer className="border-t-2 border-line bg-page px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))]">{footer}</footer>
+          <footer className="border-t border-line bg-page px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))]">{footer}</footer>
         ) : null}
       </div>
     </div>,

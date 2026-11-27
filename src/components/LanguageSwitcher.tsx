@@ -27,7 +27,7 @@ export function LanguageSwitcher({ className = '' }: { className?: string }) {
     <div
       role="group"
       aria-label={t('language.label')}
-      className={`inline-flex shrink-0 gap-2 rounded-control border-2 border-line bg-page p-0.5 ${className}`}
+      className={`inline-flex shrink-0 gap-2 rounded-control border border-line bg-page p-0.5 ${className}`}
     >
       {LOCALES.map((locale) => (
         <button

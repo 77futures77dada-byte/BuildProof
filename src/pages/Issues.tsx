@@ -91,7 +91,7 @@ export function IssuesView({
       ) : error ? (
         <ErrorMessage message={error} onRetry={reload} />
       ) : issues.length === 0 ? (
-        <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body text-fg">
+        <p className="m-0 rounded-card border border-dashed border-line p-5 text-body text-fg">
           {canCreate ? t('issues.empty') : t('issues.noActive')}
         </p>
       ) : (

@@ -87,7 +87,7 @@ export function Settings() {
           <div className="flex flex-col gap-3">
             <h2 className="m-0 text-h2 font-medium text-fg">{t('people.title')}</h2>
             {people.length === 0 ? (
-              <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body text-fg">
+              <p className="m-0 rounded-card border border-dashed border-line p-5 text-body text-fg">
                 {gateOpen ? t('people.emptyOpen') : hasLegalContact() ? t('people.emptyClosed') : t('people.emptyClosedNoContact')}
               </p>
             ) : (
@@ -124,7 +124,7 @@ export function Settings() {
               {gateOpen && id ? (
                 <InviteForm projectId={id} known={known} onAddKnown={add} onInvited={reload} />
               ) : (
-                <div className="flex flex-col gap-2 rounded-card border-2 border-line bg-surface p-4">
+                <div className="flex flex-col gap-2 rounded-card border border-line bg-surface p-4">
                   <p className="m-0 text-body font-medium text-fg">{hasLegalContact() ? t('gate.inviteLater') : t('gate.inviteLaterNoContact')}</p>
                   <ContactLines label={t('common.supportLabel')} />
                 </div>
@@ -353,8 +353,8 @@ function InviteForm({ projectId, known, onAddKnown, onInvited }: {
             disabled={busy}
             onClick={() => setRole(r)}
             className={cx(
-              'inline-flex min-h-12 flex-1 items-center justify-center rounded-control border-2 px-4 text-field font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus',
-              role === r ? 'border-fg bg-fg text-page' : 'border-fg bg-page text-fg hover:bg-surface',
+              'inline-flex min-h-12 flex-1 items-center justify-center rounded-control border px-4 text-field font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus',
+              role === r ? 'border-fg bg-fg text-page' : 'border-line bg-page text-fg hover:border-line-strong hover:bg-surface-2',
             )}
           >
             {t(`roles.${r}`)}
@@ -366,7 +366,7 @@ function InviteForm({ projectId, known, onAddKnown, onInvited }: {
         const err = problem(r, i)
         const twin = sameName(r)
         return (
-          <fieldset key={r.key} disabled={busy || r.ok} className="m-0 flex flex-col gap-3 rounded-card border-2 border-line p-4">
+          <fieldset key={r.key} disabled={busy || r.ok} className="m-0 flex flex-col gap-3 rounded-card border border-line p-4">
             <TextField label={t('invite.name')} value={r.name} onChange={(e) => patch(r.key, { name: e.target.value, sameNameOk: false, result: undefined })} />
             <TextField label={t('invite.email')} type="email" inputMode="email" autoComplete="off" value={r.email} error={err ?? undefined} onChange={(e) => patch(r.key, { email: e.target.value, result: undefined })} />
             {twin ? (

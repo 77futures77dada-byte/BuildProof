@@ -13,7 +13,7 @@ interface StageCardProps {
 
 export function StageCard({ stage, canEdit, onCommit, historyToken }: StageCardProps) {
   return (
-    <li className="flex list-none flex-col gap-3 rounded-card border-2 border-line bg-surface p-4 text-fg shadow-card">
+    <li className="flex list-none flex-col gap-3 rounded-card border border-line bg-surface p-4 text-fg shadow-card">
       <div className="flex items-center justify-between gap-3">
         <h3 className="m-0 min-w-0 text-h3 font-medium [overflow-wrap:anywhere]">{stageLabel(stage.name)}</h3>
         {!canEdit ? (

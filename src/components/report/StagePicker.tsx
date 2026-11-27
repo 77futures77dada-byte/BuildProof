@@ -26,7 +26,7 @@ export function StagePicker({ stages, currentId, onPick }: StagePickerProps) {
               aria-current={current ? 'true' : undefined}
               onClick={() => onPick(s)}
               className={cx(
-                'flex min-h-14 w-full items-center justify-between gap-3 rounded-control border-2 px-4 py-2 text-left text-field font-medium text-fg',
+                'flex min-h-14 w-full items-center justify-between gap-3 rounded-control border px-4 py-2 text-left text-field font-medium text-fg',
                 'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus hover:bg-surface',
                 current ? 'border-fg bg-surface' : 'border-line bg-page',
               )}

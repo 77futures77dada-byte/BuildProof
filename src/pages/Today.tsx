@@ -280,13 +280,13 @@ export function Today() {
       ) : null}
 
       {editing ? (
-        <section className="flex flex-wrap items-center gap-3 rounded-card border-2 border-line bg-surface p-3">
+        <section className="flex flex-wrap items-center gap-3 rounded-card border border-line bg-surface p-3">
           {/* own row: with two buttons beside it the text broke one word per line at 360–390 px */}
           <p className="m-0 min-w-0 basis-full text-field font-medium">{t('report.unfinished')}</p>
           <Button variant="secondary" onClick={() => setSheetDraftId(editing.draftId)}>{t('today.continue')}</Button>
           {/* an accidental shot can be thrown away here, off the send path (critic r3 LOW-1) */}
           {discard === editing.draftId ? (
-            <div className="flex w-full flex-col gap-3 rounded-card border-2 border-stale bg-page p-3">
+            <div className="flex w-full flex-col gap-3 rounded-card border border-stale bg-page p-3">
               <p className="m-0 text-field font-medium">{t('send.deleteConfirm')}</p>
               <div className="flex flex-wrap gap-3">
                 <Button variant="danger" onClick={() => { setDiscard(null); void removeDraft(editing.draftId) }}>{t('common.delete')}</Button>
@@ -344,7 +344,7 @@ export function Today() {
         ) : error ? (
           <ErrorMessage message={error} onRetry={reload} />
         ) : active.length === 0 ? (
-          <p className="m-0 rounded-card border-2 border-line bg-surface p-4 text-field">
+          <p className="m-0 rounded-card border border-line bg-surface p-4 text-field">
             {doneCount > 0 ? t('today.allDone') : t('today.noTasks')}
           </p>
         ) : (

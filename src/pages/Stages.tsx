@@ -45,7 +45,7 @@ export function Stages() {
       <h2 className="m-0 text-h2 font-medium text-fg">{t('stages.title')}</h2>
 
       {stages.length === 0 ? (
-        <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body text-fg">
+        <p className="m-0 rounded-card border border-dashed border-line p-5 text-body text-fg">
           {role === 'gc' ? t('stages.emptyOwner') : t('stages.emptyAsk')}
         </p>
       ) : (

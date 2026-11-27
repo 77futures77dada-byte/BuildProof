@@ -14,7 +14,7 @@ export function WorkerProjectCard({ project }: { project: DashboardProject }) {
     <Link
       data-zone="field"
       to={`/project/${project.id}/today`}
-      className="flex min-h-20 items-center gap-4 rounded-card border-2 border-line bg-surface p-4 text-fg no-underline shadow-card hover:border-fg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus active:border-fg"
+      className="flex min-h-20 items-center gap-4 rounded-card border border-line bg-surface p-4 text-fg no-underline shadow-card hover:border-fg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus active:border-fg"
     >
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <span className="flex items-baseline justify-between gap-3">

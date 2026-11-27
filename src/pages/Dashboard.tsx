@@ -85,7 +85,7 @@ export function Dashboard() {
     }
     const key = role === 'foreman' ? 'dashboard.emptyForeman' : isWorker ? 'dashboard.emptyWorker' : 'dashboard.emptyClient'
     return (
-      <section className="flex flex-col items-start gap-3 rounded-card border-2 border-dashed border-line bg-page p-5">
+      <section className="flex flex-col items-start gap-3 rounded-card border border-dashed border-line bg-page p-5">
         <p className="m-0 text-field font-medium text-fg">{t(key)}</p>
         <ContactLines label={t('common.supportLabel')} />
         {/* Access may be granted while the page is open: reload instead of signing out and in. */}

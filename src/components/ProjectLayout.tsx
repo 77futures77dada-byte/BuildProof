@@ -84,7 +84,7 @@ export function ProjectLayout() {
       </AppHeader>
       <main className="mx-auto max-w-[1120px] px-4 py-6">
         {!loading && error ? (
-          <section role="alert" className="flex flex-col items-start gap-3 rounded-card border-2 border-stale bg-page p-5">
+          <section role="alert" className="flex flex-col items-start gap-3 rounded-card border border-stale bg-page p-5">
             <p className="m-0 text-field font-medium">{t('overview.loadFailed')}</p>
             <Link to="/dashboard" className={buttonClass({ variant: 'secondary' })}>{t('tariff.toProjects')}</Link>
           </section>

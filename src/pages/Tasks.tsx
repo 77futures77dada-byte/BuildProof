@@ -72,7 +72,7 @@ function TasksView({ projectId, manager }: { projectId: string | undefined; mana
       ) : error ? (
         <ErrorMessage message={error} onRetry={reload} />
       ) : tasks.length === 0 ? (
-        <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body text-fg">
+        <p className="m-0 rounded-card border border-dashed border-line p-5 text-body text-fg">
           {!manager ? t('tasks.noActive') : isEmailGateOpen() ? t('tasks.empty') : t('tasks.emptyClosed')}
         </p>
       ) : (

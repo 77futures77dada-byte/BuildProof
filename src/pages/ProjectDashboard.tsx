@@ -192,7 +192,7 @@ export function ProjectDashboardView({
   }
 
   const stateCard = (
-    <section className="flex flex-col gap-3 rounded-card border-2 border-line bg-surface p-4 shadow-card">
+    <section className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4 shadow-card">
       <p className="m-0 text-figure font-medium">{t('overview.readyPercent', { percent: overallPercent })}</p>
       <ProgressBar value={overallPercent} thickness="thick" label={t('overview.readiness')} />
       {isManager ? (
@@ -422,7 +422,7 @@ function FeedList({ entries }: { entries: FeedEntry[] }) {
         const name = e.name ?? t('common.noName')
         const stage = stageLabel(e.stage)
         return (
-          <li key={`${e.kind}-${e.id}`} className="flex flex-col gap-1 border-b-2 border-line pb-3 last:border-b-0">
+          <li key={`${e.kind}-${e.id}`} className="flex flex-col gap-1 border-b border-line pb-3 last:border-b-0">
             <span className="text-body [overflow-wrap:anywhere]">
               {e.kind === 'report'
                 ? t('activity.report', { name, stage, from: e.from, to: e.to })
@@ -449,7 +449,7 @@ function KnownPeople({ rows, onAdd, allTo }: { rows: AccessRow[]; onAdd: (row: A
       <p className="m-0 text-body">{t('known.hint')}</p>
       <ul className="m-0 flex list-none flex-col gap-3 p-0">
         {rows.slice(0, 3).map((row) => (
-          <li key={row.userId} className="flex flex-wrap items-center justify-between gap-3 rounded-control border-2 border-line p-3">
+          <li key={row.userId} className="flex flex-wrap items-center justify-between gap-3 rounded-control border border-line p-3">
             <span className="min-w-0 text-field [overflow-wrap:anywhere]">
               {row.name} · {t(`roles.${row.role}`)}
             </span>
@@ -507,7 +507,7 @@ function IssueRow({ issue }: { issue: ActiveIssue }) {
     <li>
       <Link
         to={`/project/${id}/issues`}
-        className={`flex min-h-12 items-start justify-between gap-3 rounded-control border-2 border-l-4 border-line bg-page p-3 text-fg no-underline hover:bg-surface focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus ${issueBorder(issue.priority)}`}
+        className={`flex min-h-12 items-start justify-between gap-3 rounded-control border border-l-4 border-line bg-page p-3 text-fg no-underline hover:bg-surface focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus ${issueBorder(issue.priority)}`}
       >
         <span className="flex min-w-0 flex-col gap-1">
           <span className="text-field [overflow-wrap:anywhere]">{issue.title}</span>

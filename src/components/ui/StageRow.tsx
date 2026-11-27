@@ -36,7 +36,7 @@ export function StageRow({ name, percent, status, meta, onPress, actions, childr
   )
   const interactive = onPress && variant !== 'readonly'
   return (
-    <li className={cx('flex list-none flex-col gap-2 border-b-2 border-line py-3 last:border-b-0', className)}>
+    <li className={cx('flex list-none flex-col gap-2 border-b border-line py-3 last:border-b-0', className)}>
       <div className="flex items-start gap-3">
         {interactive ? (
           <button
