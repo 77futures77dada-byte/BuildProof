@@ -354,7 +354,6 @@
     "title": "Stages",
     "loading": "Loading stages…",
     "readOnly": "View only",
-    "empty": "This project has no stages yet.",
     "history": "Change history",
     "historyLoading": "Loading history…",
     "historyEmpty": "No changes yet.",
@@ -363,7 +362,10 @@
     "increase": "Increase progress: {{stage}}",
     "progress": "Stage percentage: {{stage}}",
     "emptyOwner": "This site has no stages.",
-    "emptyAsk": "Stages are not set yet. Ask the owner."
+    "emptyAsk": "Stages are not set yet. Ask the owner.",
+    "mark": "Mark",
+    "markFor": "Mark: {{stage}}",
+    "historyEntry": "was {{from}}%, now {{to}}%"
   },
   "settings": {
     "accessTitle": "Who sees this site",

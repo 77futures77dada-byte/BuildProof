@@ -354,7 +354,6 @@
     "title": "Etapid",
     "loading": "Etappide laadimine…",
     "readOnly": "Ainult vaatamiseks",
-    "empty": "Objektil pole veel etappe.",
     "history": "Muudatuste ajalugu",
     "historyLoading": "Ajaloo laadimine…",
     "historyEmpty": "Muudatusi veel pole.",
@@ -363,7 +362,10 @@
     "increase": "Suurenda edenemist: {{stage}}",
     "progress": "Etapi protsent: {{stage}}",
     "emptyOwner": "Objektil pole etappe.",
-    "emptyAsk": "Etappe pole veel määratud. Küsige omanikult."
+    "emptyAsk": "Etappe pole veel määratud. Küsige omanikult.",
+    "mark": "Märgi",
+    "markFor": "Märgi: {{stage}}",
+    "historyEntry": "oli {{from}}%, nüüd {{to}}%"
   },
   "settings": {
     "accessTitle": "Kes objekti näeb",
