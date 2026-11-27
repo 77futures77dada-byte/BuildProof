@@ -368,3 +368,35 @@ OVERFLOW not-found signed in /no-such-page @390: scrollWidth 477 > 390; div.flex
 | check-contrast | PASS | pairs=114 failures=0 drift=0 (0s) |
 | check-ru-latin | PASS | offending=0 strings=824 (json=545, landing=279) (0s) |
 | check-overflow | PASS | routes=32 loads=320 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (194s) |
+## 2026-11-27T15:31:07Z — overview-b плотность: Inter, ≤500, 1px, fit
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (3s) |
+| build | PASS | built in 1.49s, VITE_SUPABASE_URL=fixture (20s) |
+| test | PASS | 14 passed (14); 105 passed (105) (11s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 heavy=0 base=0 files=0 scanned=172 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=116 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=850 (json=571, landing=279) (0s) |
+| check-overflow | FAIL | routes=32 loads=320 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=2 fit_blocks=1440x900:3/6,1366x768:3/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (213s) |
+
+<details><summary>check-overflow: first lines of the failure</summary>
+
+```
+FIT overview @1440x900: issues / people / feed bottom 1166 / 900
+FIT overview @1366x768: issues / people / feed bottom 1034 / 768
+check-overflow: routes=32 loads=320 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=2 fit_blocks=1440x900:3/6,1366x768:3/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95
+```
+</details>
+
+## 2026-11-27T15:38:07Z — overview-b плотность: всё на экране 1440x900 / 1366x768
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.10s, VITE_SUPABASE_URL=fixture (17s) |
+| test | PASS | 14 passed (14); 105 passed (105) (9s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 heavy=0 base=0 files=0 scanned=172 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=116 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=850 (json=571, landing=279) (0s) |
+| check-overflow | PASS | routes=32 loads=320 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=0 fit_blocks=1440x900:6/6,1366x768:6/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (187s) |

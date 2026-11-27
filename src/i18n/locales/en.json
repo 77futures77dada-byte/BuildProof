@@ -607,5 +607,35 @@
     "title": "What is your name?",
     "hint": "Your name is shown in the change history instead of your email.",
     "name": "Your name"
+  },
+  "house": {
+    "title": "Object model",
+    "ready": "Done",
+    "working": "In progress",
+    "notStarted": "Not started",
+    "readyHint": "bright",
+    "workingHint": "partly",
+    "notStartedHint": "ghost",
+    "stateLegend": "State of parts",
+    "stageLegend": "Stage colours",
+    "fallback": "3D model unavailable. Stage progress:",
+    "loading": "Loading the 3D model…",
+    "empty": "Add construction stages to see the object model.",
+    "stages": "Construction stages",
+    "other": "Other",
+    "hint": "Tap a stage or a part of the house to see details.",
+    "doneStages": "Stages done: {{done}} of {{total}}",
+    "updated": "Updated",
+    "countOf": "{{done}} of {{total}}",
+    "clearSelection": "Clear selection",
+    "play": "Play the build",
+    "playing": "Building",
+    "playInterrupt": "Tap anywhere to stop",
+    "modelLabel": "3D model of the house. {{rows}}",
+    "units": {
+      "windows": "windows and doors",
+      "electric": "wiring runs",
+      "plumbing": "pipe sections"
+    }
   }
 }

@@ -65,14 +65,14 @@ export function ProjectLayout() {
   return (
     <div className="min-h-screen bg-page text-fg">
       <AppHeader>
-        <div className="mx-auto flex max-w-[1120px] flex-col gap-1 px-4 pt-2 pb-3">
+        <div className="mx-auto flex max-w-[1120px] flex-col gap-1 px-4 pt-2 pb-3 lg:flex-row lg:flex-wrap lg:items-baseline lg:gap-x-3 lg:pt-0 lg:pb-0">
           {project ? (
             <>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <h1 className="m-0 min-w-0 text-h1 font-medium [overflow-wrap:anywhere]">{project.name}</h1>
+                <h1 className="m-0 min-w-0 text-h1 font-medium lg:text-h2 [overflow-wrap:anywhere]">{project.name}</h1>
                 {project.status !== 'active' ? <ProjectStatusBadge status={project.status} /> : null}
               </div>
-              {project.address ? <p className="m-0 text-body [overflow-wrap:anywhere]">{project.address}</p> : null}
+              {project.address ? <p className="m-0 text-body text-muted-strong lg:text-meta [overflow-wrap:anywhere]">{project.address}</p> : null}
             </>
           ) : loading ? (
             <Skeleton variant="header" />
@@ -82,7 +82,7 @@ export function ProjectLayout() {
           <Tabs items={items} label={project?.name ?? t('nav.overview')} variant={isWorker ? 'worker' : 'owner'} className="border-b-0" />
         </div>
       </AppHeader>
-      <main className="mx-auto max-w-[1120px] px-4 py-6">
+      <main className="mx-auto max-w-[1120px] px-4 py-6 lg:py-4">
         {!loading && error ? (
           <section role="alert" className="flex flex-col items-start gap-3 rounded-card border border-stale bg-page p-5">
             <p className="m-0 text-field font-medium">{t('overview.loadFailed')}</p>

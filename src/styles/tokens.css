@@ -190,6 +190,7 @@
   --radius-card: 16px;
   --radius-sheet: 20px;
   /* role scale (02-type §6.1); nothing below 17 px */
+  --text-meta: 16px;   --text-meta--line-height: 1.35; /* desktop (lg:) secondary captions only — check-tokens */
   --text-body: 17px;   --text-body--line-height: 1.4;
   --text-field: 18px;  --text-field--line-height: 1.4;
   --text-btn: 20px;    --text-btn--line-height: 1.2;

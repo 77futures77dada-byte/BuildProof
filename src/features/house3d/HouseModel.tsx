@@ -6,7 +6,7 @@ import { initialSelection, selectionReducer, type SelectionAction, type Selectio
 import { HOUSE_BG, STAGE_COLORS } from './palette'
 import { StageRows } from './StageRows'
 import { StageCard } from './StageCard'
-import { houseStrings as t } from './strings'
+import { useHouseStrings } from './strings'
 import { STAGE_PARTS, isStagePart, type HouseRendererSnapshot, type MappedStage, type StagePart } from './types'
 
 const GROUPS = buildStageGroups()
@@ -37,6 +37,7 @@ interface HouseModelProps {
 }
 
 export function HouseModel({ stages, height, interactive = true, initialAngle = 35, reducedMotion, selection, onRendererDispose, compact = false }: HouseModelProps) {
+  const t = useHouseStrings()
   const host = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<HouseScene | null>(null)
   const ownSelection = useReducer(selectionReducer, initialSelection)
@@ -115,40 +116,45 @@ export function HouseModel({ stages, height, interactive = true, initialAngle = 
   const playingStage = playingPart ? modelStages.find(stage => stage.part === playingPart) : null
   const rows = stages.map(stage => `${stage.name}: ${Math.round(stage.percent)}%`).join(', ')
 
+  const playButton = !failed && modelStages.length ? <button type="button" onClick={play} disabled={!!playingPart}
+          className="inline-flex min-h-12 cursor-pointer items-center gap-1.5 rounded-lg bg-inverse-line px-3 text-body pointer-fine:min-h-9 text-on-inverse hover:bg-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-inverse disabled:cursor-default disabled:opacity-60">
+          <Play className="size-4" aria-hidden />{t.play}
+        </button> : null
+
   return <section aria-label={t.title} className="overflow-hidden rounded-2xl border border-inverse-line text-on-inverse shadow-sm" style={{ background: HOUSE_BG }}>
     <div className={compact ? undefined : "lg:grid lg:grid-cols-[minmax(0,1fr)_17rem]"}>
       {!failed
-        ? <div ref={host} className="house3d-canvas w-full" style={height ? { height } : undefined} role="img" aria-label={t.modelLabel(rows)} />
+        ? <div ref={host} className={compact ? "house3d-canvas house3d-canvas--fit w-full" : "house3d-canvas w-full"} style={height ? { height } : undefined} role="img" aria-label={t.modelLabel(rows)} />
         : <p className="p-4 text-body text-on-inverse">{t.fallback}</p>}
-      <aside aria-live="polite" className={compact ? "min-h-24 border-t border-inverse-line p-4" : "min-h-24 border-t border-inverse-line p-4 lg:border-l lg:border-t-0"}>
+      <aside aria-live="polite" className={compact ? "border-t border-inverse-line px-3 py-2" : "min-h-24 border-t border-inverse-line p-4 lg:border-l lg:border-t-0"}>
         {playingStage
           ? <div className="space-y-1">
               <p className="text-body text-on-inverse">{t.playing}</p>
               <p className="text-h3 font-medium" style={{ color: STAGE_COLORS[playingStage.part as StagePart] }}>{playingStage.name}</p>
               <p className="text-body text-on-inverse">{t.playInterrupt}</p>
             </div>
-          : <StageCard stage={selectedStage} part={selected} counts={counts}
-              doneStages={modelStages.filter(stage => stage.percent >= 100).length} totalStages={modelStages.length}
-              onClose={() => dispatch({ type: 'clear' })} />}
+          : <div className={compact ? "flex flex-wrap items-center justify-between gap-2" : undefined}>
+              <StageCard stage={selectedStage} part={selected} counts={counts}
+                doneStages={modelStages.filter(stage => stage.percent >= 100).length} totalStages={modelStages.length}
+                onClose={() => dispatch({ type: 'clear' })} hideHint={compact} />
+              {compact ? playButton : null}
+            </div>}
       </aside>
     </div>
-    <div className="space-y-4 border-t border-inverse-line p-4">
-      <div role="group" aria-label={t.stageLegend} className="flex flex-wrap gap-1.5">
+    <div className={compact ? "space-y-2 border-t border-inverse-line p-3" : "space-y-4 border-t border-inverse-line p-4"}>
+      <div role="group" aria-label={t.stageLegend} className={compact ? "flex gap-1.5 overflow-x-auto pb-1" : "flex flex-wrap gap-1.5"}>
         {modelStages.map(stage => <button key={stage.key} type="button" aria-pressed={selected === stage.part} onClick={() => toggle(stage.part as StagePart)}
-          className="inline-flex min-h-12 cursor-pointer items-center gap-1.5 rounded-full border border-inverse-line px-2.5 text-body text-on-inverse transition-colors hover:border-on-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-inverse aria-pressed:border-on-inverse aria-pressed:bg-inverse-line">
+          className="inline-flex min-h-12 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-inverse-line px-2.5 text-body text-on-inverse pointer-fine:min-h-9 lg:text-meta transition-colors hover:border-on-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-inverse aria-pressed:border-on-inverse aria-pressed:bg-inverse-line">
           <span className="size-2.5 shrink-0 rounded-full" style={{ background: STAGE_COLORS[stage.part as StagePart] }} aria-hidden />{stage.name}
         </button>)}
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <ul aria-label={t.stateLegend} className="flex flex-wrap gap-x-4 gap-y-1 text-body text-on-inverse">
-          <li className="flex items-center gap-1.5"><span className="h-0.5 w-5 rounded bg-on-inverse shadow-[0_0_6px_1px_rgba(255,255,255,.7)]" aria-hidden />{t.ready} <span className="text-on-inverse">({t.readyHint})</span></li>
-          <li className="flex items-center gap-1.5"><span className="flex h-0.5 w-5 overflow-hidden rounded" aria-hidden><span className="w-1/2 bg-on-inverse" /><span className="w-1/2 bg-inverse-line" /></span>{t.working} <span className="text-on-inverse">({t.workingHint})</span></li>
-          <li className="flex items-center gap-1.5"><span className="h-0.5 w-5 rounded bg-inverse-line" aria-hidden />{t.notStarted} <span className="text-on-inverse">({t.notStartedHint})</span></li>
+        <ul aria-label={t.stateLegend} className="flex flex-wrap gap-x-4 gap-y-1 text-body text-on-inverse lg:text-meta">
+          <li className="flex items-center gap-1.5"><span className="h-0.5 w-5 rounded bg-on-inverse shadow-[0_0_6px_1px_rgba(255,255,255,.7)]" aria-hidden />{t.ready} {compact ? null : <span className="text-on-inverse">({t.readyHint})</span>}</li>
+          <li className="flex items-center gap-1.5"><span className="flex h-0.5 w-5 overflow-hidden rounded" aria-hidden><span className="w-1/2 bg-on-inverse" /><span className="w-1/2 bg-inverse-line" /></span>{t.working} {compact ? null : <span className="text-on-inverse">({t.workingHint})</span>}</li>
+          <li className="flex items-center gap-1.5"><span className="h-0.5 w-5 rounded bg-inverse-line" aria-hidden />{t.notStarted} {compact ? null : <span className="text-on-inverse">({t.notStartedHint})</span>}</li>
         </ul>
-        {!failed && modelStages.length ? <button type="button" onClick={play} disabled={!!playingPart}
-          className="inline-flex min-h-12 cursor-pointer items-center gap-1.5 rounded-lg bg-inverse-line px-3 text-body text-on-inverse hover:bg-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-inverse disabled:cursor-default disabled:opacity-60">
-          <Play className="size-4" aria-hidden />{t.play}
-        </button> : null}
+        {compact ? null : playButton}
       </div>
       {compact ? null : <StageRows stages={stages} selected={selected} onSelect={toggle} />}
     </div>

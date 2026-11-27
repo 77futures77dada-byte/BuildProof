@@ -1,31 +1,41 @@
+import { useTranslation } from 'react-i18next'
 import type { StagePart } from './types'
 
-export const houseStrings = {
-  title: 'Модель объекта',
-  ready: 'Готово', working: 'В работе', notStarted: 'Не начато',
-  readyHint: 'ярко', workingHint: 'частично', notStartedHint: 'призрак',
-  stateLegend: 'Состояние частей',
-  stageLegend: 'Цвета этапов',
-  fallback: '3D-модель недоступна. Прогресс этапов:',
-  loading: 'Загружаем 3D-модель…',
-  empty: 'Добавьте этапы строительства, чтобы увидеть модель объекта.',
-  stages: 'Этапы строительства', other: 'Прочее',
-  hint: 'Нажмите на этап или на часть дома, чтобы увидеть подробности.',
-  doneStages: (done: number, total: number) => `Завершено этапов: ${done} из ${total}`,
-  updated: 'Обновлено',
-  countOf: (done: number, total: number) => `${done} из ${total}`,
-  clearSelection: 'Снять выбор',
-  play: 'Проиграть стройку',
-  playing: 'Стройка',
-  playInterrupt: 'Нажмите в любом месте, чтобы остановить',
-  modelLabel: (rows: string) => `3D-модель дома. ${rows}`,
-} as const
+/** Texts of the 3D object model, from i18n (`house.*` in src/i18n/locales/{et,ru,en}.json). */
+export function useHouseStrings() {
+  const { t } = useTranslation()
+  return {
+    title: t('house.title'),
+    ready: t('house.ready'),
+    working: t('house.working'),
+    notStarted: t('house.notStarted'),
+    readyHint: t('house.readyHint'),
+    workingHint: t('house.workingHint'),
+    notStartedHint: t('house.notStartedHint'),
+    stateLegend: t('house.stateLegend'),
+    stageLegend: t('house.stageLegend'),
+    fallback: t('house.fallback'),
+    loading: t('house.loading'),
+    empty: t('house.empty'),
+    stages: t('house.stages'),
+    other: t('house.other'),
+    hint: t('house.hint'),
+    updated: t('house.updated'),
+    clearSelection: t('house.clearSelection'),
+    play: t('house.play'),
+    playing: t('house.playing'),
+    playInterrupt: t('house.playInterrupt'),
+    doneStages: (done: number, total: number) => t('house.doneStages', { done, total }),
+    countOf: (done: number, total: number) => t('house.countOf', { done, total }),
+    modelLabel: (rows: string) => t('house.modelLabel', { rows }),
+  }
+}
+export type HouseStrings = ReturnType<typeof useHouseStrings>
 
 /** Count-based stages: what one element is called on the stage card. */
-export const elementUnits: Partial<Record<StagePart, string>> = {
-  windows: 'окон и дверей',
-  electric: 'линий проводки',
-  plumbing: 'участков труб',
+export function useElementUnits(): Partial<Record<StagePart, string>> {
+  const { t } = useTranslation()
+  return { windows: t('house.units.windows'), electric: t('house.units.electric'), plumbing: t('house.units.plumbing') }
 }
 
 export const devStrings = {

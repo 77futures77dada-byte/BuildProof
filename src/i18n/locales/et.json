@@ -607,5 +607,35 @@
     "title": "Mis on teie nimi?",
     "hint": "Nimi on muudatuste ajaloos näha e-posti asemel.",
     "name": "Teie nimi"
+  },
+  "house": {
+    "title": "Objekti mudel",
+    "ready": "Valmis",
+    "working": "Töös",
+    "notStarted": "Alustamata",
+    "readyHint": "ere",
+    "workingHint": "osaliselt",
+    "notStartedHint": "kummitus",
+    "stateLegend": "Osade olek",
+    "stageLegend": "Etappide värvid",
+    "fallback": "3D-mudel pole saadaval. Etappide edenemine:",
+    "loading": "Laadime 3D-mudelit…",
+    "empty": "Lisa ehitusetapid, et näha objekti mudelit.",
+    "stages": "Ehitusetapid",
+    "other": "Muu",
+    "hint": "Puuduta etappi või maja osa, et näha üksikasju.",
+    "doneStages": "Valmis etappe: {{done}} / {{total}}",
+    "updated": "Uuendatud",
+    "countOf": "{{done}} / {{total}}",
+    "clearSelection": "Tühista valik",
+    "play": "Mängi ehitus läbi",
+    "playing": "Ehitus",
+    "playInterrupt": "Peatamiseks puuduta ükskõik kus",
+    "modelLabel": "Maja 3D-mudel. {{rows}}",
+    "units": {
+      "windows": "akent ja ust",
+      "electric": "juhtmeliini",
+      "plumbing": "torulõiku"
+    }
   }
 }

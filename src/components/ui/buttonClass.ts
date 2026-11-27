@@ -22,7 +22,8 @@ const VARIANT: Record<ButtonVariant, string> = {
 }
 const SIZE: Record<ButtonSize, string> = {
   main: 'min-h-14 px-6 text-btn',
-  md: 'min-h-12 px-5 text-field',
+  // mouse (pointer: fine) gets 40 px for density; touch keeps 48 px
+  md: 'min-h-12 px-5 text-field pointer-fine:min-h-10',
 }
 
 /** Class list for a button-looking element (use on <a>/<Link> for a link button). */

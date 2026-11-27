@@ -21,7 +21,7 @@ interface TabsProps {
 
 const tabClass = ({ isActive }: { isActive: boolean }) =>
   cx(
-    'relative inline-flex min-h-12 shrink-0 items-center justify-center text-body leading-[1.2] whitespace-nowrap text-fg no-underline',
+    'relative inline-flex min-h-12 pointer-fine:min-h-10 shrink-0 items-center justify-center text-body leading-[1.2] whitespace-nowrap text-fg no-underline',
     'focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-focus',
     // active: 600 + 4 px --fg bar (02-type §6.1); others 500
     isActive
