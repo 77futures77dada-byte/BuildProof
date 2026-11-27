@@ -378,7 +378,6 @@
   },
   "tariff": {
     "title": "Plan",
-    "back": "Sites",
     "link": "Plan",
     "lead": "{{price}} € per site per month, + VAT. Workers are free.",
     "colObjects": "Active sites",

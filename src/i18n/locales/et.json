@@ -378,7 +378,6 @@
   },
   "tariff": {
     "title": "Hind",
-    "back": "Objektid",
     "link": "Hind",
     "lead": "{{price}} € objekti kohta kuus, + km. Töölised tasuta.",
     "colObjects": "Aktiivseid objekte",
