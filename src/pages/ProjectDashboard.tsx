@@ -13,7 +13,7 @@ import { formatDate, formatDateTimeSmart, toErrorMessage } from '../lib/format'
 import { daysSince, freshnessView, isGateOpen, lastActivityAt, STALE_DAYS } from '../lib/freshness'
 import { updateStageProgress } from '../lib/stages'
 import { issueBorder } from '../lib/issues'
-import { Button, Disclosure, FreshnessChip, ProgressBar, Sheet, Skeleton, StageRow, buttonClass } from '../components/ui'
+import { Button, Disclosure, FreshnessChip, LG_QUERY, ProgressBar, Sheet, Skeleton, StageRow, buttonClass, useMediaQuery } from '../components/ui'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { Modal } from '../components/Modal'
 import { PhotoUploadForm } from '../components/PhotoUploadForm'
@@ -300,35 +300,44 @@ export function ProjectDashboardView({
     </Section>
   )
 
-  // Desktop only: on a phone the stage list already answers «where is the work» (critic «Март» MED 8).
-  const houseBlock = stagesExist ? (
-    <div className="hidden lg:block">
-      <Disclosure label={t('overview.showHouse')}>
-        <HouseModelBlock
-          stages={stages.map((stage) => ({
-            key: stage.id,
-            name: stage.name,
-            percent: stage.progressPercent,
-            sortOrder: stage.sortOrder,
-          }))}
-        />
-      </Disclosure>
-    </div>
-  ) : null
+  const houseStages = stages.map((stage) => ({
+    key: stage.id,
+    name: stage.name,
+    percent: stage.progressPercent,
+    sortOrder: stage.sortOrder,
+  }))
+  const desktop = useMediaQuery(LG_QUERY)
 
+  // Overview, variant B.
+  // Desktop (≥ 1024 px): three columns in reading order = DOM order = Tab order —
+  //   panel 33 % (state + main action, issues, people, feed, photos) │ 3D model │ stage list.
+  // Phone: panel, stages right under the main action, the rest, then the 3D model
+  //   folded at the very end (on a phone it pushed the main action down: «Март» MED 8).
+  // The model mounts only where it is shown, so a phone never loads the three.js chunk
+  // unless «Показать дом» is opened.
   return (
-    <div className="flex flex-col gap-8 lg:grid lg:grid-cols-12 lg:items-start lg:gap-8">
-      <div className="flex min-w-0 flex-col gap-8 lg:col-span-7">
+    <div className="flex flex-col gap-8 lg:grid lg:grid-cols-12 lg:items-start lg:gap-6">
+      <div className="flex min-w-0 flex-col gap-8 lg:col-span-4">
         {stateCard}
-        {stagesBlock}
-        {feedBlock}
-      </div>
-      <div className="flex min-w-0 flex-col gap-8 lg:col-span-5">
-        {knownBlock}
+        {desktop ? null : stagesBlock}
         {issuesBlock}
+        {knownBlock}
+        {feedBlock}
         {photosBlock}
-        {houseBlock}
+        {!desktop && stagesExist ? (
+          <Disclosure label={t('overview.showHouse')}>
+            <HouseModelBlock stages={houseStages} compact />
+          </Disclosure>
+        ) : null}
       </div>
+      {desktop ? (
+        <>
+          <div className="min-w-0 lg:col-span-5">
+            {stagesExist ? <HouseModelBlock stages={houseStages} compact /> : null}
+          </div>
+          <div className="min-w-0 lg:col-span-3">{stagesBlock}</div>
+        </>
+      ) : null}
 
       <Sheet
         open={markStage !== null}

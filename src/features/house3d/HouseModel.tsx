@@ -30,9 +30,12 @@ interface HouseModelProps {
   /** Lifted selection state, for callers that drive the selection themselves. */
   selection?: [SelectionState, Dispatch<SelectionAction>]
   onRendererDispose?: (snapshot: HouseRendererSnapshot) => void
+  /** Overview variant B: the model sits in a ~460 px middle column next to the stage list,
+      so the stage card goes under the canvas and the chips and own stage list are left out. */
+  compact?: boolean
 }
 
-export function HouseModel({ stages, height, interactive = true, initialAngle = 35, reducedMotion, selection, onRendererDispose }: HouseModelProps) {
+export function HouseModel({ stages, height, interactive = true, initialAngle = 35, reducedMotion, selection, onRendererDispose, compact = false }: HouseModelProps) {
   const host = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<HouseScene | null>(null)
   const ownSelection = useReducer(selectionReducer, initialSelection)
@@ -112,11 +115,11 @@ export function HouseModel({ stages, height, interactive = true, initialAngle = 
   const rows = stages.map(stage => `${stage.name}: ${Math.round(stage.percent)}%`).join(', ')
 
   return <section aria-label={t.title} className="overflow-hidden rounded-2xl border border-inverse-line text-on-inverse shadow-sm" style={{ background: HOUSE_BG }}>
-    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_17rem]">
+    <div className={compact ? undefined : "lg:grid lg:grid-cols-[minmax(0,1fr)_17rem]"}>
       {!failed
         ? <div ref={host} className="house3d-canvas w-full" style={height ? { height } : undefined} role="img" aria-label={t.modelLabel(rows)} />
         : <p className="p-4 text-body text-on-inverse">{t.fallback}</p>}
-      <aside aria-live="polite" className="min-h-24 border-t border-inverse-line p-4 lg:border-l lg:border-t-0">
+      <aside aria-live="polite" className={compact ? "min-h-24 border-t border-inverse-line p-4" : "min-h-24 border-t border-inverse-line p-4 lg:border-l lg:border-t-0"}>
         {playingStage
           ? <div className="space-y-1">
               <p className="text-body text-on-inverse">{t.playing}</p>
@@ -125,16 +128,16 @@ export function HouseModel({ stages, height, interactive = true, initialAngle = 
             </div>
           : <StageCard stage={selectedStage} part={selected} counts={counts}
               doneStages={modelStages.filter(stage => stage.percent >= 100).length} totalStages={modelStages.length}
-              onClose={() => dispatch({ type: 'clear' })} />}
+              onClose={() => dispatch({ type: 'clear' })} compact={compact} />}
       </aside>
     </div>
     <div className="space-y-4 border-t border-inverse-line p-4">
-      <div role="group" aria-label={t.stageLegend} className="flex flex-wrap gap-1.5">
+      {compact ? null : <div role="group" aria-label={t.stageLegend} className="flex flex-wrap gap-1.5">
         {modelStages.map(stage => <button key={stage.key} type="button" aria-pressed={selected === stage.part} onClick={() => toggle(stage.part as StagePart)}
           className="inline-flex min-h-12 cursor-pointer items-center gap-1.5 rounded-full border border-inverse-line px-2.5 text-body text-on-inverse transition-colors hover:border-on-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-inverse aria-pressed:border-on-inverse aria-pressed:bg-inverse-line">
           <span className="size-2.5 shrink-0 rounded-full" style={{ background: STAGE_COLORS[stage.part as StagePart] }} aria-hidden />{stage.name}
         </button>)}
-      </div>
+      </div>}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <ul aria-label={t.stateLegend} className="flex flex-wrap gap-x-4 gap-y-1 text-body text-on-inverse">
           <li className="flex items-center gap-1.5"><span className="h-0.5 w-5 rounded bg-on-inverse shadow-[0_0_6px_1px_rgba(255,255,255,.7)]" aria-hidden />{t.ready} <span className="text-on-inverse">({t.readyHint})</span></li>
@@ -146,7 +149,7 @@ export function HouseModel({ stages, height, interactive = true, initialAngle = 
           <Play className="size-4" aria-hidden />{t.play}
         </button> : null}
       </div>
-      <StageRows stages={stages} selected={selected} onSelect={toggle} />
+      {compact ? null : <StageRows stages={stages} selected={selected} onSelect={toggle} />}
     </div>
   </section>
 }
