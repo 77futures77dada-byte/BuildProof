@@ -217,7 +217,9 @@ export function ProjectDashboardView({
     </section>
   )
 
-  // Same colour as the stage's lines in the 3D model: the list beside the model is its legend.
+  // Same colour as the stage's lines in the 3D model: on desktop the list beside the model is its
+  // legend; on a phone the model is folded away, so no dots there.
+  const desktop = useMediaQuery(LG_QUERY)
   const partByStage = new Map(stagesToParts(stages.map((stage) => ({ key: stage.id, name: stage.name, percent: stage.progressPercent, sortOrder: stage.sortOrder }))).map((m) => [m.key, m.part]))
   const stagesBlock = stagesExist ? (
     <Section title={t('overview.stages')}>
@@ -227,10 +229,13 @@ export function ProjectDashboardView({
             key={stage.id}
             variant={isManager ? 'overview' : 'readonly'}
             name={
-              <span className="inline-flex items-baseline gap-2">
-                <span aria-hidden="true" className="inline-block size-3 shrink-0 rounded-full" style={{ background: stageColor(partByStage.get(stage.id) ?? 'other') }} />
-                {stageLabel(stage.name)}
-              </span>
+              desktop ? (
+                <span className="inline-flex items-baseline gap-2">
+                  {/* stage colour on the model's own navy (3:1 checked there); the navy ring keeps it visible on the light theme */}
+                  <span aria-hidden="true" className="inline-block size-3.5 shrink-0 rounded-full" style={{ background: stageColor(partByStage.get(stage.id) ?? 'other'), boxShadow: '0 0 0 3px var(--house-bg)' }} />
+                  {stageLabel(stage.name)}
+                </span>
+              ) : stageLabel(stage.name)
             }
             percent={stage.progressPercent}
             onPress={isManager && status === 'active' ? () => setMarkStageId(stage.id) : undefined}
@@ -315,7 +320,6 @@ export function ProjectDashboardView({
     percent: stage.progressPercent,
     sortOrder: stage.sortOrder,
   }))
-  const desktop = useMediaQuery(LG_QUERY)
 
   // Overview, variant B.
   // Desktop (≥ 1024 px): three columns in reading order = DOM order = Tab order —

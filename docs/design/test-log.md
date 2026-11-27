@@ -312,3 +312,15 @@ OVERFLOW not-found signed in /no-such-page @390: scrollWidth 477 > 390; div.flex
 | check-contrast | PASS | pairs=114 failures=0 drift=0 (0s) |
 | check-ru-latin | PASS | offending=0 strings=824 (json=545, landing=279) (0s) |
 | check-overflow | PASS | routes=32 loads=320 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (198s) |
+
+## 2026-11-27T14:59:34Z — overview-b r2: точки с navy-обводкой, только десктоп
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.20s, VITE_SUPABASE_URL=fixture (15s) |
+| test | PASS | 14 passed (14); 105 passed (105) (10s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=172 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=114 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=824 (json=545, landing=279) (0s) |
+| check-overflow | PASS | routes=32 loads=320 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (194s) |
