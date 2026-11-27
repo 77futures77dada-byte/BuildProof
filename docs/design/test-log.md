@@ -390,3 +390,16 @@ OVERFLOW not-found signed in /no-such-page @390: scrollWidth 477 > 390; div.flex
 | ссылки заказчиков | HIGH 0 / MED 0 — фильтр status=confirmed и видимость этапа проверены; фото требуют отдельного согласия | HIGH 0 / MED 0 — preview использует ту же RPC-фильтрацию; данные комментариев и соседних фирм не возвращаются |
 
 Ограничение проверки: из-за отсутствия pgTAP runtime выводы по SQL основаны на чтении миграций и тестового сценария, а не на выполнении в PostgreSQL.
+
+## 2026-11-27 — company data export and storage limits
+
+| check | result | details |
+|---|---|---|
+| `npm run lint` | PASS | oxlint and token scan passed |
+| `ALLOW_PLACEHOLDERS=1 npm run build` | PASS | production build completed; Vite reported existing dynamic-import/chunk-size warnings |
+| `npm test` | PASS | 14 files, 105 tests |
+| API tests | PASS | 6 tests, including CSV output escaping |
+| `git diff --check` | PASS | no whitespace errors |
+| pgTAP | NOT RUN | 7 assertions added in `supabase/tests/company_export_storage.sql`; psql, Docker, and Supabase CLI unavailable. No migrations applied. |
+
+The database tests cover owner export isolation, rejection of a foreign company and a non-GC actor, company byte accounting, rejection above the storage limit, and preservation of the file that was already stored.

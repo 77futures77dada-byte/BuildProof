@@ -51,6 +51,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const { error } = await admin.storage.from('project-photos').upload(path, photo.data, { contentType: photo.mime, upsert: false })
     if (error) {
       if (uploaded.length) await admin.storage.from('project-photos').remove(uploaded)
+      if (error.message.includes('company_storage_limit_exceeded')) return res.status(413).json({ error: 'company_storage_limit_exceeded' })
+      if (error.message.includes('company_project_limit_exceeded')) return res.status(409).json({ error: 'company_project_limit_exceeded' })
       return res.status(500).json({ error: 'photo_upload_failed' })
     }
     uploaded.push(path)
