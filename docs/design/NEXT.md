@@ -25,7 +25,7 @@
    Обязательные пункты: `06-audit-stage1-residual.md` «Закрываем на реализации».
    **Сделано (2026-11-27):** ветки `claude/redesign-a|b|c|d` слиты (ece3c1d, 76c69b6, f10cd18), `legacy-bridge.css` удалён, временных исключений 0. Отчёты групп: «ждёт» каждой группы — в описании PR.
 4. ~~Проверка «Отправить» 360×553~~ — готово (a654dd1): блок `report-send` в `check-overflow.mjs` (8 проверок), `--strict-a11y` зелёный по приложению; лендинг считается отдельно (`landing_small_*`) до своего PR.
-5. Финал: **идёт** — критики r1 на Sonnet → `06-audit-stage5-{mart,foreman,investor}-r1.md`; затем правки, `critique-table.md`, PR-описание `docs/pr/app-redesign.md` + «ждёт владельца» (brief §3).
+5. ~~Финал~~ — готово (2026-11-28): критики r1–r4 → 0 HIGH / 0 MED у всех трёх (`06-audit-stage5-*`), скриншоты `docs/screens/redesign/`, PR-описание `docs/pr/app-redesign.md` (сделано / отклонено / осталось / ждёт владельца / ждёт Codex).
 6. Потом PR лендинга `claude/landing-v2` по `docs/design-inputs/claude-code-landing-rewrite-v2-prompt (1).md`.
 
 ## Экономия лимита
