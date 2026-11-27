@@ -383,15 +383,5 @@
     ],
     "temporary": "вкладки объекта",
     "reason": "migrated in step «вкладки объекта» (05-ui.md §«Миграция»)"
-  },
-  {
-    "file": "src/pages/Today.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "отчёт рабочего",
-    "reason": "migrated in step «отчёт рабочего» (05-ui.md §«Миграция»)"
   }
 ]

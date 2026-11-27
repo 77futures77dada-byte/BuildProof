@@ -1,22 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StatusIcon } from './StatusIcon'
-
-/** `navigator.onLine` as state (true when unknown). */
-export function useOnline(): boolean {
-  const [online, setOnline] = useState(() => typeof navigator === 'undefined' || navigator.onLine !== false)
-  useEffect(() => {
-    const on = () => setOnline(true)
-    const off = () => setOnline(false)
-    window.addEventListener('online', on)
-    window.addEventListener('offline', off)
-    return () => {
-      window.removeEventListener('online', on)
-      window.removeEventListener('offline', off)
-    }
-  }, [])
-  return online
-}
+import { useOnline } from './useOnline'
 
 /**
  * Offline strip (03 §0.2 `offline`): «Нет сети» only while `navigator.onLine`
