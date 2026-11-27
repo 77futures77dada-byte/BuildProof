@@ -7,6 +7,7 @@ import { AppHeader } from './AppHeader'
 import { ProjectStatusBadge } from './ProjectStatusBadge'
 import { Skeleton, Tabs, buttonClass } from './ui'
 import type { TabItem } from './ui'
+import { isReportReviewOn } from '../lib/reportReview'
 
 interface Tab {
   to: string
@@ -24,6 +25,8 @@ const MANAGER_TABS: Tab[] = [
 
 // «Люди» keeps the /settings route (brief §2.3 В2); gc only.
 const PEOPLE_TAB: Tab = { to: 'settings', labelKey: 'nav.people', end: false }
+// «Ссылки»: worker / client links and what the client sees; gc only (owner-only API).
+const LINKS_TAB: Tab = { to: 'links', labelKey: 'nav.links', end: false }
 
 // Workers get a short, action-first strip: their day, then where they report.
 const WORKER_TABS: Tab[] = [
@@ -35,7 +38,7 @@ const WORKER_TABS: Tab[] = [
 
 function tabsFor(role: UserRole | undefined): Tab[] {
   if (role === 'worker') return WORKER_TABS
-  if (role === 'gc') return [...MANAGER_TABS, PEOPLE_TAB]
+  if (role === 'gc') return [...MANAGER_TABS, PEOPLE_TAB, LINKS_TAB]
   return MANAGER_TABS
 }
 
@@ -49,12 +52,15 @@ export function ProjectLayout() {
   const { project, loading, error } = useProject(id)
   const { t } = useTranslation()
   const onPeople = useMatch('/project/:id/settings') !== null
+  const onLinks = useMatch('/project/:id/links') !== null
 
   const role = profile?.role
   // Only the owner ever reaches «Люди» (03 §1): a direct visit goes to the overview.
-  if (onPeople && profile && role !== 'gc') return <Navigate to={`/project/${id}`} replace />
+  if ((onPeople || onLinks) && profile && role !== 'gc') return <Navigate to={`/project/${id}`} replace />
 
   const isWorker = role === 'worker'
+  // K15 queue is cross-project (/review); owner and foreman enter it pre-filtered to this object.
+  const canReview = isReportReviewOn() && (role === 'gc' || role === 'foreman')
   const items: TabItem[] = tabsFor(role).map((tab) => ({
     key: tab.to || 'overview',
     label: t(tab.labelKey),
@@ -73,6 +79,11 @@ export function ProjectLayout() {
                 {project.status !== 'active' ? <ProjectStatusBadge status={project.status} /> : null}
               </div>
               {project.address ? <p className="m-0 text-body text-muted-strong lg:text-meta [overflow-wrap:anywhere]">{project.address}</p> : null}
+              {canReview ? (
+                <Link to={`/review?project=${project.id}`} data-review-entry className={buttonClass({ variant: 'secondary' }, 'self-start lg:ml-auto lg:self-center')}>
+                  {t('review.openQueue')}
+                </Link>
+              ) : null}
             </>
           ) : loading ? (
             <Skeleton variant="header" />

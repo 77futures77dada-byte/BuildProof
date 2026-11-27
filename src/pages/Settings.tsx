@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
-import { Navigate, useLocation, useParams, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { useProjectAccessSettings } from '../hooks/useProjectAccessSettings'
@@ -9,7 +9,7 @@ import { supabase } from '../lib/supabaseClient'
 import { hasLegalContact, isEmailGateOpen } from '../lib/emailGate'
 import { RESEND_SECONDS, codeSendError, isValidEmail, secondsLeft } from '../lib/authCode'
 import { ContactLines } from '../components/ContactLines'
-import { Button, ConfirmDialog, NetBar, Sheet, SkeletonRows, StatusIcon, TextField, cx, useOnline } from '../components/ui'
+import { Button, ConfirmDialog, NetBar, Sheet, SkeletonRows, StatusIcon, TextField, buttonClass, cx, useOnline } from '../components/ui'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { MemberAccessRow } from '../components/MemberAccessRow'
 
@@ -121,14 +121,20 @@ export function Settings() {
             ) : null}
 
             <div id="invite" className="flex flex-col gap-3 scroll-mt-4">
+              {/* Workers join by a link (no account, no e-mail): every worker invite leads to «Ссылки». */}
+              <div className="flex flex-col items-start gap-3 rounded-card border border-line bg-surface p-4" data-invite-by-link>
+                <h2 className="m-0 text-h2 font-medium text-fg">{t('links.invite.title')}</h2>
+                <p className="m-0 text-body text-fg">{t('links.invite.hint')}</p>
+                <Link to={`/project/${id}/links`} className={buttonClass({ variant: gateOpen ? 'secondary' : 'primary' })}>{t('links.invite.action')}</Link>
+              </div>
               {gateOpen && id ? (
                 <InviteForm projectId={id} known={known} onAddKnown={add} onInvited={reload} />
-              ) : (
+              ) : hasLegalContact() ? (
                 <div className="flex flex-col gap-2 rounded-card border border-line bg-surface p-4">
-                  <p className="m-0 text-body font-medium text-fg">{hasLegalContact() ? t('gate.inviteLater') : t('gate.inviteLaterNoContact')}</p>
+                  <p className="m-0 text-body font-medium text-fg">{t('gate.inviteLater')}</p>
                   <ContactLines label={t('common.supportLabel')} />
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

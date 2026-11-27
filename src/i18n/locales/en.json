@@ -97,7 +97,8 @@
     "tasks": "Tasks",
     "issues": "Issues",
     "settings": "Settings",
-    "people": "People"
+    "people": "People",
+    "links": "Links"
   },
   "auth": {
     "subtitle": "Sign in to see your sites",
@@ -567,7 +568,8 @@
     "confirmAllSmall": "Confirm all small ({{count}})",
     "closedEarly": "Not confirmed: the page closed too early.",
     "ownJump": "Your own jump is confirmed by the owner.",
-    "waiting": "waiting {{count}} h"
+    "waiting": "waiting {{count}} h",
+    "openQueue": "Review reports"
   },
   "status": {
     "markedByOwner": "Marked by the owner",
@@ -636,6 +638,89 @@
       "windows": "windows and doors",
       "electric": "wiring runs",
       "plumbing": "pipe sections"
+    }
+  },
+  "links": {
+    "loading": "Loading links…",
+    "state": {
+      "active": "Active",
+      "expired": "Expired",
+      "revoked": "Revoked"
+    },
+    "expiresOn": "Valid until {{date}}",
+    "expiredOn": "Expired on {{date}}",
+    "revokedAt": "Revoked on {{date}}",
+    "lastUsed": "Last opened: {{when}}",
+    "neverUsed": "Not opened yet",
+    "revoke": "Revoke link",
+    "keep": "Keep",
+    "createSubmit": "Create link",
+    "daysLabel": "Valid for, days",
+    "daysHint": "From 1 to {{max}}. Usually {{def}}.",
+    "createdTitle": "Link is ready",
+    "onceWarning": "This link is shown once. Copy it now: later it cannot be shown again, only a new one can be created.",
+    "linkLabel": "Link",
+    "copy": "Copy link",
+    "share": "Share",
+    "done": "Done",
+    "copied": "Link copied.",
+    "copyFailed": "Could not copy. Select the link and copy it by hand.",
+    "worker": {
+      "title": "Worker links",
+      "hint": "The worker opens the link on a phone and sends a report with photos. No e-mail or password needed.",
+      "create": "Create a worker link",
+      "empty": "No worker links yet.",
+      "nameLabel": "Worker name",
+      "nameHint": "This name is shown on reports.",
+      "createdFor": "For: {{name}}. Valid until {{date}}.",
+      "shareTitle": "Report link",
+      "revokeConfirm": "The link “{{name}}” stops working at once. Reports already received stay."
+    },
+    "client": {
+      "title": "Client links",
+      "hint": "The client sees only confirmed progress for the stages you open below.",
+      "create": "Create a client link",
+      "empty": "No client links yet.",
+      "nameLabel": "Client name",
+      "nameHint": "To tell links apart in the list.",
+      "createdFor": "For: {{name}}. Valid until {{date}}.",
+      "shareTitle": "Project progress",
+      "revokeConfirm": "The link “{{name}}” stops working at once."
+    },
+    "visibility": {
+      "title": "What the client sees",
+      "hint": "At first the client sees no stages. Tick what to show. Photos need a separate tick.",
+      "showStage": "Show to client",
+      "showPhotos": "Show photos",
+      "noConfirmed": "The client will see this stage after its first confirmed report.",
+      "saving": "Saving…",
+      "deviceNote": "Ticks are also saved on this device. On another device a stage shows as ticked once it has a confirmed report."
+    },
+    "preview": {
+      "open": "View as client",
+      "title": "What the client sees",
+      "empty": "The client sees nothing yet: no open stages with confirmed reports.",
+      "updated": "Updated {{when}}",
+      "disclaimer": "% is work progress, not a basis for payment"
+    },
+    "invite": {
+      "title": "Invite a worker by link",
+      "hint": "Create a link and send it to the worker in any messenger. No e-mail needed.",
+      "action": "Send a link to a worker"
+    },
+    "error": {
+      "unauthorized": "Session expired. Sign in again.",
+      "forbidden": "Only the owner manages links.",
+      "invalid_display_name": "Enter a name, up to 80 characters.",
+      "invalid_expiry": "Valid for 1 to 90 days.",
+      "project_not_found": "Project not found.",
+      "worker_link_limit": "This project already has 100 active worker links. Revoke the ones you no longer need.",
+      "client_link_limit": "This project already has 50 active client links. Revoke the ones you no longer need.",
+      "link_not_found": "Link not found. Refresh the list.",
+      "invalid_visibility": "Could not save. Refresh the page.",
+      "stage_not_found": "Stage not found. Refresh the page.",
+      "network": "No connection. Try again.",
+      "generic": "Something went wrong. Try again."
     }
   }
 }

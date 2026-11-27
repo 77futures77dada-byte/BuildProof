@@ -8,7 +8,8 @@ import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion'
 import { supabase } from '../lib/supabaseClient'
 import { resolvePhotoUrls } from '../lib/storage'
 import { withTimeout } from '../lib/withTimeout'
-import { UNDO_WINDOW_MS, isReportReviewOn } from '../lib/reportReview'
+import { UNDO_WINDOW_MS, isReportReviewOn, queuePercents } from '../lib/reportReview'
+import { listLinks } from '../lib/linksApi'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
 import { Spinner } from '../components/Spinner'
@@ -21,7 +22,8 @@ interface QueueItem {
   projectId: string
   projectName: string
   stageName: string
-  reporterId: string
+  /** null for a worker-link report (no account behind it). */
+  reporterId: string | null
   reporterName: string | null
   from: number
   to: number
@@ -45,23 +47,28 @@ function writeClosedEarly(ids: Set<string>) {
 async function loadQueue(): Promise<QueueItem[]> {
   const { data, error } = await supabase
     .from('stage_reports')
-    .select('id, project_id, reporter_id, previous_confirmed_percent, claimed_percent, created_at, projects(name), project_stages(stage_templates(name)), photos(storage_path)')
+    .select('id, project_id, reporter_id, worker_link_id, old_percent, new_percent, previous_confirmed_percent, claimed_percent, created_at, projects(name), project_stages(stage_templates(name)), photos(storage_path)')
     .eq('status', 'pending')
     .order('created_at', { ascending: true })
   if (error) throw error
   type Row = {
-    id: string; project_id: string; reporter_id: string; previous_confirmed_percent: number; claimed_percent: number; created_at: string
+    id: string; project_id: string; reporter_id: string | null; worker_link_id?: string | null; created_at: string
+    old_percent?: number | null; new_percent?: number | null; previous_confirmed_percent?: number | null; claimed_percent?: number | null
     projects: { name: string } | null
     project_stages: { stage_templates: { name: string } | null } | null
     photos: { storage_path: string }[] | null
   }
   const rows = (data ?? []) as unknown as Row[]
-  const ids = [...new Set(rows.map((r) => r.reporter_id))]
+  const ids = [...new Set(rows.map((r) => r.reporter_id).filter((x): x is string => !!x))]
   const names = new Map<string, string | null>()
   if (ids.length) {
     const res = await supabase.from('profiles').select('id, full_name').in('id', ids)
     for (const p of (res.data ?? []) as { id: string; full_name: string | null }[]) names.set(p.id, p.full_name)
   }
+  // Worker-link reports have no profile: their name is the link's display name (owner-only API; a foreman gets none).
+  const linkProjects = [...new Set(rows.filter((r) => r.worker_link_id).map((r) => r.project_id))]
+  const lists = await Promise.all(linkProjects.map((pid) => listLinks('worker', pid).catch(() => [])))
+  for (const link of lists.flat()) names.set(link.id, link.display_name)
   const paths = rows.map((r) => r.photos?.[0]?.storage_path).filter((p): p is string => !!p)
   const urls = paths.length ? await resolvePhotoUrls(paths) : new Map<string, string>()
   return rows.map((r) => ({
@@ -70,15 +77,14 @@ async function loadQueue(): Promise<QueueItem[]> {
     projectName: r.projects?.name ?? '',
     stageName: r.project_stages?.stage_templates?.name ?? '',
     reporterId: r.reporter_id,
-    reporterName: names.get(r.reporter_id) ?? null,
-    from: r.previous_confirmed_percent,
-    to: r.claimed_percent,
+    reporterName: names.get(r.reporter_id ?? r.worker_link_id ?? '') ?? null,
+    ...queuePercents(r),
     createdAt: r.created_at,
     photoUrl: r.photos?.[0]?.storage_path ? (urls.get(r.photos[0].storage_path) ?? null) : null,
   }))
 }
 
-/** `review_stage_report` over fetch, so it also works with `keepalive` on pagehide. */
+/** `review_stage_report(p_report_id, p_confirm, p_note)` (migration 007) over fetch, so it also works with `keepalive` on pagehide. */
 function sendDecision(token: string | null, id: string, decision: 'confirm' | 'reject', note: string | null, keepalive = false) {
   return fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/rpc/review_stage_report`, {
     method: 'POST',
@@ -88,7 +94,7 @@ function sendDecision(token: string | null, id: string, decision: 'confirm' | 'r
       apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
       Authorization: `Bearer ${token ?? import.meta.env.VITE_SUPABASE_ANON_KEY}`,
     },
-    body: JSON.stringify({ p_report_id: id, p_decision: decision, p_note: note }),
+    body: JSON.stringify({ p_report_id: id, p_confirm: decision === 'confirm', p_note: note }),
   }).then((res) => { if (!res.ok) throw new Error(`review ${res.status}`) })
 }
 
@@ -245,7 +251,8 @@ function ReviewQueue({ myId }: { myId: string | null }) {
   const projects = useMemo(() => [...new Map(items.map((i) => [i.projectId, i.projectName])).entries()], [items])
   const filter = params.get('project') ?? 'all'
   const visible = items.filter((i) => filter === 'all' || i.projectId === filter)
-  const topId = visible.find((i) => (states[i.id]?.kind ?? 'ready') === 'ready' && i.reporterId !== myId)?.id
+  const isOwn = (i: QueueItem) => i.reporterId !== null && i.reporterId === myId
+  const topId = visible.find((i) => (states[i.id]?.kind ?? 'ready') === 'ready' && !isOwn(i))?.id
 
   return (
     <div className="min-h-dvh bg-page text-fg">
@@ -285,7 +292,7 @@ function ReviewQueue({ myId }: { myId: string | null }) {
           <ul className="m-0 flex flex-col gap-3 p-0">
             {visible.map((item) => {
               const state = states[item.id] ?? { kind: 'ready' }
-              const own = item.reporterId === myId
+              const own = isOwn(item)
               const ready = loaded.has(item.id) || !item.photoUrl
               return (
                 <li
