@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { Button, buttonClass } from './ui'
+import { useSignOutGuard } from './report/SignOutDraftsConfirm'
 
 /**
  * Top bar (03 §2.1 `shell-app`, §2.2 `shell-project`): logo = «К объектам»
@@ -12,6 +13,7 @@ import { Button, buttonClass } from './ui'
 export function AppHeader({ logoTo = '/dashboard', children }: { logoTo?: string; children?: ReactNode }) {
   const { profile, user, signOut } = useAuth()
   const { t } = useTranslation()
+  const guard = useSignOutGuard(user?.id, signOut)
   return (
     <header className="sticky top-0 z-[var(--z-header)] border-b-2 border-line bg-page">
       <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-2 px-4 py-1">
@@ -36,12 +38,13 @@ export function AppHeader({ logoTo = '/dashboard', children }: { logoTo?: string
             </Link>
           ) : null}
           <LanguageSwitcher />
-          <Button variant="ghost" size="md" className="px-3" onClick={() => void signOut()}>
+          <Button variant="ghost" size="md" className="px-3" onClick={guard.request}>
             {t('common.signOut')}
           </Button>
         </div>
       </div>
       {children}
+      {guard.dialog}
     </header>
   )
 }

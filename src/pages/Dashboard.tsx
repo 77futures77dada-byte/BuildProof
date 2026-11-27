@@ -7,6 +7,7 @@ import { useProjects } from '../hooks/useProjects'
 import type { DashboardProject } from '../hooks/useProjects'
 import { isProfileConfigured } from '../lib/profile'
 import { isGateOpen, staleness } from '../lib/freshness'
+import { useSignOutGuard } from '../components/report/SignOutDraftsConfirm'
 import { AppHeader } from '../components/AppHeader'
 import { Button, EmptyState, Skeleton } from '../components/ui'
 import { ErrorMessage } from '../components/ErrorMessage'
@@ -46,6 +47,7 @@ export function Dashboard() {
   const { projects, loading, error, reload } = useProjects()
   const navigate = useNavigate()
   const [creating, setCreating] = useState(false)
+  const guard = useSignOutGuard(profile?.id, signOut)
 
   if (authLoading) return <FullPageSpinner />
 
@@ -85,8 +87,9 @@ export function Dashboard() {
       <section className="flex flex-col items-start gap-3 rounded-card border-2 border-dashed border-line bg-page p-5">
         <p className="m-0 text-field font-semibold text-fg">{t(key)}</p>
         {role === 'client' ? null : (
-          <Button variant="secondary" onClick={() => void signOut()}>{t('common.signOut')}</Button>
+          <Button variant="secondary" onClick={guard.request}>{t('common.signOut')}</Button>
         )}
+        {guard.dialog}
       </section>
     )
   }

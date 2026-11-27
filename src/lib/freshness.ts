@@ -2,10 +2,9 @@ import type { TFunction } from 'i18next'
 import type { ProjectStatus } from '../types'
 import type { StatusKind } from '../components/ui/statusKinds'
 
-/** `VITE_EMAIL_GATE_OPEN` (03 §0.2 `gate-open`); closed unless exactly `true`. */
-export function isGateOpen(): boolean {
-  return import.meta.env.VITE_EMAIL_GATE_OPEN === 'true'
-}
+/** `VITE_EMAIL_GATE_OPEN` (03 §0.2 `gate-open`); one source of truth in emailGate.ts. */
+export { isEmailGateOpen as isGateOpen } from './emailGate'
+import { isEmailGateOpen as isGateOpen } from './emailGate'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
