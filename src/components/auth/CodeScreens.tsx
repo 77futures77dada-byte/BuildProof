@@ -15,10 +15,10 @@ import { CodeField, PasswordField } from './fields'
 const MIN_PASSWORD = 8
 const passwordLink = '/login'
 
-/** Re-renders every second while `until` is in the future; returns seconds left. */
+/** Re-renders every second while the wait after `sentAt` runs; returns seconds left. */
 function useCountdown(sentAt: number | null, wait?: number): number {
   const [now, setNow] = useState(() => Date.now())
-  const left = sentAt == null ? 0 : secondsLeft(sentAt, now, wait)
+  const left = sentAt == null ? 0 : Math.min(wait ?? 60, secondsLeft(sentAt, now, wait))
   useEffect(() => {
     if (left <= 0) return
     const id = window.setInterval(() => setNow(Date.now()), 1000)
@@ -32,7 +32,7 @@ function isUnknownAddress(err: { code?: string; message?: string }) {
   return err.code === 'otp_disabled' || /signups? not allowed|user not found/i.test(err.message ?? '')
 }
 
-type SendResult = { ok: true } | { ok: false; error: 'retryAfter' | 'projectLimit' | 'sendFailed'; wait?: number }
+type SendResult = { ok: true } | { ok: false; error: 'retryAfter' | 'projectLimit' | 'sendFailed'; wait?: number; at: number }
 
 async function sendCode(email: string): Promise<SendResult> {
   try {
@@ -40,10 +40,10 @@ async function sendCode(email: string): Promise<SendResult> {
     if (error && !isUnknownAddress(error)) {
       const kind = codeSendError(error)
       const wait = Number(/(\d+)\s*seconds?/i.exec(error.message)?.[1]) || undefined
-      return { ok: false, error: kind, wait }
+      return { ok: false, error: kind, wait, at: Date.now() }
     }
   } catch (err) {
-    return { ok: false, error: codeSendError(err) }
+    return { ok: false, error: codeSendError(err), at: Date.now() }
   }
   saveLastEmail(email)
   saveCodeSent({ email, at: Date.now() })
@@ -70,7 +70,7 @@ export function CodeRequest({ reset, onSent }: { reset: boolean; onSent: () => v
     const result = await sendCode(address)
     setSending(false)
     if (result.ok) return onSent()
-    setFailure({ error: result.error, at: Date.now(), wait: result.wait ?? 60 })
+    setFailure({ error: result.error, at: result.at, wait: result.wait ?? 60 })
   }
 
   const failureText = !failure

@@ -63,15 +63,9 @@ export function Login() {
   const reset = params.get('reset') === '1'
   // Invitation link fallback (implicit flow, `#…type=invite`) or the code: offer a password next.
   const [offerPassword, setOfferPassword] = useState(() => /type=(invite|recovery)/.test(location.hash) || (mode === 'code' && reset))
-  const [linkError, setLinkError] = useState<LinkError | null>(() => parseLinkError(location.hash, location.search))
-
+  const [hashError, setLinkError] = useState<LinkError | null>(() => parseLinkError(location.hash, location.search))
   // PKCE `?code=` that did not turn into a session: the link was opened in another browser.
-  useEffect(() => {
-    if (!authLoading && !session && !linkError) {
-      const kind = parseLinkError('', location.search, true)
-      if (kind) setLinkError(kind)
-    }
-  }, [authLoading, session, linkError, location.search])
+  const linkError = hashError ?? (!authLoading && !session ? parseLinkError('', location.search, true) : null)
 
   if (authLoading) return <AppLoading />
 
