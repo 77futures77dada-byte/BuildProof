@@ -11,6 +11,8 @@ export interface AuthContextValue {
   profile: Profile | null
   /** True until the initial session + profile lookup has settled. */
   loading: boolean
+  /** User id whose profile lookup has finished (even with no row); lags `session` right after sign-in. */
+  profileLoadedFor: string | null
   /** Non-null if loading the profile failed; the UI should surface it. */
   error: string | null
   signOut: () => Promise<void>
