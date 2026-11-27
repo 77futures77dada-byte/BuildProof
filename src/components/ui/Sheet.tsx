@@ -123,7 +123,7 @@ export function Sheet({ open, onClose, title, children, footer, busy, closeLabel
           className,
         )}
       >
-        <header className="flex items-center justify-between gap-3 border-b-2 border-line py-1 pr-1 pl-4">
+        <header className="flex items-center justify-between gap-3 border-b-2 border-line py-1 pr-3 pl-4">
           <h2 id={titleId} className="m-0 min-w-0 text-h3 font-bold">{title}</h2>
           <button
             type="button"

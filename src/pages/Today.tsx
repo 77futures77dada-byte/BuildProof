@@ -281,7 +281,8 @@ export function Today() {
 
       {editing ? (
         <section className="flex flex-wrap items-center gap-3 rounded-card border-2 border-line bg-surface p-3">
-          <p className="m-0 min-w-0 flex-1 text-field font-semibold">{t('report.unfinished')}</p>
+          {/* own row: with two buttons beside it the text broke one word per line at 360–390 px */}
+          <p className="m-0 min-w-0 basis-full text-field font-semibold">{t('report.unfinished')}</p>
           <Button variant="secondary" onClick={() => setSheetDraftId(editing.draftId)}>{t('today.continue')}</Button>
           {/* an accidental shot can be thrown away here, off the send path (critic r3 LOW-1) */}
           {discard === editing.draftId ? (
