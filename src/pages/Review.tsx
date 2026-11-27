@@ -114,6 +114,7 @@ function ReviewQueue({ myId }: { myId: string | null }) {
   const [nonce, setNonce] = useState(0)
   const [states, setStates] = useState<Record<string, RowState>>({})
   const [loaded, setLoaded] = useState<Set<string>>(new Set())
+  const [broken, setBroken] = useState<Set<string>>(new Set())
   const [closedEarly, setClosedEarly] = useState<Set<string>>(() => readClosedEarly())
   const [returning, setReturning] = useState<QueueItem | null>(null)
   const [viewing, setViewing] = useState<QueueItem | null>(null)
@@ -193,11 +194,16 @@ function ReviewQueue({ myId }: { myId: string | null }) {
       const ids = pendingIds()
       if (!ids.length) return
       const early = readClosedEarly()
+      // Sent early: the row is no longer `confirmed`, so the 7 s timer never sends it again.
+      const sendingNow = Object.fromEntries(ids.map((id) => [id, { kind: 'sending' } as RowState]))
+      statesRef.current = { ...statesRef.current, ...sendingNow }
+      setStates((cur) => ({ ...cur, ...sendingNow }))
       for (const id of ids) {
         early.add(id)
         void sendDecision(token.current, id, 'confirm', null, true).then(() => {
           const cur = readClosedEarly(); cur.delete(id); writeClosedEarly(cur)
-        }).catch(() => {})
+          remove(id)
+        }).catch(() => setStates((cur) => ({ ...cur, [id]: { kind: 'failed' } })))
       }
       writeClosedEarly(early)
     }
@@ -209,7 +215,7 @@ function ReviewQueue({ myId }: { myId: string | null }) {
       window.removeEventListener('pagehide', flush)
       flush()
     }
-  }, [pendingIds])
+  }, [pendingIds, remove])
 
   useEffect(() => {
     const down = () => { touching.current = true; setTouchDown(true) }
@@ -296,7 +302,14 @@ function ReviewQueue({ myId }: { myId: string | null }) {
                           className="size-24 shrink-0 overflow-hidden rounded-control bg-surface focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
                         >
                           {item.photoUrl ? (
-                            <img src={item.photoUrl} alt="" onLoad={() => setLoaded((s) => new Set(s).add(item.id))} className="block size-full object-cover" />
+                            <img
+                              src={item.photoUrl}
+                              alt=""
+                              onLoad={() => setLoaded((s) => new Set(s).add(item.id))}
+                              // a broken/slow link must not lock «Подтвердить» forever: say why, allow confirming
+                              onError={() => { setLoaded((s) => new Set(s).add(item.id)); setBroken((s) => new Set(s).add(item.id)) }}
+                              className="block size-full object-cover"
+                            />
                           ) : null}
                         </button>
                         <div className="flex min-w-0 flex-col gap-1">
@@ -307,6 +320,7 @@ function ReviewQueue({ myId }: { myId: string | null }) {
                           <p className="m-0 text-body font-semibold num-col">{t('review.waiting', { count: waitedHours(item.createdAt, now) })}</p>
                         </div>
                       </div>
+                      {broken.has(item.id) ? <p className="m-0 text-body font-semibold">{t('photos.imageFailed')}</p> : null}
                       {closedEarly.has(item.id) && state.kind === 'ready' ? (
                         <p className="m-0 text-body font-semibold">{t('review.closedEarly')}</p>
                       ) : null}

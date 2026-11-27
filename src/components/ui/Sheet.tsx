@@ -118,7 +118,7 @@ export function Sheet({ open, onClose, title, children, footer, busy, closeLabel
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         className={cx(
-          'flex max-h-[90vh] w-full flex-col overflow-hidden rounded-t-sheet bg-page text-fg shadow-sheet outline-none',
+          'flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-sheet bg-page text-fg shadow-sheet outline-none',
           'lg:max-w-[560px] lg:rounded-sheet',
           className,
         )}

@@ -247,10 +247,21 @@ export async function sendDraft(store: DraftStore, t: DraftTransport, d: Draft, 
   }
 }
 
-/** Drafts the queue tries now: own, queued/unknown (stale waits for the worker). */
+/**
+ * Errors a retry cannot fix: the worker must change the draft (retake, reason)
+ * or delete it. Such drafts are not retried automatically nor by «Отправить снова».
+ */
+export const PERMANENT_ERRORS: ReadonlySet<DraftError> = new Set<DraftError>([
+  'forbidden', 'photo_required', 'nothing_to_report', 'invalid_photo_path', 'comment_required', 'invalid_percent',
+])
+export function needsWorker(d: Draft): boolean {
+  return d.state === 'stale' || (d.lastError !== null && PERMANENT_ERRORS.has(d.lastError))
+}
+
+/** Drafts the queue tries now: own, queued/unknown, not waiting for the worker. */
 export function sendable(drafts: Draft[], userId: string): Draft[] {
   return drafts
-    .filter((d) => d.userId === userId && (d.state === 'queued' || d.state === 'unknown'))
+    .filter((d) => d.userId === userId && (d.state === 'queued' || d.state === 'unknown') && !needsWorker(d))
     .sort((a, b) => a.createdAt - b.createdAt)
 }
 
@@ -267,6 +278,21 @@ export async function flushQueue(store: DraftStore, t: DraftTransport, userId: s
     if (r.result === 'failed' && r.error === 'auth') break
   }
   return out
+}
+
+/**
+ * One in-flight promise per key: a second call while the first is running gets
+ * the same promise (double tap on «Отправить» never sends twice).
+ */
+export function singleFlight<A extends { draftId: string }, R>(fn: (arg: A) => Promise<R>): (arg: A) => Promise<R> {
+  const inFlight = new Map<string, Promise<R>>()
+  return (arg) => {
+    const running = inFlight.get(arg.draftId)
+    if (running) return running
+    const p = fn(arg).finally(() => inFlight.delete(arg.draftId))
+    inFlight.set(arg.draftId, p)
+    return p
+  }
 }
 
 /** Worker chose «Отправить с новым %» on a stale draft: re-base it on the current %. */
@@ -287,4 +313,17 @@ export function resolveStale(d: Draft, newPercent: number, reason: string | null
 export function nextRetryDelay(step: number, startedAt: number, now: number): number | null {
   if (now - startedAt >= RETRY_STOP_MS) return null
   return RETRY_DELAYS_MS[Math.min(step, RETRY_DELAYS_MS.length - 1)]
+}
+
+/**
+ * What the camera was opened for. Set right before `input.click()` and consumed
+ * once by the file handler (or cleared on cancel), so a cancelled «Переснять»
+ * never makes the next «Сфотографировать» overwrite an old draft's photo.
+ */
+export type ShotIntent = { kind: 'new' } | { kind: 'retake'; draftId: string }
+
+/** The draft whose photo a shot replaces, or null for a new draft. */
+export function shotTarget(intent: ShotIntent | null, drafts: Draft[]): Draft | null {
+  if (!intent || intent.kind !== 'retake') return null
+  return drafts.find((d) => d.draftId === intent.draftId) ?? null
 }

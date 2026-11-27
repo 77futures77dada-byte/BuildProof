@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useSyncExternalStore } from 'react'
-import { draftStore, expireEditing, flushQueue, nextRetryDelay, requestPersistentStorage, sendDraft, sendable } from '../../lib/drafts'
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
+import { draftStore, expireEditing, flushQueue, nextRetryDelay, requestPersistentStorage, sendDraft, sendable, singleFlight } from '../../lib/drafts'
 import type { Draft, SendOutcome } from '../../lib/drafts'
 import { supabaseDraftTransport } from '../../lib/draftTransport'
 
@@ -64,8 +64,12 @@ export function flushDrafts(userId: string): Promise<SendOutcome[]> {
   return running
 }
 
-/** Send one draft right away (the sheet's «Отправить»), after any running flush. */
-export async function sendDraftNow(d: Draft): Promise<SendOutcome> {
+/**
+ * Send one draft right away (the sheet's «Отправить»), after any running flush.
+ * Single flight per draft: a double tap never submits twice.
+ */
+export const sendDraftNow = singleFlight(sendDraftOnce)
+async function sendDraftOnce(d: Draft): Promise<SendOutcome> {
   await running?.catch(() => undefined)
   emit({ sending: true })
   const job = sendDraft(draftStore(), supabaseDraftTransport, d, Date.now())
@@ -97,6 +101,9 @@ export function useAutoRetry(userId: string | undefined) {
   const { drafts } = useDrafts()
   const pending = userId ? sendable(drafts, userId).length : 0
 
+  // Auto-retry gave up (30 min): the banner says it no longer goes by itself.
+  const [stopped, setStopped] = useState(false)
+  const [cycle, setCycle] = useState(0)
   const kick = useCallback(() => {
     if (userId && sendable(snap.drafts, userId).length) void flushDrafts(userId)
   }, [userId])
@@ -114,7 +121,7 @@ export function useAutoRetry(userId: string | undefined) {
     let timer: ReturnType<typeof setTimeout> | undefined
     const schedule = () => {
       const delay = nextRetryDelay(step, started, Date.now())
-      if (delay === null) return
+      if (delay === null) { setStopped(true); return }
       timer = setTimeout(() => { step += 1; kick(); schedule() }, delay)
     }
     schedule()
@@ -124,7 +131,14 @@ export function useAutoRetry(userId: string | undefined) {
       document.removeEventListener('visibilitychange', onVisible)
       if (timer) clearTimeout(timer)
     }
-  }, [userId, pending, kick])
+  }, [userId, pending, kick, cycle])
 
-  return kick
+  /** «Отправить снова»: try now and restart the 30-min retry cycle. */
+  const retryNow = useCallback(() => {
+    setStopped(false)
+    setCycle((c) => c + 1)
+    kick()
+  }, [kick])
+
+  return { retryNow, stopped: stopped && pending > 0 }
 }

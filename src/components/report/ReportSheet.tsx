@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { EditableStage } from '../../hooks/useProjectStages'
 import { effectiveSeenPercent, isUnsent, resolveStale } from '../../lib/drafts'
 import type { Draft, DraftError, SendOutcome } from '../../lib/drafts'
-import { Button, PercentStepper, Sheet, StatusIcon, cx } from '../ui'
+import { isReportReviewOn } from '../../lib/reportReview'
+import { Button, NetBar, PercentStepper, Sheet, StatusIcon, cx, useOnline } from '../ui'
 import { StagePicker } from './StagePicker'
 import { draftErrorKey } from './draftErrors'
 import { removeDraft, saveDraft, sendDraftNow, useDrafts } from './useDrafts'
@@ -11,6 +12,8 @@ import { removeDraft, saveDraft, sendDraftNow, useDrafts } from './useDrafts'
 const REASONS = ['rework', 'mistake', 'demolition'] as const
 /** «Закрыть» is blocked for the first 3 s of sending (03 §6.2). */
 const LOCK_MS = 3000
+/** Jump that goes to review under K15 (brief §2.1 п.4, `projects.review_threshold` default). */
+const BIG_JUMP = 25
 
 interface ReportSheetProps {
   /** The draft on the sheet (`editing`, or `stale` for the decision view). Null = closed. */
@@ -43,12 +46,18 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
   const [phase, setPhase] = useState<'idle' | 'locked' | 'closable'>('idle')
   const [error, setError] = useState<DraftError | null>(null)
   const [syncedFor, setSyncedFor] = useState<string | null>(null)
+  // Set synchronously on the first tap: a double tap must not start a second send.
+  const busy = useRef(false)
+  const online = useOnline()
 
   const stale = draft?.state === 'stale'
   const stage = stages.find((s) => s.id === stageId) ?? null
   const others = useMemo(() => drafts.filter((d) => d.draftId !== draft?.draftId), [drafts, draft?.draftId])
+  // A queued/unknown draft reopened from the banner keeps its own claim.
+  const ownClaim = !!draft && !stale && draft.state !== 'editing' && stageId === draft.stageId
   const base = stale
     ? (draft?.stalePercent ?? 0)
+    : ownClaim ? draft.seenPercent
     : stage ? effectiveSeenPercent(others, userId, stage.id, stage.progressPercent) : (draft?.seenPercent ?? 0)
 
   // A new draft on the sheet: start from «без изменений» (or the stale claim).
@@ -58,10 +67,11 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
     if (draft) {
       const st = stages.find((s) => s.id === draft.stageId)
       setStageId(draft.stageId)
-      setValue(stale ? draft.newPercent : st ? effectiveSeenPercent(others, userId, st.id, st.progressPercent) : draft.seenPercent)
-      setReason(stale ? draft.reason : null)
+      const keepClaim = stale || draft.state !== 'editing'
+      setValue(keepClaim ? draft.newPercent : st ? effectiveSeenPercent(others, userId, st.id, st.progressPercent) : draft.seenPercent)
+      setReason(keepClaim ? draft.reason : null)
+      setError(draft.lastError)
       setView('main')
-      setError(null)
       setPhase('idle')
     }
   }
@@ -92,7 +102,9 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
   }
 
   const send = async () => {
-    if (needsReason || sending) return
+    if (needsReason || sending || busy.current) return
+    busy.current = true
+    setPhase('locked')
     setError(null)
     const ready: Draft = stale
       ? resolveStale(draft, value, reason)
@@ -106,16 +118,19 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
           reason: decrease ? reason : null,
           state: 'queued',
         }
-    await saveDraft(ready)
-    setPhase('locked')
-    const outcome = await sendDraftNow(ready)
-    if (outcome.result === 'stale') { setPhase('idle'); return } // sheet switches to the decision view
-    if (outcome.result === 'failed' && outcome.error !== 'network' && outcome.error !== 'timeout') {
+    try {
+      await saveDraft(ready)
+      const outcome = await sendDraftNow(ready)
+      if (outcome.result === 'stale') return // sheet switches to the decision view
+      if (outcome.result === 'failed' && outcome.error !== 'network' && outcome.error !== 'timeout') {
+        setError(outcome.error)
+        return
+      }
+      onDone(outcome)
+    } finally {
+      busy.current = false
       setPhase('idle')
-      setError(outcome.error)
-      return
     }
-    onDone(outcome)
   }
 
   const reasonBlock = (
@@ -147,10 +162,17 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
     </div>
   )
 
-  const notices = [paused ? t('report.paused') : null, unsentOthers ? t('send.bar', { count: unsentOthers }) : null].filter(Boolean)
+  const bigJump = isReportReviewOn() && value - base > BIG_JUMP
+  const notices = [bigJump ? t('report.bigJump') : null, paused ? t('report.paused') : null, unsentOthers ? t('send.bar', { count: unsentOthers }) : null].filter(Boolean)
 
   const footer = view === 'main' ? (
     <div className="flex flex-col gap-2">
+      {!online && !sending ? (
+        <div className="flex flex-col gap-1" data-offline-hint>
+          <NetBar />
+          <p className="m-0 text-body font-semibold text-fg">{t('report.offlineSaved')}</p>
+        </div>
+      ) : null}
       {sending ? (
         <p aria-live="polite" className="m-0 flex items-center gap-2 text-body font-semibold text-fg">
           <StatusIcon kind="sending" />{t('send.sending')}
@@ -225,10 +247,13 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
 
           {!stale ? (
             <div className="flex items-center justify-between gap-3">
-              <p className="m-0 min-w-0 truncate text-field font-semibold text-fg">{t('report.stage', { stage: stageName })}</p>
+              <p className="m-0 line-clamp-2 min-w-0 text-field font-semibold text-fg [overflow-wrap:anywhere]">{t('report.stage', { stage: stageName })}</p>
               <Button variant="secondary" disabled={sending} onClick={() => setView('picker')} className="shrink-0">{t('report.changeStage')}</Button>
             </div>
-          ) : view === 'delete' ? (
+          ) : null}
+
+          {/* Any draft can be deleted from the phone (same confirm), so a draft stuck on an error never blocks a slot forever. */}
+          {view === 'delete' ? (
             <div className="flex flex-col gap-3 rounded-card border-2 border-stale p-3">
               <p className="m-0 text-field font-semibold text-fg">{t('send.deleteConfirm')}</p>
               <div className="flex flex-wrap gap-3">

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  needsWorker, sendable, shotTarget, singleFlight,
   decideBeforeSend, effectiveSeenPercent, expireEditing, flushQueue, memoryStore, nextRetryDelay,
   overLimit, resolveStale, DRAFT_LIMIT, EDITING_TTL_MS,
 } from './drafts'
@@ -143,5 +144,38 @@ describe('helpers', () => {
   it('retry backoff 15/30/60/120 s, stop after 30 min', () => {
     expect([0, 1, 2, 3, 9].map((s) => nextRetryDelay(s, 0, 0))).toEqual([15_000, 30_000, 60_000, 120_000, 120_000])
     expect(nextRetryDelay(0, 0, 30 * 60 * 1000)).toBeNull()
+  })
+})
+
+describe('stage-5 critic fixes', () => {
+  it('double tap: singleFlight sends a draft once while the first send runs', async () => {
+    const d = draft({ draftId: 'dbl' })
+    const store = memoryStore([d])
+    const { t, submitted } = transport({ s1: 40 })
+    const { sendDraft } = await import('./drafts')
+    const send = singleFlight((x: Draft) => sendDraft(store, t, x, 1))
+    const [a, b] = await Promise.all([send(d), send(d)])
+    expect(a).toBe(b)
+    expect(submitted).toHaveLength(1)
+  })
+
+  it('cancelled retake: a new shot never targets an old draft', () => {
+    const old = draft({ draftId: 'old', state: 'editing' })
+    expect(shotTarget({ kind: 'new' }, [old])).toBeNull()
+    expect(shotTarget(null, [old])).toBeNull()
+    expect(shotTarget({ kind: 'retake', draftId: 'old' }, [old])).toBe(old)
+  })
+
+  it('a draft with an error a retry cannot fix is not retried and waits for the worker', async () => {
+    const bad = draft({ draftId: 'bad', lastError: 'forbidden', attempts: 1 })
+    const net = draft({ draftId: 'net', stageId: 's2', lastError: 'network', attempts: 1 })
+    expect(needsWorker(bad)).toBe(true)
+    expect(needsWorker(net)).toBe(false)
+    expect(sendable([bad, net], 'u1').map((d) => d.draftId)).toEqual(['net'])
+    const store = memoryStore([bad, net])
+    const { t, submitted } = transport({ s1: 40, s2: 40 })
+    await flushQueue(store, t, 'u1')
+    expect(submitted.map((x) => x.stageId)).toEqual(['s2'])
+    expect(store.rows.has('bad')).toBe(true)
   })
 })
