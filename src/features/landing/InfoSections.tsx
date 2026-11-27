@@ -1,10 +1,16 @@
-import { LEGAL } from '../../config/legal'
 import { priceTable } from '../../config/pricing'
+import { isPlaceholder, LEGAL } from '../../config/legal'
 import type { LandingCopy } from './copy'
-import { CheckIcon, CrossIcon, Legal } from './parts'
+import { CheckIcon, CrossIcon } from './parts'
 
 export function TrustSection({ copy }: { copy: LandingCopy }) {
   const t = copy.trust
+  const dataFields = [
+    !isPlaceholder(LEGAL.hosting) ? `${t.hosting}: ${LEGAL.hosting}` : null,
+    !isPlaceholder(LEGAL.emailProvider) ? `${t.email}: ${LEGAL.emailProvider}` : null,
+    !isPlaceholder(LEGAL.analytics) ? `${t.analytics}: ${LEGAL.analytics}` : null,
+    !isPlaceholder(LEGAL.dpaTimeline) ? `${t.dpa}: ${LEGAL.dpaTimeline}` : null,
+  ].filter(Boolean)
   return (
     <section className="sec alt" id="trust" aria-labelledby="trust-title">
       <div className="in">
@@ -43,10 +49,7 @@ export function TrustSection({ copy }: { copy: LandingCopy }) {
           <div className="card wide" id="data">
             <h3>{t.dataTitle}</h3>
             <p>{t.dataText}</p>
-            <p className="sub-host">
-              {t.hosting}: <Legal value={LEGAL.hosting} /> · {t.email}: <Legal value={LEGAL.emailProvider} /> · {t.analytics}:{' '}
-              <Legal value={LEGAL.analytics} /> · {t.dpa}, <Legal value={LEGAL.dpaTimeline} />.
-            </p>
+            {dataFields.length ? <p className="sub-host">{dataFields.join(' · ')}</p> : null}
           </div>
         </div>
       </div>
@@ -138,29 +141,30 @@ export function FaqSection({ copy }: { copy: LandingCopy }) {
 
 export function Footer({ copy }: { copy: LandingCopy }) {
   const f = copy.footer
+  const companyName = isPlaceholder(LEGAL.companyName) ? null : LEGAL.companyName
+  const registry = isPlaceholder(LEGAL.registryCode) ? null : LEGAL.registryCode
+  const vat = isPlaceholder(LEGAL.vatNumber) ? null : LEGAL.vatNumber
+  const phone = isPlaceholder(LEGAL.phone) ? null : LEGAL.phone
+  const email = isPlaceholder(LEGAL.email) ? null : LEGAL.email
+  const hasLegal = companyName || registry || vat
+  const hasContact = phone || email
   return (
     <footer>
       <div className="in">
         <div>
           <b>BuildProof</b>
           <br />
-          <Legal value={LEGAL.companyName} />
-          <br />
-          {f.registry} <Legal value={LEGAL.registryCode} /> · {f.vat} <Legal value={LEGAL.vatNumber} />
+          {hasLegal ? <>
+            {companyName ? <><br />{companyName}</> : null}
+            {registry ? <><br />{f.registry} {registry}</> : null}
+            {vat ? <> · {f.vat} {vat}</> : null}
+          </> : null}
         </div>
-        <div>
+        {hasContact ? <div>
           <b>{f.contact}</b>
-          <br />
-          <Legal value={LEGAL.phone} /> · <Legal value={LEGAL.email} />
-          <br />
-          {f.reply}
-        </div>
-        <div>
-          <b>{f.docs}</b>
-          <br />
-          {/* TODO: point at real documents once they exist; until then they lead to "Your data". */}
-          <a href="#data">{f.privacy}</a> · <a href="#data">{f.terms}</a> · <a href="#data">{f.dpa}</a>
-        </div>
+          {phone ? <><br />{phone}</> : null}
+          {email ? <><br /><a href={`mailto:${email}`}>{email}</a></> : null}
+        </div> : null}
       </div>
     </footer>
   )

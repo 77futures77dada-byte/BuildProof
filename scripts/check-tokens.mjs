@@ -6,7 +6,7 @@
 //   colorfn  — rgb( / rgba( / hsl( / hsla( / oklch( / oklab( literals
 //   font     — a font-family / fontFamily declaration whose value is not var(--font-…) / inherit
 //   palette  — a Tailwind fixed-palette colour class (bg-sky-600, text-white, …) in .ts/.tsx
-//   small    — text below 17 px in app code (not src/features/landing/); `text-meta` (16 px)
+//   small    — text below 17 px in all product code; `text-meta` (16 px)
 //              only with an lg:/xl: prefix (desktop secondary captions, owner 2026-11-28):
 //              classes text-xs / text-sm / text-[<17px] / text-[<1.0625rem] in .ts/.tsx,
 //              font-size / font shorthand < 17 px in .css
@@ -52,9 +52,6 @@ const FIELD_ZONE = [
   'src/components/report/',
   'src/components/ui/',
 ]
-/** The small-text rule covers app code; the landing has its own rewrite PR. */
-const NOT_APP = ['src/features/landing/']
-
 const under = (file, list) => list.some((p) => (p.endsWith('/') ? file.startsWith(p) : file === p))
 
 const allowPath = join(root, 'scripts/check-tokens.allow.json')
@@ -127,7 +124,6 @@ for (const file of files) {
   const code = isJs ? scanJs(raw).code : isCss ? stripCss(raw) : stripHtml(raw)
   const rawLines = raw.split('\n')
   const field = under(file, FIELD_ZONE)
-  const app = !under(file, NOT_APP)
   code.split('\n').forEach((text, idx) => {
     for (const re of HEAVY) for (const m of text.matchAll(re)) push(file, idx + 1, 'heavy', rawLines[idx], m[0])
   })
@@ -146,12 +142,12 @@ for (const file of files) {
       for (const m of text.matchAll(FONT)) if (!FONT_OK.test(m[1])) add('font', m[0])
       if (isJs || /@apply\b/.test(text)) {
         for (const m of text.matchAll(PALETTE)) add('palette', m[0])
-        if (app) for (const m of text.matchAll(SMALL_CLASS)) if (!m[1] || px(m[1], m[2]) < 17) add('small', m[0])
+        for (const m of text.matchAll(SMALL_CLASS)) if (!m[1] || px(m[1], m[2]) < 17) add('small', m[0])
         // text-meta (16 px) is for desktop secondary captions only: it must carry an lg:/xl: prefix
-        if (app) for (const m of text.matchAll(/(?<![\w:-])text-meta(?![\w-])/g)) add('small', m[0])
+        for (const m of text.matchAll(/(?<![\w:-])text-meta(?![\w-])/g)) add('small', m[0])
         if (field) for (const m of text.matchAll(FIELD_CLASS)) add('weight', m[0])
       }
-      if (isCss && app) for (const m of text.matchAll(CSS_SIZE)) if (cssPx(m) < 17) add('small', m[0])
+      if (isCss) for (const m of text.matchAll(CSS_SIZE)) if (cssPx(m) < 17) add('small', m[0])
     })
   }
 
