@@ -1,27 +1,40 @@
 import type { HousePart, StagePart } from './types'
 
-/** Scene background; every stage colour is validated against it (palette.test.ts). */
-export const HOUSE_BG = '#0b2a4a'
-
 /**
- * Colour = stage. Single source for the 3D lines, the stage list and the legend.
- * Hues follow the brief; foundation, frame, electric and finish were lightened or
- * shifted so that no pair merges under simulated deuteranopia (min ΔE ≥ 15).
+ * Colours of the 3D object model live in src/styles/tokens.css (`--house-*`),
+ * like every other colour of the product; nothing here is a literal colour.
+ * DOM (legend, stage rows, cards) uses `var(--house-…)` directly; three.js
+ * cannot read CSS variables, so the scene resolves them once with
+ * `resolveColor()` when it is built. The model sits on a fixed navy stage in
+ * both themes; in the dark navy theme it matches the card surface.
+ * Stage hues are pinned and checked (contrast on --house-bg ≥ 3:1, ΔE under
+ * deuteranopia ≥ 15) by palette.test.ts and scripts/check-contrast.mjs.
  */
-export const STAGE_COLORS: Record<StagePart, string> = {
-  foundation: '#e3cba8', // sand
-  frame: '#ff9f40', // orange
-  roof: '#ff6b6b', // coral
-  windows: '#5eead4', // turquoise
-  electric: '#fff176', // yellow
-  plumbing: '#60a5fa', // blue
-  finish: '#f0abfc', // orchid
+const v = (name: string) => `var(${name})`
+
+/** Scene background. */
+export const HOUSE_BG = v('--house-bg')
+export const HOUSE_GRID = v('--house-grid')
+export const HOUSE_GRID_SUB = v('--house-grid-sub')
+
+/** CSS variable per stage: colour = stage. Single source for the 3D lines, the stage list and the legend. */
+export const STAGE_VARS: Record<StagePart, string> = {
+  foundation: '--house-foundation',
+  frame: '--house-frame',
+  roof: '--house-roof',
+  windows: '--house-windows',
+  electric: '--house-electric',
+  plumbing: '--house-plumbing',
+  finish: '--house-finish',
 }
+export const STAGE_COLORS = Object.fromEntries(
+  Object.entries(STAGE_VARS).map(([part, name]) => [part, v(name)]),
+) as Record<StagePart, string>
 
 /** Stages that do not map onto the model (no geometry) use a neutral tone. */
-export const OTHER_STAGE_COLOR = '#94a3b8'
+export const OTHER_STAGE_COLOR = v('--house-other')
 /** Whole-house contour once all seven stages are at 100%. */
-export const CONTOUR_COLOR = '#ffffff'
+export const CONTOUR_COLOR = v('--house-contour')
 
 /** State = brightness, never hue. */
 export const HOUSE_OPACITY = {
@@ -33,4 +46,14 @@ export const GLOW_WIDTH = 4
 
 export function stageColor(part: HousePart): string {
   return part in STAGE_COLORS ? STAGE_COLORS[part as StagePart] : OTHER_STAGE_COLOR
+}
+
+/** `var(--x)` → the computed value on <html> (for three.js); other strings pass through. */
+export function resolveColor(color: string, el: Element = document.documentElement): string {
+  const m = color.match(/^var\((--[\w-]+)\)$/)
+  if (!m) return color
+  const value = getComputedStyle(el).getPropertyValue(m[1]).trim()
+  // a missing token would silently paint black in three.js
+  if (!value && import.meta.env.DEV) console.warn(`house3d: token ${m[1]} is not defined in tokens.css`)
+  return value
 }

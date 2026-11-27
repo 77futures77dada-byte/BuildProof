@@ -200,3 +200,79 @@ check-overflow: routes=31 loads=248 overflow_failures=0 render_failures=2 page_e
 | check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=169 allowlisted=5 temporary=0 (1s) |
 | check-ru-latin | PASS | offending=0 strings=819 (json=540, landing=279) (0s) |
 | check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 send_checks=8 send_failures=0 landing_small_targets=8 landing_small_text=95 (134s) |
+
+## 2026-11-27T13:56:17Z — navy-theme: токены, переключатель, 3D на токенах
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.16s, VITE_SUPABASE_URL=fixture (18s) |
+| test | PASS | 14 passed (14); 84 passed (84) (10s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=171 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=74 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=823 (json=544, landing=279) (0s) |
+| check-overflow | FAIL | routes=32 loads=256 overflow_failures=24 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 theme_failures=0 send_checks=8 send_failures=0 landing_small_targets=8 landing_small_text=95 (131s) |
+
+<details><summary>check-overflow: first lines of the failure</summary>
+
+```
+OVERFLOW login /login @360: scrollWidth 477 > 360; div.flex.min-h-svh.flex-col > header.flex.items-center.justify-between > div.inline-flex.shrink-0.gap-2 (w 168, right 477)
+OVERFLOW login /login @390: scrollWidth 477 > 390; div.flex.min-h-svh.flex-col > header.flex.items-center.justify-between > div.inline-flex.shrink-0.gap-2 (w 168, right 477)
+OVERFLOW protected-signed-out /dashboard @360: scrollWidth 477 > 360; div.flex.min-h-svh.flex-col > header.flex.items-center.justify-between > div.inline-flex.shrink-0.gap-2 (w 168, right 477)
+OVERFLOW protected-signed-out /dashboard @390: scrollWidth 477 > 390; div.flex.min-h-svh.flex-col > header.flex.items-center.justify-between > div.inline-flex.shrink-0.gap-2 (w 168, right 477)
+OVERFLOW not-found /no-such-page @360: scrollWidth 477 > 360; div.flex.min-h-svh.flex-col > header.flex.items-center.justify-between > div.inline-flex.shrink-0.gap-2 (w 168, right 477)
+OVERFLOW not-found /no-such-page @390: scrollWidth 477 > 390; div.flex.min-h-svh.flex-col > header.flex.items-center.justify-between > div.inline-flex.shrink-0.gap-2 (w 168, right 477)
+OVERFLOW onboarding (no company) /dashboard @360: scrollWidth 477 > 360; div.flex.min-h-svh.flex-col > header.flex.items-center.justify-between > div.inline-flex.shrink-0.gap-2 (w 168, right 477)
+OVERFLOW onboarding (no company) /dashboard @390: scrollWidth 477 > 390; div.flex.min-h-svh.flex-col > header.flex.items-center.justify-between > div.inline-flex.shrink-0.gap-2 (w 168, right 477)
+OVERFLOW not-found signed in /no-such-page @360: scrollWidth 477 > 360; div.flex.min-h-svh.flex-col > header.flex.items-center.justify-between > div.inline-flex.shrink-0.gap-2 (w 168, right 477)
+OVERFLOW not-found signed in /no-such-page @390: scrollWidth 477 > 390; div.flex.min-h-svh.flex-col > header.flex.items-center.justify-between > div.inline-flex.shrink-0.gap-2 (w 168, right 477)
+```
+</details>
+
+## 2026-11-27T14:06:34Z — navy-theme: шапка входа с переносом
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (4s) |
+| build | PASS | built in 1.76s, VITE_SUPABASE_URL=fixture (26s) |
+| test | PASS | 14 passed (14); 84 passed (84) (11s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=171 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=74 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=823 (json=544, landing=279) (0s) |
+| check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 theme_failures=0 send_checks=8 send_failures=0 landing_small_targets=8 landing_small_text=95 (138s) |
+
+## 2026-11-27T14:15:21Z — navy r1: правки критиков
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=1 errors=0 (3s) |
+| build | PASS | built in 2.08s, VITE_SUPABASE_URL=fixture (23s) |
+| test | PASS | 14 passed (14); 105 passed (105) (13s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=171 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=114 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=824 (json=545, landing=279) (1s) |
+| check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 theme_failures=0 send_checks=8 send_failures=0 landing_small_targets=8 landing_small_text=95 (160s) |
+
+## 2026-11-27T14:24:31Z — navy r2: шапка не закреплена на телефоне, проверка sticky-top
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.13s, VITE_SUPABASE_URL=fixture (16s) |
+| test | PASS | 14 passed (14); 105 passed (105) (9s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=171 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=114 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=824 (json=545, landing=279) (0s) |
+| check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (169s) |
+
+## 2026-11-27T14:29:20Z — navy r3: порядок фокуса в шапке
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.24s, VITE_SUPABASE_URL=fixture (16s) |
+| test | PASS | 14 passed (14); 105 passed (105) (9s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=171 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=114 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=824 (json=545, landing=279) (0s) |
+| check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (171s) |

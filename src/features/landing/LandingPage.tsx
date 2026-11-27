@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useLandingCopy } from './copy'
 import { Hero } from './Hero'
 import { LandingLanguageSwitcher, LogoMark } from './parts'
+import { ThemeSwitcher } from '../../components/ThemeSwitcher'
 import './landing.css'
 
 const loadBelowFold = () => import('./BelowFold')
@@ -30,6 +31,7 @@ export function LandingPage() {
             <LogoMark />
             BuildProof
           </a>
+          <ThemeSwitcher />
           <LandingLanguageSwitcher locale={locale} label={n.language} />
           <Link className="login" to="/login">
             {n.login}
