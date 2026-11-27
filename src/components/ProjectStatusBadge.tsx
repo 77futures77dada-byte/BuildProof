@@ -1,18 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import type { ProjectStatus } from '../types'
+import { StatusChip } from './ui/StatusChip'
 
-const STATUS_STYLE: Record<ProjectStatus, string> = {
-  active: 'bg-sky-100 text-sky-700',
-  paused: 'bg-slate-100 text-slate-600',
-  completed: 'bg-green-100 text-green-700',
-}
-
+/** Paused = SVG `paused` + word; active/completed have no shape in 02-type §8, so word only. */
 export function ProjectStatusBadge({ status }: { status: ProjectStatus }) {
   const { t } = useTranslation()
+  if (status === 'paused') return <StatusChip kind="paused" className="shrink-0">{t(`projectStatus.${status}`)}</StatusChip>
   return (
-    <span
-      className={`inline-block shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLE[status]}`}
-    >
+    <span className="inline-flex min-h-8 shrink-0 items-center gap-2 rounded-chip border-2 border-line px-3 text-body font-semibold text-fg">
       {t(`projectStatus.${status}`)}
     </span>
   )

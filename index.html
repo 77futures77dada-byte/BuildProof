@@ -4,7 +4,11 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0284c7" />
+    <!-- theme-color mirrors --bg of src/styles/tokens.css (meta cannot read CSS vars; allowlisted in scripts/check-tokens.allow.json) -->
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121417" media="(prefers-color-scheme: dark)" />
+    <link rel="preload" href="/fonts/onest/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/onest/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <meta name="description" content="BuildProof — прозрачность строительных объектов: этапы, фото, задачи, замечания." />
 
     <!-- Static Open Graph / Twitter Card (pure client SPA, no SSR — one card for the whole site) -->

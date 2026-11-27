@@ -1,0 +1,212 @@
+/*
+ * BuildProof design tokens — the ONLY file with raw colour values and font
+ * families (scripts/check-tokens.mjs enforces it). Spec: docs/design/05-ui.md,
+ * values from docs/design/02-type.md §6–§7.
+ *
+ * One theme for the whole product (landing, login, app, sheets, modals):
+ *   light by default, dark by `prefers-color-scheme: dark`,
+ *   forced with <html data-theme="light|dark">.
+ * Words are always `--fg`; status colour lives only on the icon and the 4 px
+ * chip edge (02-type §6.1).
+ */
+
+/* ---------- fonts: Onest variable (OFL, public/fonts/onest/OFL.txt) ---------- */
+/* unicode-range from @fontsource-variable/onest@5.3.1/index.css */
+@font-face {
+  font-family: "Onest"; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url("/fonts/onest/onest-cyrillic-wght-normal.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: "Onest"; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url("/fonts/onest/onest-latin-ext-wght-normal.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Onest"; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url("/fonts/onest/onest-latin-wght-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* Metric-matched fallbacks (02-type §4): regular vs Onest 500, bold vs Onest 600 */
+@font-face { font-family: "Onest Fallback Roboto"; font-weight: 100 549; src: local("Roboto"), local("Roboto-Regular");
+  size-adjust: 105.55%; ascent-override: 91.90%; descent-override: 28.90%; line-gap-override: 0%; }
+@font-face { font-family: "Onest Fallback Roboto"; font-weight: 550 900; src: local("Roboto Bold"), local("Roboto-Bold");
+  size-adjust: 105.55%; ascent-override: 91.90%; descent-override: 28.90%; line-gap-override: 0%; }
+@font-face { font-family: "Onest Fallback Arial"; font-weight: 100 549; src: local("Arial"), local("ArialMT");
+  size-adjust: 104.32%; ascent-override: 92.98%; descent-override: 29.24%; line-gap-override: 0%; }
+@font-face { font-family: "Onest Fallback Arial"; font-weight: 550 900; src: local("Arial Bold"), local("Arial-BoldMT");
+  size-adjust: 99.35%; ascent-override: 97.64%; descent-override: 30.70%; line-gap-override: 0%; }
+
+/* ---------- colour: light (default) ---------- */
+:root {
+  color-scheme: light;
+  --bg: #FFFFFF;
+  --surface: #F3F4F6;
+  --fg: #111418;
+  --muted-strong: #3D434B;   /* not for worker text: under glare 3.50 < 4.5 */
+  --muted: #5B636E;          /* owner desktop ≥ 1024 px long text only */
+  --line: #D9DDE2;
+  --accent: #FFD84D;         /* brand yellow, main button only */
+  --accent-pressed: #F5C518;
+  --on-accent: #111418;
+  --accent-border: #111418;
+  --pending-ink: #6E4400;
+  --ok-ink: #0F5C2B;
+  --stale-ink: #9E1C1C;      /* also error, returned, danger */
+  --warn-bg: #FFE4CC;        /* «не отправлено» — not the main-button yellow */
+  --warn-border: #3F1A00;
+  --scrim: rgba(0, 0, 0, .72);
+  --on-scrim: #FFFFFF;
+  --focus: #111418;
+  --elev-card: 0 1px 2px rgba(17, 20, 24, .06), 0 8px 24px -12px rgba(17, 20, 24, .22);
+  --elev-sheet: 0 -8px 32px rgba(17, 20, 24, .22);
+  --elev-press: 0 2px 0 rgba(0, 0, 0, .18);
+
+  /* always-dark bands (landing night sections, phone bezel, logo tile) */
+  --inverse-bg: #111418;
+  --inverse-deep: #0B0D10;
+  --inverse-fg: #F1F3F5;
+  --inverse-muted: #A3ABB5;
+  --inverse-line: #3A4049;
+  --inverse-field: #1B1E22;
+  --inverse-warn: #FF9A4D;
+  /* photo placeholders and blueprint grid */
+  --photo-ph: #CDD2D8;
+  --grid-line: rgba(17, 20, 24, .12);
+
+  /* illustration palette: landing demo plan (fixed artwork, same in both themes) */
+  --illu-plan: #0B2A4A;
+  --illu-blueprint: #7DD3FC;
+  --illu-ok: #2FB67E;
+  --illu-part: #D9962B;
+  --illu-part-line: #FFB547;
+  --illu-bad: #FF6B6B;
+  --illu-bad-edge: #FFD0D0;
+  --illu-none-fill: rgba(125, 211, 252, .06);
+  --illu-label-ok: #06281A;
+  --illu-label-part: #FFFFFF;
+  --illu-label-part-edge: #3B2A08;
+  --illu-label-bad: #4A0B0B;
+  --illu-label-none: #9DB7D0;
+
+  /* size, layers */
+  --tap: 48px;
+  --tap-main: 56px;
+  --gutter: 16px;
+  --z-header: 10;
+  --z-sticky: 20;
+  --z-undo: 30;
+  --z-sheet: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+}
+
+/* ---------- colour: dark (system, unless forced light) ---------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #121417; --surface: #1B1E22; --fg: #F1F3F5;
+    --muted-strong: #C9CED5; --muted: #A3ABB5; --line: #2C3138;
+    --accent-border: #FFD84D; --focus: #FFD84D;
+    --pending-ink: #F0B429; --ok-ink: #5FD08A; --stale-ink: #FF9C94;
+    --warn-bg: #3B1D05; --warn-border: #FF9A4D;
+    --elev-card: 0 8px 24px -12px rgba(0, 0, 0, .6);
+    --elev-sheet: 0 -8px 32px rgba(0, 0, 0, .6);
+    --inverse-bg: #0B0D10; --inverse-deep: #07080A; --inverse-field: #16191C;
+    --photo-ph: #3A4049; --grid-line: rgba(255, 255, 255, .10);
+  }
+}
+/* ---------- colour: dark (forced) ---------- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121417; --surface: #1B1E22; --fg: #F1F3F5;
+  --muted-strong: #C9CED5; --muted: #A3ABB5; --line: #2C3138;
+  --accent-border: #FFD84D; --focus: #FFD84D;
+  --pending-ink: #F0B429; --ok-ink: #5FD08A; --stale-ink: #FF9C94;
+  --warn-bg: #3B1D05; --warn-border: #FF9A4D;
+  --elev-card: 0 8px 24px -12px rgba(0, 0, 0, .6);
+  --elev-sheet: 0 -8px 32px rgba(0, 0, 0, .6);
+  --inverse-bg: #0B0D10; --inverse-deep: #07080A; --inverse-field: #16191C;
+  --photo-ph: #3A4049; --grid-line: rgba(255, 255, 255, .10);
+}
+
+/* ---------- Tailwind v4 mapping: bg-surface, text-fg, border-line, … ---------- */
+@theme inline {
+  --color-page: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-muted-strong: var(--muted-strong);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-pressed: var(--accent-pressed);
+  --color-on-accent: var(--on-accent);
+  --color-accent-border: var(--accent-border);
+  --color-pending: var(--pending-ink);
+  --color-ok: var(--ok-ink);
+  --color-stale: var(--stale-ink);
+  --color-warn-bg: var(--warn-bg);
+  --color-warn-border: var(--warn-border);
+  --color-scrim: var(--scrim);
+  --color-on-scrim: var(--on-scrim);
+  --color-focus: var(--focus);
+  --color-inverse: var(--inverse-bg);
+  --color-on-inverse: var(--inverse-fg);
+  --color-inverse-line: var(--inverse-line);
+
+  --shadow-card: var(--elev-card);
+  --shadow-sheet: var(--elev-sheet);
+  --shadow-press: var(--elev-press);
+}
+@theme static {
+  --font-sans: "Onest", "Onest Fallback Roboto", "Onest Fallback Arial", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --radius-chip: 8px;
+  --radius-control: 12px;
+  --radius-card: 16px;
+  --radius-sheet: 20px;
+  /* role scale (02-type §6.1); nothing below 17 px */
+  --text-body: 17px;   --text-body--line-height: 1.4;
+  --text-field: 18px;  --text-field--line-height: 1.4;
+  --text-btn: 20px;    --text-btn--line-height: 1.2;
+  --text-h3: 20px;     --text-h3--line-height: 1.25;
+  --text-h2: 24px;     --text-h2--line-height: 1.2;
+  --text-h1: 28px;     --text-h1--line-height: 1.15;
+  --text-figure: 40px; --text-figure--line-height: 1.1;
+  /* stock steps below 17 px are lifted (the classes are banned by check-tokens anyway) */
+  --text-xs: 17px;   --text-xs--line-height: 1.35;
+  --text-sm: 17px;   --text-sm--line-height: 1.4;
+  --text-base: 17px; --text-base--line-height: 1.45;
+}
+
+/* ---------- base ---------- */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    margin: 0;
+    min-height: 100svh;
+    background: var(--bg);
+    color: var(--fg);
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  input, button, select, textarea { font: inherit; color: inherit; letter-spacing: inherit; }
+  input, select, textarea { font-size: max(17px, 1em); }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  /* the one themed root: app, landing, sheets and modals (portals) live inside */
+  #bp-root { min-height: 100svh; background: var(--bg); color: var(--fg); }
+
+  /* worker and foreman routes (02-type §7.3) */
+  [data-zone="field"] { font-size: 18px; font-weight: 500; line-height: 1.4; }
+  [data-zone="field"] :is(input, select, textarea) { font-size: max(18px, 1em); }
+}
+
+.num-col { font-variant-numeric: tabular-nums; } /* columns, dates, time only */

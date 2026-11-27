@@ -7,8 +7,7 @@ import { useProjectMembers } from '../hooks/useProjectMembers'
 import { useStageOptions } from '../hooks/useStageOptions'
 import { createTask } from '../lib/tasks'
 import { toErrorMessage } from '../lib/format'
-import { Button } from './Button'
-import { TextField } from './TextField'
+import { Button, FormField, TextField, controlClass } from './ui'
 import { ErrorMessage } from './ErrorMessage'
 
 interface TaskFormProps {
@@ -19,9 +18,7 @@ interface TaskFormProps {
   onCancel: () => void
 }
 
-const selectClass =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 disabled:opacity-60'
-
+/** task-form (03 §7): name · assignee · stage · deadline · «Создать задачу» · «Отмена». */
 export function TaskForm({ projectId, defaultStageId, onCreated, onCancel }: TaskFormProps) {
   const { user } = useAuth()
   const { t } = useTranslation()
@@ -33,12 +30,13 @@ export function TaskForm({ projectId, defaultStageId, onCreated, onCancel }: Tas
   const [deadline, setDeadline] = useState('')
   const [stageId, setStageId] = useState(defaultStageId ?? '')
   const [busy, setBusy] = useState(false)
+  const [nameError, setNameError] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!title.trim()) {
-      setError(t('tasks.nameRequired'))
+      setNameError(true)
       return
     }
     if (!user) {
@@ -65,76 +63,54 @@ export function TaskForm({ projectId, defaultStageId, onCreated, onCancel }: Tas
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
-    >
-      <h2 className="text-base font-semibold text-slate-900">{t('tasks.formHeading')}</h2>
-
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
       <TextField
         label={t('tasks.name')}
+        hint={t('tasks.namePlaceholder')}
+        error={nameError ? t('tasks.nameRequired') : undefined}
         required
         value={title}
         disabled={busy}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder={t('tasks.namePlaceholder')}
+        onChange={(e) => { setTitle(e.target.value); setNameError(false) }}
       />
 
-      <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">{t('tasks.assignee')}</span>
-        <select
-          value={assignedTo}
-          disabled={busy || membersLoading}
-          onChange={(e) => setAssignedTo(e.target.value)}
-          className={selectClass}
-        >
-          <option value="">{t('tasks.unassigned')}</option>
-          {members.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.name || t('common.noName')}
-            </option>
-          ))}
-        </select>
-      </label>
+      <FormField label={t('tasks.assignee')}>
+        {(control) => (
+          <select {...control} value={assignedTo} disabled={busy || membersLoading} onChange={(e) => setAssignedTo(e.target.value)} className={controlClass}>
+            <option value="">{t('tasks.unassigned')}</option>
+            {members.map((m) => (
+              <option key={m.id} value={m.id}>{m.name || t('common.noName')}</option>
+            ))}
+          </select>
+        )}
+      </FormField>
       <ErrorMessage message={membersError} />
 
-      <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">{t('tasks.deadline')}</span>
-        <input
-          type="date"
-          value={deadline}
-          disabled={busy}
-          onChange={(e) => setDeadline(e.target.value)}
-          className={selectClass}
-        />
-      </label>
+      <FormField label={t('tasks.stage')}>
+        {(control) => (
+          <select {...control} value={stageId} disabled={busy || stagesLoading} onChange={(e) => setStageId(e.target.value)} className={controlClass}>
+            <option value="">{t('tasks.noStage')}</option>
+            {stages.map((s) => (
+              <option key={s.id} value={s.id}>{stageLabel(s.name)}</option>
+            ))}
+          </select>
+        )}
+      </FormField>
 
-      <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">{t('tasks.stage')}</span>
-        <select
-          value={stageId}
-          disabled={busy || stagesLoading}
-          onChange={(e) => setStageId(e.target.value)}
-          className={selectClass}
-        >
-          <option value="">{t('tasks.noStage')}</option>
-          {stages.map((s) => (
-            <option key={s.id} value={s.id}>
-              {stageLabel(s.name)}
-            </option>
-          ))}
-        </select>
-      </label>
+      <TextField
+        label={t('tasks.deadline')}
+        hint={t('common.optional')}
+        type="date"
+        value={deadline}
+        disabled={busy}
+        onChange={(e) => setDeadline(e.target.value)}
+      />
 
       <ErrorMessage message={error} />
 
-      <div className="flex gap-2">
-        <Button type="submit" loading={busy}>
-          {t('tasks.create')}
-        </Button>
-        <Button type="button" variant="secondary" onClick={onCancel} disabled={busy}>
-          {t('common.cancel')}
-        </Button>
+      <div className="flex flex-col gap-3">
+        <Button type="submit" variant="primary" block loading={busy}>{t('tasks.create')}</Button>
+        <Button type="button" variant="secondary" block onClick={onCancel} disabled={busy}>{t('common.cancel')}</Button>
       </div>
     </form>
   )

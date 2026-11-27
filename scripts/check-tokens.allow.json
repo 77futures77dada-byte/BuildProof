@@ -1,0 +1,37 @@
+[
+  {
+    "file": "src/features/house3d/palette.ts",
+    "kinds": [
+      "hex"
+    ],
+    "reason": "WebGL stage palette for three.js materials; literal colours are validated by palette.test.ts (contrast vs HOUSE_BG, deuteranopia ΔE). Fixed artwork, same in both themes."
+  },
+  {
+    "file": "src/features/house3d/houseScene.ts",
+    "kinds": [
+      "hex"
+    ],
+    "reason": "three.js GridHelper colours of the 3D scene (WebGL, cannot read CSS vars); part of the same fixed palette as palette.ts."
+  },
+  {
+    "file": "src/components/siteLoopScene.ts",
+    "kinds": [
+      "hex"
+    ],
+    "reason": "2D-canvas illustration of the landing loop (fixed always-dark blueprint artwork, not UI chrome); canvas cannot use var(); reading 109 vars at runtime per frame is not worth it."
+  },
+  {
+    "file": "src/components/SiteLoop.tsx",
+    "kinds": [
+      "hex"
+    ],
+    "reason": "SVG artwork of the same landing loop illustration; must match the canvas palette of siteLoopScene.ts exactly; theme-independent."
+  },
+  {
+    "file": "index.html",
+    "kinds": [
+      "hex"
+    ],
+    "reason": "<meta name=\"theme-color\"> cannot read CSS variables; values mirror --bg (light #FFFFFF / dark #121417) of src/styles/tokens.css — change both together."
+  }
+]

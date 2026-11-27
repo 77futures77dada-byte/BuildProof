@@ -22,7 +22,7 @@ export interface NewIssueInput {
  * so colour never hints at a level the form does not offer.
  */
 export const issueBorder = (priority: IssuePriority) =>
-  priority === 'high' ? 'border-l-red-500' : 'border-l-slate-300'
+  priority === 'high' ? 'border-l-stale' : 'border-l-line'
 
 function buildIssuePhotoPath(projectId: string, originalName: string): string {
   return `${projectId}/issues/${Date.now()}-${sanitizeImageBaseName(originalName)}.jpg`

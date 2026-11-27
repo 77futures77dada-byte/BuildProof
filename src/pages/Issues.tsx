@@ -5,8 +5,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useIssues } from '../hooks/useIssues'
 import type { IssueItem } from '../hooks/useIssues'
 import type { IssuePriority, IssueStatus } from '../types'
-import { Button } from '../components/Button'
-import { Spinner } from '../components/Spinner'
+import { Button, Disclosure, NetBar, Sheet, SkeletonRows } from '../components/ui'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { IssueForm } from '../components/IssueForm'
 import { IssueCard } from '../components/IssueCard'
@@ -71,7 +70,6 @@ export function IssuesView({
 }) {
   const { t } = useTranslation()
   const [showForm, setShowForm] = useState(false)
-  const [resolvedOpen, setResolvedOpen] = useState(false)
 
   const active = issues
     .filter((i) => i.status !== 'resolved')
@@ -81,77 +79,49 @@ export function IssuesView({
     .sort((a, b) => PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority])
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-sm font-semibold text-slate-700">{t('issues.title')}</h2>
-        {canCreate && !showForm ? (
-          <Button onClick={() => setShowForm(true)}>{t('issues.create')}</Button>
-        ) : null}
-      </div>
-
-      {canCreate && showForm && projectId ? (
-        <IssueForm
-          projectId={projectId}
-          onCancel={() => setShowForm(false)}
-          onCreated={() => {
-            setShowForm(false)
-            reload()
-          }}
-        />
+    <section className="flex flex-col gap-4">
+      <NetBar />
+      <h2 className="m-0 text-h2 font-bold text-fg">{t('issues.title')}</h2>
+      {canCreate ? (
+        <Button variant="primary" block onClick={() => setShowForm(true)} className="sm:w-auto sm:self-start">{t('issues.create')}</Button>
       ) : null}
 
       {loading ? (
-        <Spinner label={t('issues.loading')} />
+        <SkeletonRows label={t('issues.loading')} />
       ) : error ? (
         <ErrorMessage message={error} onRetry={reload} />
       ) : issues.length === 0 ? (
-        <p className="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm">
-          {t('issues.empty')}
+        <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body font-medium text-fg">
+          {canCreate ? t('issues.empty') : t('issues.noActive')}
         </p>
       ) : (
         <>
           {active.length > 0 ? (
-            <ul className="space-y-3">
+            <ul className="m-0 flex flex-col gap-3 p-0">
               {active.map((issue) => (
-                <IssueCard
-                  key={issue.id}
-                  issue={issue}
-                  canManage={canManage}
-                  onUpdateStatus={updateStatus}
-                />
+                <IssueCard key={issue.id} issue={issue} canManage={canManage} onUpdateStatus={updateStatus} />
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-500">{t('issues.noActive')}</p>
+            <p className="m-0 text-body font-medium text-fg">{t('issues.noActive')}</p>
           )}
-
           {resolved.length > 0 ? (
-            <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
-              <button
-                type="button"
-                onClick={() => setResolvedOpen((v) => !v)}
-                aria-expanded={resolvedOpen}
-                className="flex w-full items-center gap-1 px-4 py-3 text-sm font-medium text-slate-600"
-              >
-                <span aria-hidden="true">{resolvedOpen ? '▾' : '▸'}</span>
-                {t('issues.resolved', { count: resolved.length })}
-              </button>
-              {resolvedOpen ? (
-                <ul className="space-y-3 border-t border-slate-100 p-3">
-                  {resolved.map((issue) => (
-                    <IssueCard
-                      key={issue.id}
-                      issue={issue}
-                      canManage={canManage}
-                      onUpdateStatus={updateStatus}
-                    />
-                  ))}
-                </ul>
-              ) : null}
-            </div>
+            <Disclosure label={t('issues.resolved', { count: resolved.length })}>
+              <ul className="m-0 flex flex-col gap-3 p-0">
+                {resolved.map((issue) => (
+                  <IssueCard key={issue.id} issue={issue} canManage={canManage} onUpdateStatus={updateStatus} />
+                ))}
+              </ul>
+            </Disclosure>
           ) : null}
         </>
       )}
-    </div>
+
+      <Sheet open={canCreate && showForm} onClose={() => setShowForm(false)} title={t('issues.formHeading')} history name="issue-form">
+        {projectId ? (
+          <IssueForm projectId={projectId} onCancel={() => setShowForm(false)} onCreated={() => { setShowForm(false); reload() }} />
+        ) : null}
+      </Sheet>
+    </section>
   )
 }

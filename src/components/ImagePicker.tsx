@@ -1,91 +1,66 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Button } from './Button'
+import { Button } from './ui'
 
 interface ImagePickerProps {
   /** Fires with the chosen file, or null when cleared. */
   onChange: (file: File | null) => void
   disabled?: boolean
+  /** Already chosen file (e.g. straight from the camera); shown as the preview. */
+  initialFile?: File | null
+  /** Open the rear camera instead of the gallery (`capture="environment"`). */
+  camera?: boolean
 }
 
 /**
- * File input + thumbnail preview for a single image. Owns the preview object
- * URL (revoked on replace and unmount). Shared by the photo upload form and the
- * issue form. Reset it by remounting (e.g. a changing `key`).
+ * File input + preview for one image. Owns the preview object URL (revoked on
+ * replace and unmount). Shared by the photo form and the issue form. Reset it
+ * by remounting (a changing `key`).
  */
-export function ImagePicker({ onChange, disabled }: ImagePickerProps) {
+export function ImagePicker({ onChange, disabled, initialFile = null, camera }: ImagePickerProps) {
   const { t } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null)
-  const urlRef = useRef<string | null>(null)
+  const [file, setFile] = useState<File | null>(initialFile)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!file) return
+    const url = URL.createObjectURL(file)
+    // The preview URL belongs to this file; revoked when the file changes.
+    // oxlint-disable-next-line react/set-state-in-effect
+    setPreviewUrl(url)
     return () => {
-      if (urlRef.current) URL.revokeObjectURL(urlRef.current)
+      URL.revokeObjectURL(url)
+      setPreviewUrl(null)
     }
-  }, [])
+  }, [file])
 
   function pick(next: File | null) {
-    if (urlRef.current) {
-      URL.revokeObjectURL(urlRef.current)
-      urlRef.current = null
-    }
-    const url = next ? URL.createObjectURL(next) : null
-    urlRef.current = url
-    setPreviewUrl(url)
+    setFile(next)
     onChange(next)
   }
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <input
         ref={inputRef}
         type="file"
         accept="image/*"
+        capture={camera ? 'environment' : undefined}
         className="hidden"
         disabled={disabled}
         onChange={(e) => pick(e.target.files?.[0] ?? null)}
       />
-      {previewUrl ? (
-        <div className="space-y-1">
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            disabled={disabled}
-            className="block w-full"
-          >
-            <img
-              src={previewUrl}
-              alt={t('image.preview')}
-              className="max-h-64 w-full rounded-lg bg-slate-100 object-contain"
-            />
-          </button>
-          <div className="flex gap-3 text-xs">
-            <button
-              type="button"
-              onClick={() => inputRef.current?.click()}
-              disabled={disabled}
-              className="text-sky-700 underline underline-offset-2"
-            >
-              {t('image.replace')}
-            </button>
-            <button
-              type="button"
-              onClick={() => pick(null)}
-              disabled={disabled}
-              className="text-slate-500 underline underline-offset-2"
-            >
-              {t('image.remove')}
-            </button>
+      {file && previewUrl ? (
+        <>
+          <img src={previewUrl} alt={t('image.preview')} className="block max-h-64 w-full rounded-card bg-surface object-contain" />
+          <div className="flex flex-wrap gap-3">
+            <Button variant="secondary" disabled={disabled} onClick={() => inputRef.current?.click()}>{t('image.replace')}</Button>
+            <Button variant="ghost" disabled={disabled} onClick={() => pick(null)}>{t('image.remove')}</Button>
           </div>
-        </div>
+        </>
       ) : (
-        <Button
-          variant="secondary"
-          className="w-full"
-          disabled={disabled}
-          onClick={() => inputRef.current?.click()}
-        >
+        <Button variant="secondary" block disabled={disabled} onClick={() => inputRef.current?.click()}>
           {t('image.choose')}
         </Button>
       )}

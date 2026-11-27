@@ -1,0 +1,31 @@
+import { LEGAL, isPlaceholder } from '../config/legal'
+
+/**
+ * E-mail gate (03 §0.2 `gate-open` / `gate-closed`). Everything that needs a
+ * letter from us — sign-in by code, password reset, invitations, sign-up —
+ * is shown only when the build sets VITE_EMAIL_GATE_OPEN=true. It is opened
+ * only after K34: the Supabase templates carry {{ .Token }} and were checked
+ * on staging. Default: closed (password sign-in only).
+ */
+export function isEmailGateOpen(env: Record<string, unknown> = import.meta.env): boolean {
+  return env.VITE_EMAIL_GATE_OPEN === 'true'
+}
+
+/** Filled contact parts of src/config/legal.ts; each part only when it is not a placeholder. */
+export function legalContact(): { phone: string | null; email: string | null } {
+  return {
+    phone: isPlaceholder(LEGAL.phone) ? null : LEGAL.phone,
+    email: isPlaceholder(LEGAL.email) ? null : LEGAL.email,
+  }
+}
+
+/** Founder's name for «Делает {имя}, Эстония», only when legal.ts is filled (decisions §1 п.5). */
+export function founderName(): string | null {
+  return isPlaceholder(LEGAL.founderName) ? null : LEGAL.founderName
+}
+
+/** True when legal.ts has at least one contact part (phone or e-mail). */
+export function hasLegalContact(): boolean {
+  const { phone, email } = legalContact()
+  return !!(phone || email)
+}

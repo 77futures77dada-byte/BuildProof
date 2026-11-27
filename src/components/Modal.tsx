@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { portalTarget } from './ui/theme'
 
 interface ModalProps {
   open: boolean
@@ -10,7 +11,7 @@ interface ModalProps {
   label: string
 }
 
-/** Centered overlay dialog. Closes on Escape or backdrop click. */
+/** Centered overlay dialog inside the themed root (#bp-root). Closes on Escape or backdrop click. */
 export function Modal({ open, onClose, children, label }: ModalProps) {
   useEffect(() => {
     if (!open) return
@@ -34,12 +35,12 @@ export function Modal({ open, onClose, children, label }: ModalProps) {
       aria-modal="true"
       aria-label={label}
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-scrim p-4"
     >
       <div onClick={(e) => e.stopPropagation()} className="max-h-full w-full max-w-3xl overflow-auto">
         {children}
       </div>
     </div>,
-    document.body,
+    portalTarget(),
   )
 }

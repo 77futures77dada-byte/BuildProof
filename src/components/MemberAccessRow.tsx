@@ -1,48 +1,89 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { AccessRow } from '../hooks/useProjectAccessSettings'
-import { toErrorMessage } from '../lib/format'
-import { Toggle } from './Toggle'
-import { ErrorMessage } from './ErrorMessage'
+import { formatDate } from '../lib/format'
+import { Button, StatusIcon, cx } from './ui'
 
 interface MemberAccessRowProps {
   row: AccessRow
-  onToggle: (userId: string, next: boolean) => Promise<void>
+  /** `on-project`: «Люди объекта»; `in-company`: «Уже работают у вас». */
+  variant: 'on-project' | 'in-company'
+  /** in-company: «Добавить на объект». Rejects on failure. */
+  onAdd?: (row: AccessRow) => Promise<void>
+  /** on-project: «⋯» → «Убрать с объекта» (the page confirms). */
+  onRemove?: (row: AccessRow) => void
+  /** on-project, gate open: «Отправить код входа». */
+  onSendCode?: (row: AccessRow) => void
+  /** `?focus=silent`: silent 3+ days, framed and on top (03 §5.7). */
+  silent?: boolean
+  sendCodeLabel?: string
 }
 
-export function MemberAccessRow({ row, onToggle }: MemberAccessRowProps) {
+/**
+ * PersonRow (03 §9): name · role · «последний отчёт {дата}» / «отчётов ещё
+ * нет» (never «приглашён», residual М4-7) and the row's actions, each ≥ 48 px.
+ */
+export function MemberAccessRow({ row, variant, onAdd, onRemove, onSendCode, silent, sendCodeLabel }: MemberAccessRowProps) {
   const { t } = useTranslation()
   const name = row.name || t('common.noName')
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [menu, setMenu] = useState(false)
+  const [state, setState] = useState<'idle' | 'adding' | 'error'>('idle')
 
-  async function handle(next: boolean) {
-    setBusy(true)
-    setError(null)
+  async function add() {
+    if (!onAdd) return
+    setState('adding')
     try {
-      await onToggle(row.userId, next)
-    } catch (err) {
-      setError(toErrorMessage(err))
-    } finally {
-      setBusy(false)
+      await onAdd(row)
+      setState('idle')
+    } catch {
+      setState('error')
     }
   }
 
+  const status = row.lastReportAt ? t('people.lastReport', { date: formatDate(row.lastReportAt) }) : t('people.noReportsYet')
+
   return (
-    <li className="space-y-1 px-4 py-3">
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="truncate text-sm text-slate-900">{name}</p>
-          <p className="text-xs text-slate-500">{t(`roles.${row.role}`)}</p>
+    <li
+      data-person={row.userId}
+      className={cx(
+        'flex list-none flex-col gap-3 border-b-2 border-line py-3 last:border-b-0',
+        silent && 'rounded-card border-2 border-stale px-3',
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-col">
+          <span className="text-field font-semibold text-fg [overflow-wrap:anywhere]">{name}</span>
+          <span className="text-body font-medium text-fg">
+            {t(`roles.${row.role}`)}
+            {variant === 'on-project' ? <> · <span className="inline-flex items-center gap-1">{silent ? <StatusIcon kind="stale" /> : null}{status}</span></> : null}
+          </span>
         </div>
-        <Toggle
-          checked={row.hasAccess}
-          disabled={busy}
-          onChange={handle}
-          label={t('settings.accessFor', { name })}
-        />
+        {variant === 'on-project' && onRemove ? (
+          <Button
+            variant="ghost"
+            aria-label={`${t('common.actions')}: ${name}`}
+            aria-expanded={menu}
+            onClick={() => setMenu((v) => !v)}
+            className="min-w-12 shrink-0 px-3"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6" fill="currentColor"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg>
+          </Button>
+        ) : null}
+        {variant === 'in-company' && onAdd ? (
+          <Button variant="secondary" loading={state === 'adding'} onClick={() => void add()} className="shrink-0">
+            {t('known.add')}
+          </Button>
+        ) : null}
       </div>
-      <ErrorMessage message={error} />
+      {variant === 'on-project' && onSendCode ? (
+        <Button variant="secondary" onClick={() => onSendCode(row)} className="self-start">{sendCodeLabel ?? t('people.sendCode')}</Button>
+      ) : null}
+      {menu && onRemove ? (
+        <Button variant="danger" onClick={() => { setMenu(false); onRemove(row) }} className="self-start">{t('people.remove')}</Button>
+      ) : null}
+      {state === 'error' ? (
+        <p role="alert" className="m-0 flex items-center gap-2 text-body font-semibold text-fg"><StatusIcon kind="error" />{t('known.addFailed')}</p>
+      ) : null}
     </li>
   )
 }

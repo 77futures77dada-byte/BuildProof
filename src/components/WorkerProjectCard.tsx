@@ -1,31 +1,37 @@
 import { Link } from 'react-router-dom'
-import { ChevronRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import type { DashboardProject } from '../hooks/useProjects'
-import { ProgressBar } from './ProgressBar'
+import { formatDate } from '../lib/format'
+import { ProgressBar } from './ui'
 
 /**
- * Big, single-tap project tile for a worker with several sites. Goes straight
- * to that site's "Today" screen.
+ * Worker's site tile (03 §4.4): name, figure, bar, «Ваш последний отчёт: {дата}»
+ * and a chevron; ≥ 80 px, one tap to the site's «Сегодня».
  */
 export function WorkerProjectCard({ project }: { project: DashboardProject }) {
+  const { t } = useTranslation()
   return (
     <Link
+      data-zone="field"
       to={`/project/${project.id}/today`}
-      className="flex min-h-20 items-center gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-slate-300 hover:shadow-md active:bg-slate-50"
+      className="flex min-h-20 items-center gap-4 rounded-card border-2 border-line bg-surface p-4 text-fg no-underline shadow-card hover:border-fg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus active:border-fg"
     >
-      <div className="min-w-0 flex-1">
-        <div className="flex items-baseline justify-between gap-3">
-          <span className="truncate text-lg font-semibold text-slate-900">{project.name}</span>
-          <span className="shrink-0 text-xl font-semibold tabular-nums text-slate-900">
-            {project.overallPercent}%
-          </span>
-        </div>
-        {project.address ? (
-          <p className="mt-0.5 truncate text-sm text-slate-500">{project.address}</p>
-        ) : null}
-        <ProgressBar value={project.overallPercent} className="mt-3" />
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <span className="flex items-baseline justify-between gap-3">
+          <span className="min-w-0 text-h3 font-bold [overflow-wrap:anywhere]">{project.name}</span>
+          <span className="shrink-0 text-h2 font-bold">{project.overallPercent}%</span>
+        </span>
+        {project.address ? <span className="text-body font-medium [overflow-wrap:anywhere]">{project.address}</span> : null}
+        <ProgressBar value={project.overallPercent} />
+        <span className="text-body font-semibold">
+          {project.myLastReportAt
+            ? t('dashboard.workerLastReport', { date: formatDate(project.myLastReportAt) })
+            : t('dashboard.workerNoReport')}
+        </span>
       </div>
-      <ChevronRight className="size-6 shrink-0 text-slate-400" aria-hidden="true" />
+      <svg aria-hidden="true" viewBox="0 0 20 20" width="24" height="24" className="shrink-0">
+        <path d="M7 4l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
     </Link>
   )
 }

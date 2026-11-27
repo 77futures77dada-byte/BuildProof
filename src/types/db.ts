@@ -43,6 +43,8 @@ export interface Project {
   deadline: string | null // ISO date
   budget: number | null
   status: ProjectStatus
+  /** Only when the query selects it (overview, list). */
+  created_at?: string | null
 }
 
 export interface ProjectAccess {

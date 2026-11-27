@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Уличный тест шрифта</title>
+<!--
+  Уличный тест A/B (02-type.md §5.2), r4 2026-11-26. Файлы локальные, OFL-1.1.
+  Какой шрифт A, а какой B — случайно при каждом открытии; ключ в адресе (#k=...) и по кнопке «Показать ключ» после ответа.
+  Внизу — самопроверка подмены запасного шрифта (Roboto / Arial), видна без DevTools.
+-->
+<style>
+  @font-face { font-family: "F1"; font-display: swap; font-weight: 100 900; src: url(./fonts/onest-cyrillic-wght-normal.woff2) format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: "F1"; font-display: swap; font-weight: 100 900; src: url(./fonts/onest-latin-ext-wght-normal.woff2) format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+  @font-face { font-family: "F1"; font-display: swap; font-weight: 100 900; src: url(./fonts/onest-latin-wght-normal.woff2) format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+  @font-face { font-family: "F2"; font-display: swap; font-weight: 100 900; src: url(./fonts/geologica-cyrillic-wght-normal.woff2) format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: "F2"; font-display: swap; font-weight: 100 900; src: url(./fonts/geologica-latin-ext-wght-normal.woff2) format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+  @font-face { font-family: "F2"; font-display: swap; font-weight: 100 900; src: url(./fonts/geologica-latin-wght-normal.woff2) format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+  /* пробы самопроверки: только local(), без файлов */
+  @font-face { font-family: "Probe Roboto"; src: local("Roboto"), local("Roboto-Regular"); }
+  @font-face { font-family: "Probe Arial"; src: local("Arial"), local("ArialMT"); }
+
+  :root { --bg: #FFFFFF; --surface: #F3F4F6; --fg: #111418; --pending-ink: #6E4400; --ok-ink: #0F5C2B;
+          --warn-bg: #FFE4CC; --warn-border: #3F1A00; --accent: #FFD84D; --line: #D9DDE2; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 500 18px/1.4 system-ui, sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px 16px 0; }
+  .how { border: 2px solid var(--fg); border-radius: 10px; padding: 10px 12px; font-size: 17px; }
+  .how ol { margin: 4px 0 0; padding-left: 22px; }
+  .state { font: 600 17px/1.3 system-ui, sans-serif; margin: 10px 0; }
+  .switch { display: flex; gap: 8px; margin: 10px 0; }
+  .switch button { flex: 1; min-height: 56px; border-radius: 10px; border: 2px solid var(--fg); background: var(--bg); color: var(--fg); font: 700 22px system-ui, sans-serif; }
+  .switch button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+  /* экран рабочего «Сегодня» — корень зоны: 18 / 500 */
+  .screen { background: var(--surface); border-radius: 10px; padding: 12px 12px 0; font-size: 18px; font-weight: 500; line-height: 1.4; }
+  .w6 { font-weight: 600; } .big { font-size: 40px; line-height: 1.2; font-weight: 700; }
+  .num-col { font-variant-numeric: tabular-nums; }
+  .tabs { display: flex; border-bottom: 2px solid var(--line); margin: 8px 0; }
+  .tabs a { flex: 1; min-height: 48px; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 500; color: var(--fg); text-decoration: none; }
+  .tabs a[aria-current] { font-weight: 600; box-shadow: inset 0 -4px 0 var(--fg); }
+  .link { display: inline-flex; align-items: center; min-height: 48px; font-weight: 600; color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
+  .status { display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 600; line-height: 1.3; margin-top: 6px; border-left: 4px solid var(--c); padding-left: 8px; }
+  .status svg { width: 20px; height: 20px; flex: none; color: var(--c); }
+  .plate { background: var(--warn-bg); border: 2px solid var(--warn-border); border-radius: 10px; padding: 10px 12px; margin: 10px 0 0; }
+  .plate .head { display: flex; align-items: center; gap: 8px; font-weight: 600; line-height: 1.3; }
+  .plate .head svg { width: 22px; height: 22px; flex: none; color: var(--warn-border); }
+  .bar { position: sticky; bottom: 0; background: var(--surface); padding: 8px 0 12px; margin-top: 10px; border-top: 1px solid var(--line); }
+  .btn { width: 100%; min-height: 56px; border-radius: 10px; border: 2px solid var(--fg); background: var(--accent); color: var(--fg); font-size: 20px; font-weight: 600; }
+  .et { margin: 14px 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; }
+  .answer { display: flex; gap: 8px; margin: 14px 0; }
+  .answer button, .key { flex: 1; min-height: 48px; border-radius: 10px; border: 2px solid var(--fg); background: var(--bg); color: var(--fg); font: 600 17px system-ui, sans-serif; }
+  .answer button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+  .key { width: 100%; }
+  .self { margin: 14px 0 24px; padding: 10px 12px; border: 2px dashed var(--fg); border-radius: 10px; font: 600 17px/1.4 system-ui, sans-serif; }
+  .self b { font-weight: 800; }
+</style>
+</head>
+<body>
+<main>
+  <div class="how">
+    <b>Как проверять (2 минуты)</b>
+    <ol>
+      <li>Улица, день, яркость экрана — авто, телефон на вытянутой руке, без приближения.</li>
+      <li>Переключайте A и B кнопками ниже: экран тот же, меняется только шрифт.</li>
+      <li>Где быстрее прочли «Сохранено на телефоне, не отправлено» и время «08:30»? Где текст меньше выцветает?</li>
+      <li>Нажмите A, B или «одинаково», затем «Показать ключ» и пришлите снимок экрана.</li>
+    </ol>
+  </div>
+
+  <p class="state" id="state">Шрифты загружаются…</p>
+
+  <div class="switch" role="group" aria-label="Вариант">
+    <button type="button" data-v="A" aria-pressed="true">A</button>
+    <button type="button" data-v="B" aria-pressed="false">B</button>
+  </div>
+
+  <div class="screen" id="screen" hidden>
+    <div class="w6">Сегодня · Элва, Кооли 5</div>
+    <div class="tabs"><a href="#" aria-current="page">Сегодня</a><a href="#">Мои отчёты</a></div>
+    <div>Этап: Кровля</div>
+    <div class="big">60%</div>
+    <div class="w6">снято <span class="num-col">08:30</span> · отправлено <span class="num-col">08:31</span></div>
+    <a class="link" href="#">Изменить этап</a>
+    <div class="status" style="--c:var(--pending-ink)"><svg><use href="#i-pending"/></svg>Ждёт проверки</div>
+    <div class="status" style="--c:var(--ok-ink)"><svg><use href="#i-verified"/></svg>Проверено</div>
+    <div class="plate"><div class="head"><svg><use href="#i-queued"/></svg>Сохранено на телефоне, не отправлено</div></div>
+    <div class="bar"><button class="btn" type="button">Отправить снова</button></div>
+  </div>
+
+  <div class="et" id="et" hidden>
+    <div style="font-size:17px">Eesti (TODO native ET review):</div>
+    <div>Katusetööd 60% valmis · ootab kontrolli</div>
+    <div>Salvestatud telefoni, saatmata · õhtune töö</div>
+  </div>
+
+  <div class="answer">
+    <button type="button" data-ans="A" aria-pressed="false">A</button>
+    <button type="button" data-ans="B" aria-pressed="false">B</button>
+    <button type="button" data-ans="=" aria-pressed="false">Одинаково</button>
+  </div>
+  <button class="key" type="button" id="key">Показать ключ</button>
+  <p class="state" id="keyout"></p>
+
+  <div class="self" id="self">Самопроверка подмены шрифта…</div>
+</main>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-pending" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="2.5"/></symbol>
+  <symbol id="i-verified" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="currentColor"/><path d="M5.5 10.3l3 3 6-6.5" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-queued" viewBox="0 0 20 20"><rect x="5.5" y="1.75" width="9" height="16.5" rx="2" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M10 6v4.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="10" cy="14" r="1.4" fill="currentColor"/></symbol>
+</svg>
+
+<script>
+  // Случайное назначение: какой файл будет A. Ключ хранится в адресе, чтобы ответ можно было сверить.
+  const NAMES = { F1: "Onest", F2: "Geologica" };
+  let k = (location.hash.match(/k=(F1F2|F2F1)/) || [])[1];
+  if (!k) { k = Math.random() < 0.5 ? "F1F2" : "F2F1"; history.replaceState(null, "", "#k=" + k); }
+  const MAP = { A: k.slice(0, 2), B: k.slice(2) };
+  let answer = null;
+  const screen = document.getElementById("screen"), et = document.getElementById("et");
+  const show = v => {
+    screen.style.fontFamily = et.style.fontFamily = `"${MAP[v]}", system-ui, sans-serif`;
+    document.querySelectorAll(".switch button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === v)));
+  };
+  document.querySelectorAll(".switch button").forEach(b => b.addEventListener("click", () => show(b.dataset.v)));
+  document.querySelectorAll(".answer button").forEach(b => b.addEventListener("click", () => {
+    answer = b.dataset.ans;
+    document.querySelectorAll(".answer button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  }));
+  document.getElementById("key").addEventListener("click", () => {
+    const out = document.getElementById("keyout");
+    if (!answer) { out.textContent = "Сначала выберите A, B или «одинаково»."; return; }
+    const res = answer === "=" ? "одинаково, по правилу берём более лёгкий файл: Geologica (если владелец не решит иначе)" : `выбран ${answer} = ${NAMES[MAP[answer]]}`;
+    out.textContent = `A = ${NAMES[MAP.A]}, B = ${NAMES[MAP.B]}. Ответ: ${res}.`;
+  });
+
+  // Экран показываем только когда оба шрифта реально загружены, иначе сравнили бы системный с системным.
+  Promise.all([document.fonts.load('600 18px "F1"', "Ааöš8"), document.fonts.load('600 18px "F2"', "Ааöš8")]).then(() => document.fonts.ready).then(() => {
+    const ok1 = document.fonts.check('600 18px "F1"', "Аа"), ok2 = document.fonts.check('600 18px "F2"', "Аа");
+    const st = document.getElementById("state");
+    if (ok1 && ok2) { st.textContent = "Шрифты A и B загружены, можно сравнивать."; screen.hidden = et.hidden = false; show("A"); }
+    else st.textContent = `Шрифт не загрузился (A: ${ok1 ? "да" : "нет"}, B: ${ok2 ? "да" : "нет"}). Обновите страницу.`;
+
+    // Самопроверка подмены: если local() найден, ширина пробы отличается от monospace.
+    const w = fam => { const s = document.createElement("span"); s.style.cssText = `position:absolute;visibility:hidden;white-space:nowrap;font:400 40px ${fam}`; s.textContent = "Hamburgefonstiv Элва 0123"; document.body.appendChild(s); const x = s.getBoundingClientRect().width; s.remove(); return x; };
+    const mono = w("monospace");
+    const rob = Math.abs(w('"Probe Roboto", monospace') - mono) > 1;
+    const ari = Math.abs(w('"Probe Arial", monospace') - mono) > 1;
+    document.getElementById("self").innerHTML =
+      `Подмена Roboto (Android): <b>${rob ? "работает" : "НЕ работает"}</b><br>` +
+      `Подмена Arial (iPhone, Windows, Mac): <b>${ari ? "работает" : "НЕ работает"}</b><br>` +
+      `<span style="font-weight:500">Нужно «работает» хотя бы в одной строке. Если в обеих «НЕ работает», пришлите снимок: запасной шрифт без подгонки, экран может прыгать при загрузке.</span>`;
+  });
+</script>
+</body>
+</html>
