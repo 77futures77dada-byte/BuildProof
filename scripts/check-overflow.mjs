@@ -339,6 +339,42 @@ if (!ONLY || 'theme-default'.includes(ONLY)) {
   console.log(`theme-default: checks=${defaultChecks} failures=${defaultFailures.length}${defaultFailures.length ? `\n  ${defaultFailures.join('\n  ')}` : ''}`)
 }
 
+// Sticky/fixed bars at the top must leave the phone screen to the content:
+// together ≤ 25 % of a 553 px high screen (browser chrome already took the rest).
+const STICKY_ROUTES = [['gc', '/dashboard'], ['gc', P], ['gc', `${P}/stages`], ['w1', `${P}/today`], ['foreman', P]]
+const stickyFailures = []
+let stickyChecks = 0
+if (!ONLY || 'sticky-top'.includes(ONLY)) {
+  for (const [width, height] of SEND_VIEWPORTS) for (const [as, path] of STICKY_ROUTES) {
+    const ctx = await browser.newContext({ viewport: { width, height }, locale: 'ru-RU' })
+    await installFixtures(ctx, { as, extended: true })
+    await ctx.addInitScript(() => { try { localStorage.setItem('bp-theme', 'system') } catch { /* no storage */ } }) // widest theme label
+    const page = await ctx.newPage()
+    stickyChecks++
+    try {
+      await page.goto(`${base}${path}`, { waitUntil: 'networkidle' })
+      await page.evaluate(() => window.scrollTo(0, 400))
+      await page.waitForTimeout(200)
+      const covered = await page.evaluate(() => {
+        let bottom = 0
+        for (const el of document.querySelectorAll('#root *')) {
+          const cs = getComputedStyle(el)
+          if (cs.position !== 'sticky' && cs.position !== 'fixed') continue
+          const r = el.getBoundingClientRect()
+          if (r.top <= 1 && r.height > 0) bottom = Math.max(bottom, r.bottom) // bars at the top edge; bottom bars start lower
+        }
+        return Math.round(bottom)
+      })
+      if (covered > height * 0.25) stickyFailures.push(`STICKY ${as} ${path} @${width}×${height}: top bars cover ${covered} px > 25 %`)
+    } catch (e) {
+      stickyFailures.push(`STICKY ${as} ${path}: ${String(e.message ?? e).split('\n')[0]}`)
+    }
+    await ctx.close()
+  }
+  console.log(`sticky-top: checks=${stickyChecks} failures=${stickyFailures.length}${stickyFailures.length ? `\n  ${stickyFailures.join('\n  ')}` : ''}`)
+}
+
+
 
 const queue = [...jobs]
 await Promise.all(Array.from({ length: CONCURRENCY }, async () => {
@@ -359,7 +395,7 @@ let a11yTargets = 0
 let a11yText = 0
 let landingTargets = 0
 let landingText = 0
-const failLines = [...sendFailures, ...defaultFailures]
+const failLines = [...sendFailures, ...defaultFailures, ...stickyFailures]
 // One theme on every screen: data-theme = the chosen one, and the same #bp-root background on all routes.
 let themeFailures = 0
 for (const scheme of SCHEMES) {
@@ -400,6 +436,6 @@ for (const [k, list] of byRoute) {
 }
 if (failLines.length) console.log(`\nFAILURES:\n${failLines.join('\n')}`)
 const a11yNote = STRICT_A11Y ? '' : ' (a11y = warnings; --strict-a11y to fail)'
-console.log(`\ncheck-overflow: routes=${byRoute.size} loads=${results.length} overflow_failures=${overflowFailures} render_failures=${renderFailures} page_errors=${pageErrors} a11y_small_targets=${a11yTargets} a11y_small_text=${a11yText} theme_failures=${themeFailures + defaultFailures.length} send_checks=${sendChecks} send_failures=${sendFailures.length} landing_small_targets=${landingTargets} landing_small_text=${landingText}${a11yNote}`)
-const failed = overflowFailures || renderFailures || pageErrors || themeFailures || defaultFailures.length || sendFailures.length || (STRICT_A11Y && (a11yTargets || a11yText))
+console.log(`\ncheck-overflow: routes=${byRoute.size} loads=${results.length} overflow_failures=${overflowFailures} render_failures=${renderFailures} page_errors=${pageErrors} a11y_small_targets=${a11yTargets} a11y_small_text=${a11yText} theme_failures=${themeFailures + defaultFailures.length} send_checks=${sendChecks} send_failures=${sendFailures.length} sticky_failures=${stickyFailures.length} landing_small_targets=${landingTargets} landing_small_text=${landingText}${a11yNote}`)
+const failed = overflowFailures || renderFailures || pageErrors || themeFailures || defaultFailures.length || stickyFailures.length || sendFailures.length || (STRICT_A11Y && (a11yTargets || a11yText))
 process.exit(failed ? 1 : 0)

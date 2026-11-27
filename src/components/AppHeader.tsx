@@ -15,9 +15,11 @@ export function AppHeader({ logoTo = '/dashboard', children }: { logoTo?: string
   const { profile, user, signOut } = useAuth()
   const { t } = useTranslation()
   const guard = useSignOutGuard(user?.id, signOut)
+  // sticky only from 1024 px: on a phone the header (logo, switches, project
+  // title, tabs) is ~250 px and would cover half of a 553 px screen
   return (
-    <header className="sticky top-0 z-[var(--z-header)] border-b-2 border-line bg-page">
-      <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-2 px-4 py-1">
+    <header className="top-0 z-[var(--z-header)] border-b-2 border-line bg-page lg:sticky">
+      <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-x-2 gap-y-1 px-4 py-1">
         <div className="flex min-w-0 items-center gap-4">
           <Link
             to={logoTo}
@@ -32,18 +34,21 @@ export function AppHeader({ logoTo = '/dashboard', children }: { logoTo?: string
             </span>
           ) : null}
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        {/* phone: row 1 = logo · Тариф · Выйти, row 2 = theme + language; desktop: one row */}
+        <div className="order-2 flex items-center gap-2 lg:order-3">
           {profile?.role === 'gc' ? (
             // NavLink marks «Тариф» with aria-current="page" on /tariff itself.
             <NavLink to="/tariff" className={buttonClass({ variant: 'ghost', size: 'md' }, 'px-3 aria-[current=page]:underline')}>
               {t('tariff.link')}
             </NavLink>
           ) : null}
-          <ThemeSwitcher />
-          <LanguageSwitcher />
           <Button variant="ghost" size="md" className="px-3" onClick={guard.request}>
             {t('common.signOut')}
           </Button>
+        </div>
+        <div className="order-3 flex w-full flex-wrap items-center gap-2 lg:order-2 lg:ml-auto lg:w-auto">
+          <ThemeSwitcher />
+          <LanguageSwitcher />
         </div>
       </div>
       {children}
