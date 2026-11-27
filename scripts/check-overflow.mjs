@@ -15,7 +15,9 @@
 //
 //   node scripts/check-overflow.mjs [--strict-a11y] [--only <substring>] [--verbose]
 // Env: CHROME_PATH (else the first local Chrome/Edge), CHECK_CONCURRENCY (default 4).
-// Last line: `check-overflow: routes=… loads=… overflow_failures=… render_failures=… page_errors=… a11y_small_targets=… a11y_small_text=…`.
+// FAIL also when the report sheet «Отправить» is not fully visible at 360×553 /
+// 390×553 (growth and decrease). The landing `/` is outside --strict-a11y.
+// Last line: `check-overflow: routes=… loads=… overflow_failures=… render_failures=… page_errors=… a11y_small_targets=… a11y_small_text=… send_checks=… send_failures=… landing_small_*=…`.
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -252,6 +254,56 @@ async function runJob({ scheme, width, role }) {
   console.log('self-test: planted 900px element detected; scroll-strip content ignored.')
 }
 
+// Send button of the worker report sheet must be fully on screen without
+// scrolling on a small phone with the keyboard-less browser chrome (360×553),
+// in growth mode and in decrease mode (brief §2.5), light and dark.
+// Selectors: [data-sheet="report"] [data-main] (Button primary), «−10» = [data-minus].
+const SEND_VIEWPORTS = [[360, 553], [390, 553]]
+const PNG_1PX = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64')
+const sendFailures = []
+let sendChecks = 0
+async function sendVisible(page) {
+  return page.evaluate(() => {
+    const btn = document.querySelector('[data-sheet="report"] [data-main]')
+    if (!btn) return { ok: false, why: 'no send button' }
+    const r = btn.getBoundingClientRect()
+    const inView = r.top >= 0 && r.left >= 0 && r.bottom <= window.innerHeight && r.right <= window.innerWidth && r.height > 0
+    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)
+    const onTop = !!hit && (hit === btn || btn.contains(hit))
+    return { ok: inView && onTop, why: `top ${Math.round(r.top)} bottom ${Math.round(r.bottom)} / ${window.innerHeight}${onTop ? '' : ', covered'}` }
+  })
+}
+if (!ONLY || 'report-send'.includes(ONLY) || 'worker today'.includes(ONLY)) {
+  for (const [width, height] of SEND_VIEWPORTS) {
+    for (const scheme of SCHEMES) {
+      const ctx = await browser.newContext({ viewport: { width, height }, colorScheme: scheme, locale: 'ru-RU' })
+      await installFixtures(ctx, { as: 'w1', extended: true })
+      const page = await ctx.newPage()
+      const tag = `${width}×${height} ${scheme}`
+      try {
+        await page.goto(`${base}${P}/today`, { waitUntil: 'networkidle' })
+        await page.setInputFiles('input[capture]', { name: 'p.png', mimeType: 'image/png', buffer: PNG_1PX })
+        await page.waitForSelector('[data-sheet="report"] [data-main]', { timeout: 8000 })
+        await page.waitForTimeout(400) // sheet open transition
+        for (const mode of ['growth', 'decrease']) {
+          if (mode === 'decrease') {
+            await page.click('[data-sheet="report"] [data-minus]')
+            await page.waitForSelector('[data-stepper="decrease"]', { timeout: 4000 })
+          }
+          sendChecks++
+          const v = await sendVisible(page)
+          if (!v.ok) sendFailures.push(`SEND ${tag} ${mode}: ${v.why}`)
+        }
+      } catch (e) {
+        sendChecks++
+        sendFailures.push(`SEND ${tag}: ${String(e.message ?? e).split('\n')[0]}`)
+      }
+      await ctx.close()
+    }
+  }
+  console.log(`report-send: checks=${sendChecks} failures=${sendFailures.length}${sendFailures.length ? `\n  ${sendFailures.join('\n  ')}` : ''}`)
+}
+
 const queue = [...jobs]
 await Promise.all(Array.from({ length: CONCURRENCY }, async () => {
   while (queue.length) await runJob(queue.shift())
@@ -269,7 +321,9 @@ let renderFailures = 0
 let pageErrors = 0
 let a11yTargets = 0
 let a11yText = 0
-const failLines = []
+let landingTargets = 0
+let landingText = 0
+const failLines = [...sendFailures]
 console.log('route | as | screen (h1 · active tab · main heading) | overflow (width/scheme: px) | targets<48 | text<17px')
 for (const [k, list] of byRoute) {
   const [name, path, as] = k.split('\t')
@@ -281,8 +335,9 @@ for (const [k, list] of byRoute) {
   overflowFailures += over.length
   renderFailures += notRendered.length
   pageErrors += errs.length
-  a11yTargets += maxT
-  a11yText += maxX
+  // The landing (`/`) is outside the a11y rule until its own PR (claude/landing-v2,
+  // 05-ui.md §6): counted separately, never fails --strict-a11y.
+  if (path === '/') { landingTargets += maxT; landingText += maxX } else { a11yTargets += maxT; a11yText += maxX }
   const sample = list.find((r) => r.rendered) ?? list[0]
   const h1 = [sample.h1 || '—', sample.tab && `tab «${sample.tab}»`, sample.mainHeading && `main «${sample.mainHeading}»`].filter(Boolean).join(' · ')
   const overTxt = over.length ? over.map((r) => `${r.width}/${r.scheme[0]}: +${r.scrollWidth - r.innerWidth}`).join(', ') : 'ok'
@@ -301,6 +356,6 @@ for (const [k, list] of byRoute) {
 }
 if (failLines.length) console.log(`\nFAILURES:\n${failLines.join('\n')}`)
 const a11yNote = STRICT_A11Y ? '' : ' (a11y = warnings; --strict-a11y to fail)'
-console.log(`\ncheck-overflow: routes=${byRoute.size} loads=${results.length} overflow_failures=${overflowFailures} render_failures=${renderFailures} page_errors=${pageErrors} a11y_small_targets=${a11yTargets} a11y_small_text=${a11yText}${a11yNote}`)
-const failed = overflowFailures || renderFailures || pageErrors || (STRICT_A11Y && (a11yTargets || a11yText))
+console.log(`\ncheck-overflow: routes=${byRoute.size} loads=${results.length} overflow_failures=${overflowFailures} render_failures=${renderFailures} page_errors=${pageErrors} a11y_small_targets=${a11yTargets} a11y_small_text=${a11yText} send_checks=${sendChecks} send_failures=${sendFailures.length} landing_small_targets=${landingTargets} landing_small_text=${landingText}${a11yNote}`)
+const failed = overflowFailures || renderFailures || pageErrors || sendFailures.length || (STRICT_A11Y && (a11yTargets || a11yText))
 process.exit(failed ? 1 : 0)

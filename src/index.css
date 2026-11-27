@@ -1,8 +1,5 @@
 @import 'tailwindcss';
 @import './styles/tokens.css';
-/* TEMPORARY bridge for screens not yet migrated (docs/design/05-ui.md §«Миграция»);
-   the last screen step deletes it. */
-@import './styles/legacy-bridge.css';
 
 .house3d-canvas { height: clamp(300px, 52vw, 420px); touch-action: pan-y; cursor: grab; }
 .house3d-canvas:active { cursor: grabbing; }

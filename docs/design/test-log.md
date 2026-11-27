@@ -123,3 +123,25 @@ check-overflow: routes=31 loads=248 overflow_failures=0 render_failures=2 page_e
 
 Предыдущий FAIL (render_failures=2, page_errors=1, ERR_NETWORK_IO_SUSPENDED, 6983 s) — машина уходила в сон. Повтор: PASS — routes=31 loads=248 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=191 a11y_small_text=101.
 
+
+## 2026-11-27T08:46:50Z — слияние 4 групп, без legacy-bridge
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.22s, VITE_SUPABASE_URL=fixture (16s) |
+| test | PASS | 12 passed (12); 75 passed (75) (9s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=167 allowlisted=5 temporary=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=813 (json=534, landing=279) (0s) |
+| check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=8 a11y_small_text=95 (a11y = warnings; --strict-a11y to fail) (123s) |
+
+## 2026-11-27T08:57:21Z — 4 группы слиты; legacy-bridge удалён; проверка «Отправить» 360×553
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.19s, VITE_SUPABASE_URL=fixture (16s) |
+| test | PASS | 12 passed (12); 75 passed (75) (9s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=167 allowlisted=5 temporary=0 (1s) |
+| check-ru-latin | PASS | offending=0 strings=813 (json=534, landing=279) (0s) |
+| check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 send_checks=8 send_failures=0 landing_small_targets=8 landing_small_text=95 (131s) |
