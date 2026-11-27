@@ -23,6 +23,8 @@ import { StageActionButtons } from '../components/StageActionButtons'
 import type { StageActionCapabilities, StageActionKind } from '../components/StageActionButtons'
 import { StageProgressControl } from '../components/StageProgressControl'
 import { HouseModelBlock } from '../features/house3d/HouseModelBlock'
+import { ContactLines } from '../components/ContactLines'
+import { hasLegalContact } from '../lib/emailGate'
 import { UrgentBadge } from '../components/UrgentBadge'
 
 function capabilitiesFor(role: UserRole | undefined): StageActionCapabilities {
@@ -131,7 +133,7 @@ export function ProjectDashboardView({
     lastMarkAt: data.lastMarkAt,
     lastMarkRole: data.lastMarkRole,
     peopleNames: onProject.map((p) => p.name),
-    createdAt: (project as typeof project & { created_at?: string | null }).created_at ?? null,
+    createdAt: project.created_at ?? null,
   }
   const fresh = freshnessView(freshInput, t, { gateOpen, fmt: formatDate })
   const lastAt = lastActivityAt(freshInput)
@@ -150,7 +152,8 @@ export function ProjectDashboardView({
       if (gateOpen && isGc) return { main: { kind: 'link', label: t('overview.next.inviteOpen'), to: `/project/${projectId}/settings#invite` } }
       return {
         main: { kind: 'mark', label: t('overview.next.action') },
-        line: gateOpen ? undefined : t('gate.inviteLater'),
+        line: gateOpen ? undefined : hasLegalContact() ? t('gate.inviteLater') : t('gate.inviteLaterNoContact'),
+        secondary: gateOpen ? undefined : <ContactLines label={t('common.supportLabel')} />,
       }
     }
     if (stale && gateOpen && hasPeople) {
@@ -300,16 +303,16 @@ export function ProjectDashboardView({
   // Desktop only: on a phone the stage list already answers «where is the work» (critic «Март» MED 8).
   const houseBlock = stagesExist ? (
     <div className="hidden lg:block">
-    <Disclosure label={t('overview.showHouse')}>
-      <HouseModelBlock
-        stages={stages.map((stage) => ({
-          key: stage.id,
-          name: stage.name,
-          percent: stage.progressPercent,
-          sortOrder: stage.sortOrder,
-        }))}
-      />
-    </Disclosure>
+      <Disclosure label={t('overview.showHouse')}>
+        <HouseModelBlock
+          stages={stages.map((stage) => ({
+            key: stage.id,
+            name: stage.name,
+            percent: stage.progressPercent,
+            sortOrder: stage.sortOrder,
+          }))}
+        />
+      </Disclosure>
     </div>
   ) : null
 

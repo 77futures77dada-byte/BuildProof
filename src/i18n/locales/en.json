@@ -29,6 +29,7 @@
     "actions": "Actions",
     "stay": "Stay",
     "signOutAnyway": "Sign out anyway",
+    "supportLabel": "BuildProof support",
     "backOnline": "Connection is back"
   },
   "language": {
@@ -107,7 +108,8 @@
     "network": "Cannot reach the server. Check the connection and try again.",
     "signInFailed": "Could not sign in. Please try again a bit later.",
     "taglineOpen": "Photos and stage percentages from your workers. You see where work moves and where it stalls.",
-    "signupLater": "Right now we connect firms by invitation.",
+    "signupLater": "Right now we connect firms by invitation. Write to us:",
+    "signupLaterNoContact": "Right now we connect firms by invitation. If you were invited, sign in.",
     "forgotPassword": "Forgot your password?",
     "recoveryLater": "We reset passwords by hand: write to us.",
     "recoveryOwner": "We reset passwords by hand: tell the owner of your firm.",
@@ -231,7 +233,7 @@
     "markStage": "Mark a stage",
     "openLastReport": "Open the latest report",
     "openPeople": "Who has not reported lately",
-    "staleForeman": "No report for a while from: {{names}}. Tell the owner.",
+    "staleForeman": "No report for a while from: {{names}}. Remind them or mark the stage yourself.",
     "readyPercent": "{{percent}}% done",
     "updatedAt": "updated {{date}}",
     "showHouse": "Show the house",
@@ -432,6 +434,7 @@
     "submitForeman": "Invite foreman",
     "submitForemen": "Invite foremen ({{count}})",
     "hint": "An email with a code will arrive. The worker signs in with the code, no password.",
+    "hintForeman": "An email with a code will arrive. The foreman signs in with the code and can set a password later.",
     "sent": "Invitation sent to {{email}}. If it is not there in a minute, they should check Spam.",
     "ownEmail": "This is your email. Enter the worker’s email.",
     "duplicate": "This address is already in the list above.",
@@ -478,7 +481,8 @@
     "reasonComment": "a reason for the decrease is needed"
   },
   "gate": {
-    "inviteLater": "We connect new people by hand: write to us.",
+    "inviteLater": "We connect new people by hand. Write to us:",
+    "inviteLaterNoContact": "Right now you can add people who already work for you.",
     "startEarlier": "Want to start sooner: {{phone}}"
   },
   "activity": {
@@ -497,7 +501,8 @@
     "title": "Site people",
     "lastReport": "last report {{date}}",
     "noReportsYet": "no reports yet",
-    "emptyClosed": "Nobody but you is on this site. Add people from “Already working for you”. We connect new people by hand: write to us.",
+    "emptyClosed": "Nobody but you is on this site. Add people from “Already working for you”. New people are connected by BuildProof support.",
+    "emptyClosedNoContact": "Nobody but you is on this site. Add people from “Already working for you”.",
     "emptyOpen": "Nobody but you is on this site. Invite a worker by email.",
     "inviteMore": "Invite another person",
     "sendCode": "Send sign-in code",
@@ -564,9 +569,9 @@
     "waiting": "waiting {{count}} h"
   },
   "status": {
-    "markedByOwner": "Mark: owner",
-    "markedByForeman": "Mark: foreman",
-    "markedByCrew": "Mark: crew",
+    "markedByOwner": "Marked by the owner",
+    "markedByForeman": "Marked by the foreman",
+    "markedByCrew": "Marked by the crew",
     "verified": "Checked",
     "accepted": "Accepted",
     "pending": "Waiting for check",

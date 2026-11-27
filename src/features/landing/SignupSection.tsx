@@ -3,7 +3,7 @@ import type { FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { LandingCopy } from './copy'
-import { isEmailGateOpen, legalContact } from '../../lib/emailGate'
+import { hasLegalContact, isEmailGateOpen, legalContact } from '../../lib/emailGate'
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/
 const MIN_PASSWORD = 8
@@ -40,7 +40,7 @@ function SignupClosed({ copy }: { copy: LandingCopy }) {
       <div className="in">
         <h2 id="start-title">{f.title}</h2>
         <div className="signup">
-          <p className="note" role="status">{t('auth.signupLater')}</p>
+          <p className="note" role="status">{hasLegalContact() ? t('auth.signupLater') : t('auth.signupLaterNoContact')}</p>
           {phone ? <a className="linkbtn" href={`tel:${phone.replace(/\s+/g, '')}`}>{t('common.contactPhone', { phone })}</a> : null}
           {email ? <a className="linkbtn" href={`mailto:${email}`}>{t('common.contactEmail', { email })}</a> : null}
           <Link className="linkbtn" to="/login">{f.toLogin}</Link>

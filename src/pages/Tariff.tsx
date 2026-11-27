@@ -4,7 +4,7 @@ import { AppHeader } from '../components/AppHeader'
 import { AppLoading } from '../components/AppLoading'
 import { buttonClass, cx } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
-import { legalContact } from '../lib/emailGate'
+import { founderName, legalContact } from '../lib/emailGate'
 import { PRICING, priceTable } from '../config/pricing'
 
 /**
@@ -59,6 +59,7 @@ export function Tariff() {
         <div className="flex flex-col gap-4">
           <p className="m-0 text-body text-fg">{t('tariff.trial', { days: p.trialDays })}</p>
           <p className="m-0 rounded-card bg-surface p-4 text-body text-fg">{t('tariff.noBilling')}</p>
+          {founderName() ? <p className="m-0 text-body text-fg">{t('auth.madeBy', { name: founderName() })}</p> : null}
           {email ? (
             <a href={`mailto:${email}`} data-main="" className={buttonClass({ variant: 'primary', block: true })}>
               {t('tariff.contact')}

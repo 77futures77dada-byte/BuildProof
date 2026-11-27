@@ -23,3 +23,9 @@ export function legalContact(): { phone: string | null; email: string | null } {
 export function founderName(): string | null {
   return isPlaceholder(LEGAL.founderName) ? null : LEGAL.founderName
 }
+
+/** True when legal.ts has at least one contact part (phone or e-mail). */
+export function hasLegalContact(): boolean {
+  const { phone, email } = legalContact()
+  return !!(phone || email)
+}

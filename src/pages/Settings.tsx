@@ -6,8 +6,9 @@ import { useAuth } from '../hooks/useAuth'
 import { useProjectAccessSettings } from '../hooks/useProjectAccessSettings'
 import type { AccessRow } from '../hooks/useProjectAccessSettings'
 import { supabase } from '../lib/supabaseClient'
-import { isEmailGateOpen } from '../lib/emailGate'
+import { hasLegalContact, isEmailGateOpen } from '../lib/emailGate'
 import { RESEND_SECONDS, codeSendError, isValidEmail, secondsLeft } from '../lib/authCode'
+import { ContactLines } from '../components/ContactLines'
 import { Button, ConfirmDialog, NetBar, Sheet, SkeletonRows, StatusIcon, TextField, cx, useOnline } from '../components/ui'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { MemberAccessRow } from '../components/MemberAccessRow'
@@ -87,7 +88,7 @@ export function Settings() {
             <h2 className="m-0 text-h2 font-bold text-fg">{t('people.title')}</h2>
             {people.length === 0 ? (
               <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body font-medium text-fg">
-                {gateOpen ? t('people.emptyOpen') : t('people.emptyClosed')}
+                {gateOpen ? t('people.emptyOpen') : hasLegalContact() ? t('people.emptyClosed') : t('people.emptyClosedNoContact')}
               </p>
             ) : (
               <ul className="m-0 flex flex-col gap-2 p-0">
@@ -123,7 +124,10 @@ export function Settings() {
               {gateOpen && id ? (
                 <InviteForm projectId={id} known={known} onAddKnown={add} onInvited={reload} />
               ) : (
-                <p className="m-0 rounded-card border-2 border-line bg-surface p-4 text-body font-semibold text-fg">{t('gate.inviteLater')}</p>
+                <div className="flex flex-col gap-2 rounded-card border-2 border-line bg-surface p-4">
+                  <p className="m-0 text-body font-semibold text-fg">{hasLegalContact() ? t('gate.inviteLater') : t('gate.inviteLaterNoContact')}</p>
+                  <ContactLines label={t('common.supportLabel')} />
+                </div>
               )}
             </div>
           </div>
@@ -325,13 +329,27 @@ function InviteForm({ projectId, known, onAddKnown, onInvited }: {
   return (
     <form onSubmit={(e) => void submit(e)} noValidate className="flex flex-col gap-4">
       <h2 id="invite-title" className="m-0 text-h2 font-bold text-fg">{role === 'foreman' ? t('invite.foreman') : t('invite.title')}</h2>
-      <div role="radiogroup" aria-labelledby="invite-title" className="flex gap-2">
+      <div
+        role="radiogroup"
+        aria-labelledby="invite-title"
+        className="flex gap-2"
+        onKeyDown={(e) => {
+          // Radio group keys: arrows move the choice and the focus (roving tabindex).
+          if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return
+          e.preventDefault()
+          const next = role === 'worker' ? 'foreman' : 'worker'
+          setRole(next)
+          e.currentTarget.querySelector<HTMLButtonElement>(`[data-role="${next}"]`)?.focus()
+        }}
+      >
         {(['worker', 'foreman'] as const).map((r) => (
           <button
             key={r}
             type="button"
             role="radio"
+            data-role={r}
             aria-checked={role === r}
+            tabIndex={role === r ? 0 : -1}
             disabled={busy}
             onClick={() => setRole(r)}
             className={cx(
@@ -343,7 +361,7 @@ function InviteForm({ projectId, known, onAddKnown, onInvited }: {
           </button>
         ))}
       </div>
-      <p className="m-0 text-body font-medium text-fg">{t('invite.hint')}</p>
+      <p className="m-0 text-body font-medium text-fg">{role === 'foreman' ? t('invite.hintForeman') : t('invite.hint')}</p>
       {rows.map((r, i) => {
         const err = problem(r, i)
         const twin = sameName(r)

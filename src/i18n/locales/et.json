@@ -29,6 +29,7 @@
     "actions": "Toimingud",
     "stay": "Jää",
     "signOutAnyway": "Logi ikkagi välja",
+    "supportLabel": "BuildProofi tugi",
     "backOnline": "Ühendus on tagasi"
   },
   "language": {
@@ -107,7 +108,8 @@
     "network": "Serveriga ühendust pole. Kontrollige internetti ja proovige uuesti.",
     "signInFailed": "Sisselogimine ei õnnestunud. Proovige veidi hiljem uuesti.",
     "taglineOpen": "Fotod ja etappide protsendid teie töölistelt. Näete, kus töö käib ja kus seisab.",
-    "signupLater": "Praegu liidame firmasid kutse alusel.",
+    "signupLater": "Praegu liidame firmasid kutse alusel. Kirjutage meile:",
+    "signupLaterNoContact": "Praegu liidame firmasid kutse alusel. Kui teid kutsuti, logige sisse.",
     "forgotPassword": "Unustasite parooli?",
     "recoveryLater": "Parooli lähtestame käsitsi: kirjutage meile.",
     "recoveryOwner": "Parooli lähtestame käsitsi: öelge oma firma omanikule.",
@@ -231,7 +233,7 @@
     "markStage": "Märgi etapp",
     "openLastReport": "Ava viimane aruanne",
     "openPeople": "Kes pole ammu aru andnud",
-    "staleForeman": "Ammu pole aruannet: {{names}}. Öelge omanikule.",
+    "staleForeman": "Ammu pole aruannet: {{names}}. Tuletage neile meelde või märkige etapp ise.",
     "readyPercent": "{{percent}}% valmis",
     "updatedAt": "uuendatud {{date}}",
     "showHouse": "Näita maja",
@@ -432,6 +434,7 @@
     "submitForeman": "Kutsu brigadir",
     "submitForemen": "Kutsu brigadirid ({{count}})",
     "hint": "Tuleb e-kiri koodiga. Tööline logib koodiga sisse, ilma paroolita.",
+    "hintForeman": "Tuleb e-kiri koodiga. Brigadir logib koodiga sisse ja võib hiljem parooli määrata.",
     "sent": "Kutse saadeti aadressile {{email}}. Kui minuti pärast pole, vaadaku rämpsposti.",
     "ownEmail": "See on teie e-post. Sisestage töölise e-post.",
     "duplicate": "See aadress on juba ülal loendis.",
@@ -478,7 +481,8 @@
     "reasonComment": "vähendamiseks on vaja põhjust"
   },
   "gate": {
-    "inviteLater": "Uusi inimesi liidame käsitsi: kirjutage meile.",
+    "inviteLater": "Uusi inimesi liidame käsitsi. Kirjutage meile:",
+    "inviteLaterNoContact": "Praegu saate objektile lisada need, kes juba teie juures töötavad.",
     "startEarlier": "Soovite varem alustada: {{phone}}"
   },
   "activity": {
@@ -497,7 +501,8 @@
     "title": "Objekti inimesed",
     "lastReport": "viimane aruanne {{date}}",
     "noReportsYet": "aruandeid veel pole",
-    "emptyClosed": "Peale teie pole objektil kedagi. Lisage inimesi loendist „Juba teie juures tööl“. Uusi liidame käsitsi: kirjutage meile.",
+    "emptyClosed": "Peale teie pole objektil kedagi. Lisage inimesi loendist „Juba teie juures tööl“. Uusi liidab BuildProofi tugi.",
+    "emptyClosedNoContact": "Peale teie pole objektil kedagi. Lisage inimesi loendist „Juba teie juures tööl“.",
     "emptyOpen": "Peale teie pole objektil kedagi. Kutsuge tööline e-posti teel.",
     "inviteMore": "Kutsu veel üks inimene",
     "sendCode": "Saada sisselogimiskood",
@@ -564,9 +569,9 @@
     "waiting": "ootab {{count}} h"
   },
   "status": {
-    "markedByOwner": "Märkis: omanik",
-    "markedByForeman": "Märkis: brigadir",
-    "markedByCrew": "Märkis: brigaad",
+    "markedByOwner": "Omanik märkis",
+    "markedByForeman": "Brigadir märkis",
+    "markedByCrew": "Brigaadi märgitud",
     "verified": "Kontrollitud",
     "accepted": "Vastu võetud",
     "pending": "Ootab kontrolli",

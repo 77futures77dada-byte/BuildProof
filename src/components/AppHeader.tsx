@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { LanguageSwitcher } from './LanguageSwitcher'
@@ -33,9 +33,10 @@ export function AppHeader({ logoTo = '/dashboard', children }: { logoTo?: string
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {profile?.role === 'gc' ? (
-            <Link to="/tariff" className={buttonClass({ variant: 'ghost', size: 'md' }, 'px-3')}>
+            // NavLink marks «Тариф» with aria-current="page" on /tariff itself.
+            <NavLink to="/tariff" className={buttonClass({ variant: 'ghost', size: 'md' }, 'px-3 aria-[current=page]:underline')}>
               {t('tariff.link')}
-            </Link>
+            </NavLink>
           ) : null}
           <LanguageSwitcher />
           <Button variant="ghost" size="md" className="px-3" onClick={guard.request}>

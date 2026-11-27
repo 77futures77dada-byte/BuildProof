@@ -4,7 +4,8 @@ import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabaseClient'
 import { signInErrorMessage } from '../lib/authErrors'
-import { founderName, isEmailGateOpen, legalContact } from '../lib/emailGate'
+import { founderName, hasLegalContact, isEmailGateOpen } from '../lib/emailGate'
+import { ContactLines } from '../components/ContactLines'
 import { parseLinkError } from '../lib/authCode'
 import type { LinkError } from '../lib/authCode'
 import { isProfileConfigured } from '../lib/profile'
@@ -112,7 +113,6 @@ export function Login() {
 
 function PasswordForm({ gateOpen }: { gateOpen: boolean }) {
   const { t } = useTranslation()
-  const contact = legalContact()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -170,28 +170,10 @@ function PasswordForm({ gateOpen }: { gateOpen: boolean }) {
         </div>
       ) : (
         <div className="flex flex-col gap-1">
-          <p className="m-0 text-body text-fg">{contact.phone || contact.email ? t('auth.recoveryLater') : t('auth.recoveryOwner')}</p>
-          <ContactLines phone={contact.phone} email={contact.email} />
+          <p className="m-0 text-body text-fg">{hasLegalContact() ? t('auth.recoveryLater') : t('auth.recoveryOwner')}</p>
+          <ContactLines />
         </div>
       )}
-    </>
-  )
-}
-
-function ContactLines({ phone, email }: { phone: string | null; email: string | null }) {
-  const { t } = useTranslation()
-  return (
-    <>
-      {phone ? (
-        <a href={`tel:${phone.replace(/\s+/g, '')}`} className="inline-flex min-h-12 items-center text-body font-semibold text-fg underline underline-offset-4">
-          {t('common.contactPhone', { phone })}
-        </a>
-      ) : null}
-      {email ? (
-        <a href={`mailto:${email}`} className="inline-flex min-h-12 items-center text-body font-semibold text-fg underline underline-offset-4">
-          {t('common.contactEmail', { email })}
-        </a>
-      ) : null}
     </>
   )
 }
@@ -199,15 +181,14 @@ function ContactLines({ phone, email }: { phone: string | null; email: string | 
 /** Sign-up only behind the gate (residual М4-1); «На главную» always. */
 function LoginFooter({ gateOpen }: { gateOpen: boolean }) {
   const { t } = useTranslation()
-  const contact = legalContact()
   return (
     <>
       {gateOpen ? (
         <Link to="/#start" className={buttonClass({ variant: 'ghost', block: true })}>{t('auth.startFree')}</Link>
       ) : (
         <div className="flex flex-col gap-1">
-          <p className="m-0 text-body text-fg">{t('auth.signupLater')}</p>
-          <ContactLines phone={contact.phone} email={contact.email} />
+          <p className="m-0 text-body text-fg">{hasLegalContact() ? t('auth.signupLater') : t('auth.signupLaterNoContact')}</p>
+          <ContactLines />
         </div>
       )}
       <Link to="/" className={buttonClass({ variant: 'ghost', block: true })}>{t('auth.backHome')}</Link>

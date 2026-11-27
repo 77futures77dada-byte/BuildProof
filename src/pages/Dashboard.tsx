@@ -7,9 +7,9 @@ import { useProjects } from '../hooks/useProjects'
 import type { DashboardProject } from '../hooks/useProjects'
 import { isProfileConfigured } from '../lib/profile'
 import { isGateOpen, staleness } from '../lib/freshness'
-import { legalContact } from '../lib/emailGate'
 import { useSignOutGuard } from '../components/report/SignOutDraftsConfirm'
 import { AppHeader } from '../components/AppHeader'
+import { ContactLines } from '../components/ContactLines'
 import { Button, EmptyState, Skeleton } from '../components/ui'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { FullPageSpinner } from '../components/Spinner'
@@ -49,7 +49,6 @@ export function Dashboard() {
   const navigate = useNavigate()
   const [creating, setCreating] = useState(false)
   const guard = useSignOutGuard(profile?.id, signOut)
-  const contact = legalContact()
 
   if (authLoading) return <FullPageSpinner />
 
@@ -88,16 +87,7 @@ export function Dashboard() {
     return (
       <section className="flex flex-col items-start gap-3 rounded-card border-2 border-dashed border-line bg-page p-5">
         <p className="m-0 text-field font-semibold text-fg">{t(key)}</p>
-        {contact.phone ? (
-          <a href={`tel:${contact.phone.replace(/\s+/g, '')}`} className="inline-flex min-h-12 items-center text-body font-semibold text-fg underline underline-offset-4">
-            {t('common.contactPhone', { phone: contact.phone })}
-          </a>
-        ) : null}
-        {contact.email ? (
-          <a href={`mailto:${contact.email}`} className="inline-flex min-h-12 items-center text-body font-semibold text-fg underline underline-offset-4">
-            {t('common.contactEmail', { email: contact.email })}
-          </a>
-        ) : null}
+        <ContactLines label={t('common.supportLabel')} />
         {/* Access may be granted while the page is open: reload instead of signing out and in. */}
         <div className="flex flex-wrap gap-3">
           <Button variant="secondary" onClick={reload}>{t('common.reload')}</Button>
