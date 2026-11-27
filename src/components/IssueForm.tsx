@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { createIssue } from '../lib/issues'
 import { toErrorMessage } from '../lib/format'
-import { Button } from './Button'
-import { TextField } from './TextField'
+import { Button, Disclosure, FormField, TextField, controlClass, cx } from './ui'
 import { ErrorMessage } from './ErrorMessage'
 import { ImagePicker } from './ImagePicker'
 
@@ -15,14 +14,11 @@ interface IssueFormProps {
   onCancel: () => void
 }
 
-const fieldClass =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200'
-
 /**
- * «Сообщить о проблеме», built for a phone on site: photo, one line
- * «Что случилось», urgent / not urgent, «Отправить». Everything else sits
- * under «Ещё»; responsible party and deadline only for the owner/foreman, who
- * manage issues. Urgent → priority `high`, not urgent → `medium`.
+ * «Сообщить о проблеме», built for a phone on site (03 §7 issue-form): photo
+ * (camera), one line «Что случилось», «Срочно / Не срочно», «Отправить».
+ * Everything else sits under «Ещё»; responsible party and deadline only for
+ * the owner/foreman. Urgent → priority `high`, not urgent → `medium`.
  */
 export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
   const { user, profile } = useAuth()
@@ -36,12 +32,13 @@ export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
   const [dueDate, setDueDate] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [busy, setBusy] = useState(false)
+  const [titleError, setTitleError] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!title.trim()) {
-      setError(t('issues.titleRequired'))
+      setTitleError(true)
       return
     }
     if (!user) {
@@ -69,99 +66,64 @@ export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
     }
   }
 
-  const choice = (active: boolean, tone: 'red' | 'sky') =>
-    `flex min-h-12 flex-1 cursor-pointer items-center justify-center rounded-lg border-2 px-3 text-sm font-semibold transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-sky-600 ${
-      active
-        ? tone === 'red'
-          ? 'border-red-600 bg-red-50 text-red-800'
-          : 'border-sky-600 bg-sky-50 text-sky-900'
-        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-    }`
+  const choice = (on: boolean) => cx(
+    'inline-flex min-h-12 flex-1 items-center justify-center rounded-control border-2 px-3 text-field font-semibold',
+    'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:opacity-60',
+    on ? 'border-fg bg-fg text-page' : 'border-line bg-page text-fg hover:border-fg',
+  )
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
-    >
-      <h2 className="text-base font-semibold text-slate-900">{t('issues.formHeading')}</h2>
-
-      <div className="space-y-1">
-        <span className="text-sm font-medium text-slate-700">{t('issues.photo')}</span>
-        <ImagePicker onChange={setFile} disabled={busy} />
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1.5">
+        <p className="m-0 text-field font-medium text-fg">{t('issues.photo')}</p>
+        <ImagePicker onChange={setFile} disabled={busy} camera />
       </div>
 
       <TextField
         label={t('issues.titleField')}
+        hint={t('issues.titlePlaceholder')}
+        error={titleError ? t('issues.titleRequired') : undefined}
         required
         value={title}
         disabled={busy}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder={t('issues.titlePlaceholder')}
+        onChange={(e) => { setTitle(e.target.value); setTitleError(false) }}
       />
 
-      <fieldset disabled={busy}>
-        <legend className="mb-1 text-sm font-medium text-slate-700">{t('issues.urgency')}</legend>
-        <div className="flex gap-2">
-          <label className={choice(urgent, 'red')}>
-            <input type="radio" name="urgency" className="sr-only" checked={urgent} onChange={() => setUrgent(true)} />
-            {t('issues.urgent')}
-          </label>
-          <label className={choice(!urgent, 'sky')}>
-            <input type="radio" name="urgency" className="sr-only" checked={!urgent} onChange={() => setUrgent(false)} />
-            {t('issues.notUrgent')}
-          </label>
+      <div role="group" aria-label={t('issues.urgency')} className="flex flex-col gap-1.5">
+        <p className="m-0 text-field font-medium text-fg">{t('issues.urgency')}</p>
+        <div className="flex gap-3">
+          <button type="button" aria-pressed={urgent} disabled={busy} onClick={() => setUrgent(true)} className={choice(urgent)}>{t('issues.urgent')}</button>
+          <button type="button" aria-pressed={!urgent} disabled={busy} onClick={() => setUrgent(false)} className={choice(!urgent)}>{t('issues.notUrgent')}</button>
         </div>
-      </fieldset>
+      </div>
 
-      <details className="rounded-lg border border-slate-200 px-3 py-2">
-        <summary className="flex min-h-8 cursor-pointer items-center text-sm font-medium text-slate-600">
-          {t('issues.more')}
-        </summary>
-        <div className="mt-3 space-y-4">
-          <label className="block space-y-1">
-            <span className="text-sm font-medium text-slate-700">{t('issues.description')}</span>
-            <textarea
-              value={description}
-              disabled={busy}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              className={fieldClass}
-              placeholder={t('common.optional')}
-            />
-          </label>
+      <Disclosure label={t('issues.more')}>
+        <div className="flex flex-col gap-4">
+          <FormField label={t('issues.description')} hint={t('common.optional')}>
+            {(control) => (
+              <textarea {...control} value={description} disabled={busy} rows={3} onChange={(e) => setDescription(e.target.value)} className={cx(controlClass, 'py-3')} />
+            )}
+          </FormField>
           {manages ? (
             <>
               <TextField
                 label={t('issues.responsible')}
+                hint={t('issues.responsiblePlaceholder')}
                 value={responsibleParty}
                 disabled={busy}
                 onChange={(e) => setResponsibleParty(e.target.value)}
-                placeholder={t('issues.responsiblePlaceholder')}
               />
-              <label className="block space-y-1">
-                <span className="text-sm font-medium text-slate-700">{t('issues.dueDate')}</span>
-                <input
-                  type="date"
-                  value={dueDate}
-                  disabled={busy}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  className={fieldClass}
-                />
-              </label>
+              <TextField label={t('issues.dueDate')} type="date" value={dueDate} disabled={busy} onChange={(e) => setDueDate(e.target.value)} />
             </>
           ) : null}
         </div>
-      </details>
+      </Disclosure>
 
       <ErrorMessage message={error} />
 
-      <div className="flex gap-2">
-        <Button type="submit" loading={busy} className="min-h-12 flex-1">
-          {t('issues.submit')}
-        </Button>
-        <Button type="button" variant="secondary" onClick={onCancel} disabled={busy} className="min-h-12">
-          {t('common.cancel')}
-        </Button>
+      <div className="flex flex-col gap-3">
+        <Button type="submit" variant="primary" block loading={busy}>{t('issues.submit')}</Button>
+        <Button type="button" variant="secondary" block onClick={onCancel} disabled={busy}>{t('common.cancel')}</Button>
       </div>
     </form>
   )
