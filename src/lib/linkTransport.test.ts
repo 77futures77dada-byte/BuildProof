@@ -28,10 +28,10 @@ describe('error codes → draft errors and texts', () => {
     expect(classifyLinkError(new LinkApiError('request_failed', 400))).toBe('other')
   })
   it('invalid link → «ask the owner for a new one» text', () => {
-    expect(linkDraftErrorKey('auth')).toBe('workerLink.error.invalidLink')
-    expect(linkLoadErrorKey('invalid_worker_link')).toBe('workerLink.error.invalidLink')
-    expect(linkLoadErrorKey('invalid_client_link')).toBe('workerLink.error.invalidLink')
-    expect(linkDraftErrorKey('rate_limit')).toBe('workerLink.error.rateLimit')
+    expect(linkDraftErrorKey('auth')).toBe('linkPage.error.invalidLink')
+    expect(linkLoadErrorKey('invalid_worker_link')).toBe('linkPage.error.invalidLink')
+    expect(linkLoadErrorKey('invalid_client_link')).toBe('linkPage.error.invalidLink')
+    expect(linkDraftErrorKey('rate_limit')).toBe('linkPage.error.rateLimit')
     expect(linkDraftErrorKey(null)).toBeNull()
   })
 })
@@ -48,7 +48,7 @@ describe('submit body and transport', () => {
     const t = workerLinkTransport(TOKEN, fake(429, { error: 'worker_link_rate_limit' }, seen))
     await expect(t.submitDraft!(draft(), 50, null)).rejects.toMatchObject({ code: 'worker_link_rate_limit', status: 429 })
     expect(seen[0].url).toBe('/api/worker-link-submit')
-    expect((seen[0].init?.headers as Record<string, string>).Authorization).toBe(`Bearer ${TOKEN}`)
+    expect((seen[0].init!.headers as Record<string, string>).Authorization).toBe(`Bearer ${TOKEN}`)
   })
   it('currentPercent reads the stage list; network failure → network', async () => {
     const t = workerLinkTransport(TOKEN, fake(200, { project_id: 'p', worker_name: 'W', stages: [{ id: 's1', name: 'A', progress_percent: 70 }] }))

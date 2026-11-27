@@ -722,5 +722,79 @@
       "network": "Ühendus puudub. Proovi uuesti.",
       "generic": "Midagi läks valesti. Proovi uuesti."
     }
+  },
+  "workerLink": {
+    "title": "Objekti aruanne",
+    "worker": "Sina: {{name}}",
+    "stagesTitle": "Etapid",
+    "noStages": "Objektil pole veel etappe.",
+    "noStagesWho": "Etapid lisab objekti omanik.",
+    "newReport": "Tee aruanne",
+    "takePhoto": "Pildista",
+    "fromGallery": "Galeriist",
+    "photosCount": "Fotod: {{count}} / {{max}}",
+    "removePhoto": "Eemalda foto {{n}}",
+    "maxPhotos": "Ühes aruandes on kuni {{max}} fotot.",
+    "pickStage": "Vali etapp",
+    "photoNeeded": "Lisa vähemalt üks foto",
+    "preparing": "Valmistame fotosid ette…",
+    "tooLarge": "Fotod on liiga suured. Eemalda üks ja saada uuesti.",
+    "offlineSaved": "Aruanne salvestatakse telefoni. Kui võrk tuleb tagasi, ava see leht ja saadame.",
+    "state": {
+      "sending": "Saadame…",
+      "queued": "Salvestatud telefoni, saatmata",
+      "sent": "Saadetud ✓"
+    },
+    "queueTitle": "Telefonis: {{count}}",
+    "queuedHint": "Kuni see leht on avatud, proovime uuesti. Kui ei läinud, vajuta „Saada uuesti“.",
+    "sendWithCurrent": "Saada foto {{percent}}% juures",
+    "stageUnknown": "Etapp",
+    "recentTitle": "Minu viimased aruanded",
+    "recentEmpty": "Aruandeid veel pole.",
+    "recentEmptyWho": "Saadetud aruanne ilmub siia.",
+    "status": {
+      "accepted": "Vastu võetud",
+      "pending": "Ootab kontrolli",
+      "confirmed": "Kontrollitud",
+      "rejected": "Tagasi lükatud"
+    },
+    "photoTotal": "Fotod: {{count}}",
+    "photoAlt": "Aruande foto: {{stage}}",
+    "thumbFailed": "Foto ei laadinud",
+    "prevPhoto": "Eelmine foto",
+    "nextPhoto": "Järgmine foto"
+  },
+  "linkPage": {
+    "noLink": {
+      "title": "Linki ei leitud",
+      "text": "Ava omaniku saadetud link tervikuna.",
+      "who": "Uue lingi annab objekti omanik."
+    },
+    "error": {
+      "invalidLink": "Link ei kehti enam, küsi omanikult uus",
+      "rateLimit": "Selle tunni jooksul on liiga palju aruandeid. Aruanne on telefonis, vajuta hiljem „Saada uuesti“.",
+      "photo": "Foto ei sobinud. Pildista uuesti ja saada.",
+      "stageNotFound": "Seda etappi objektil enam pole. Vali teine etapp.",
+      "reasonRequired": "Vähendamiseks on vaja põhjust.",
+      "percent": "Protsenti ei võetud vastu. Vali see uuesti.",
+      "network": "Võrku pole. Aruanne on telefonis.",
+      "loadNetwork": "Ei laadinud. Kontrolli võrku.",
+      "timeout": "Vastust pole. Aruanne on telefonis, kontrollime uuesti.",
+      "generic": "Ei õnnestunud. Proovi uuesti."
+    }
+  },
+  "clientView": {
+    "title": "Tööde käik",
+    "empty": "Omanik pole veel ühtegi etappi avanud",
+    "emptyWho": "Milliseid etappe näidata, otsustab objekti omanik.",
+    "confirmed": "Kinnitatud: {{percent}}%",
+    "updated": "uuendatud {{date}}",
+    "photoAlt": "Etapi foto: {{stage}}",
+    "photoFailed": "Foto ei laadinud"
+  },
+  "client": {
+    "disclaimer": {
+      "percentNotPayment": "% näitab tööde käiku, see ei ole maksmise alus"
+    }
   }
 }

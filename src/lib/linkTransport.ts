@@ -171,24 +171,24 @@ export function classifyLinkError(err: unknown): DraftError {
 export function linkDraftErrorKey(e: DraftError | null): string | null {
   switch (e) {
     case null: return null
-    case 'network': return 'workerLink.error.network'
-    case 'timeout': return 'workerLink.error.timeout'
-    case 'auth': return 'workerLink.error.invalidLink'
-    case 'rate_limit': return 'workerLink.error.rateLimit'
-    case 'photo_invalid': return 'workerLink.error.photo'
-    case 'stage_not_found': return 'workerLink.error.stageNotFound'
-    case 'comment_required': return 'workerLink.error.reasonRequired'
-    case 'invalid_percent': return 'workerLink.error.percent'
-    default: return 'workerLink.error.generic'
+    case 'network': return 'linkPage.error.network'
+    case 'timeout': return 'linkPage.error.timeout'
+    case 'auth': return 'linkPage.error.invalidLink'
+    case 'rate_limit': return 'linkPage.error.rateLimit'
+    case 'photo_invalid': return 'linkPage.error.photo'
+    case 'stage_not_found': return 'linkPage.error.stageNotFound'
+    case 'comment_required': return 'linkPage.error.reasonRequired'
+    case 'invalid_percent': return 'linkPage.error.percent'
+    default: return 'linkPage.error.generic'
   }
 }
 
 /** i18n key for a page-level load error (stages, reports, client view). */
 export function linkLoadErrorKey(code: string): string {
-  if (code === 'invalid_worker_link' || code === 'invalid_client_link') return 'workerLink.error.invalidLink'
-  if (code === 'network') return 'workerLink.error.loadNetwork'
-  if (code === 'timeout') return 'workerLink.error.timeout'
-  return 'workerLink.error.generic'
+  if (code === 'invalid_worker_link' || code === 'invalid_client_link') return 'linkPage.error.invalidLink'
+  if (code === 'network') return 'linkPage.error.loadNetwork'
+  if (code === 'timeout') return 'linkPage.error.timeout'
+  return 'linkPage.error.generic'
 }
 
 /** Draft queue transport for a worker link (one POST with photos; server dedupes by client_request_id). */

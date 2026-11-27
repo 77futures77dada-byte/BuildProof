@@ -722,5 +722,79 @@
       "network": "No connection. Try again.",
       "generic": "Something went wrong. Try again."
     }
+  },
+  "workerLink": {
+    "title": "Site report",
+    "worker": "You: {{name}}",
+    "stagesTitle": "Stages",
+    "noStages": "This site has no stages yet.",
+    "noStagesWho": "The site owner adds stages.",
+    "newReport": "Make a report",
+    "takePhoto": "Take a photo",
+    "fromGallery": "From gallery",
+    "photosCount": "Photos: {{count}} of {{max}}",
+    "removePhoto": "Remove photo {{n}}",
+    "maxPhotos": "One report takes at most {{max}} photos.",
+    "pickStage": "Choose a stage",
+    "photoNeeded": "Add at least one photo",
+    "preparing": "Preparing photos…",
+    "tooLarge": "The photos are too large. Remove one and send again.",
+    "offlineSaved": "The report will be saved on this phone. When you have a connection, open this page and we will send it.",
+    "state": {
+      "sending": "Sending…",
+      "queued": "Saved on this phone, not sent",
+      "sent": "Sent ✓"
+    },
+    "queueTitle": "On this phone: {{count}}",
+    "queuedHint": "While this page is open we keep trying. If it has not gone, tap “Send again”.",
+    "sendWithCurrent": "Send the photo at {{percent}}%",
+    "stageUnknown": "Stage",
+    "recentTitle": "My recent reports",
+    "recentEmpty": "No reports yet.",
+    "recentEmptyWho": "A sent report appears here.",
+    "status": {
+      "accepted": "Accepted",
+      "pending": "Awaiting review",
+      "confirmed": "Verified",
+      "rejected": "Rejected"
+    },
+    "photoTotal": "Photos: {{count}}",
+    "photoAlt": "Report photo: {{stage}}",
+    "thumbFailed": "The photo did not load",
+    "prevPhoto": "Previous photo",
+    "nextPhoto": "Next photo"
+  },
+  "linkPage": {
+    "noLink": {
+      "title": "Link not found",
+      "text": "Open the full link the owner sent you.",
+      "who": "The site owner gives out new links."
+    },
+    "error": {
+      "invalidLink": "This link no longer works. Ask the owner for a new one",
+      "rateLimit": "Too many reports this hour. The report is saved on this phone; tap “Send again” later.",
+      "photo": "The photo was not accepted. Retake it and send again.",
+      "stageNotFound": "This stage is no longer on the site. Choose another stage.",
+      "reasonRequired": "A reason for the decrease is needed.",
+      "percent": "The percentage was not accepted. Choose it again.",
+      "network": "No connection. The report is saved on this phone.",
+      "loadNetwork": "Did not load. Check your connection.",
+      "timeout": "No answer. The report is saved on this phone; we will check again.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
+  "clientView": {
+    "title": "Work progress",
+    "empty": "The owner has not opened any stages yet",
+    "emptyWho": "The site owner decides which stages to show.",
+    "confirmed": "Confirmed: {{percent}}%",
+    "updated": "updated {{date}}",
+    "photoAlt": "Stage photo: {{stage}}",
+    "photoFailed": "The photo did not load"
+  },
+  "client": {
+    "disclaimer": {
+      "percentNotPayment": "% shows work progress, not a basis for payment"
+    }
   }
 }
