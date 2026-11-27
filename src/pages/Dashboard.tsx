@@ -36,7 +36,7 @@ function groupProjects(projects: DashboardProject[]) {
 function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="m-0 text-h2 font-semibold text-fg">{title}</h2>
+      <h2 className="m-0 text-h2 font-medium text-fg">{title}</h2>
       <ul className="m-0 flex list-none flex-col gap-3 p-0">{children}</ul>
     </section>
   )
@@ -105,7 +105,7 @@ export function Dashboard() {
       <AppHeader />
       <main className="mx-auto flex max-w-[1120px] flex-col gap-6 px-4 py-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="m-0 text-h1 font-semibold text-fg">
+          <h1 className="m-0 text-h1 font-medium text-fg">
             {isWorker ? t('dashboard.pickProject') : t('dashboard.title')}
           </h1>
           {isGc && !creating && !empty ? (

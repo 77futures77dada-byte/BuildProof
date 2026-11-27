@@ -175,7 +175,7 @@ export function DemoObjectSection({ copy }: { copy: LandingCopy }) {
                         textAnchor="middle"
                         fontFamily="var(--sans)"
                         fontSize={stage.id === 'i' ? 12 : 14}
-                        fontWeight="600"
+                        fontWeight="500"
                         fill={LABEL[stage.state]}
                         stroke={stage.state === 'part' ? 'var(--illu-label-part-edge)' : 'none'}
                         strokeWidth="3"

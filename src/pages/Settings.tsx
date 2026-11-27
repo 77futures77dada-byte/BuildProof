@@ -85,7 +85,7 @@ export function Settings() {
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="flex flex-col gap-3">
-            <h2 className="m-0 text-h2 font-semibold text-fg">{t('people.title')}</h2>
+            <h2 className="m-0 text-h2 font-medium text-fg">{t('people.title')}</h2>
             {people.length === 0 ? (
               <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body text-fg">
                 {gateOpen ? t('people.emptyOpen') : hasLegalContact() ? t('people.emptyClosed') : t('people.emptyClosedNoContact')}
@@ -110,7 +110,7 @@ export function Settings() {
           <div className="flex flex-col gap-6">
             {known.length > 0 ? (
               <div className="flex flex-col gap-3">
-                <h2 className="m-0 text-h2 font-semibold text-fg">{t('known.title')}</h2>
+                <h2 className="m-0 text-h2 font-medium text-fg">{t('known.title')}</h2>
                 <p className="m-0 text-body text-fg">{t('known.hint')}</p>
                 <ul className="m-0 flex flex-col p-0">
                   {known.map((row) => (
@@ -328,7 +328,7 @@ function InviteForm({ projectId, known, onAddKnown, onInvited }: {
 
   return (
     <form onSubmit={(e) => void submit(e)} noValidate className="flex flex-col gap-4">
-      <h2 id="invite-title" className="m-0 text-h2 font-semibold text-fg">{role === 'foreman' ? t('invite.foreman') : t('invite.title')}</h2>
+      <h2 id="invite-title" className="m-0 text-h2 font-medium text-fg">{role === 'foreman' ? t('invite.foreman') : t('invite.title')}</h2>
       <div
         role="radiogroup"
         aria-labelledby="invite-title"

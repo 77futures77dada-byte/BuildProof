@@ -55,7 +55,7 @@ export default function House3DDevPage() {
     setRunning(false)
   }
   return <main className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
-    <header><p className="text-body font-medium uppercase tracking-wider text-fg">{d.badge}</p><h1 className="mt-2 text-h1 font-semibold text-fg">{d.title}</h1><p className="mt-1 text-body text-fg">{d.note}</p></header>
+    <header><p className="text-body font-medium uppercase tracking-wider text-fg">{d.badge}</p><h1 className="mt-2 text-h1 font-medium text-fg">{d.title}</h1><p className="mt-1 text-body text-fg">{d.note}</p></header>
     <section className="flex flex-wrap gap-2" aria-label={d.presets}>
       <button data-testid="preset-zero" className={`${button} bg-fg text-page`} onClick={() => setPercents(BASE_STAGES.map(() => 0))}>{d.zero}</button>
       <button data-testid="preset-mixed" className={`${button} bg-fg text-page`} onClick={() => setPercents([100, 60, 30, 50, 25, 50, 0])}>{d.mixed}</button>

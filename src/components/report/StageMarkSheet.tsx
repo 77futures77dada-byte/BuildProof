@@ -80,7 +80,7 @@ export function StageMarkSheet({ stage, onClose, onSave, onSaved }: StageMarkShe
     >
       <div className="flex flex-col gap-4">
         <NetBar />
-        <p className="m-0 text-h3 font-semibold text-fg [overflow-wrap:anywhere]">{name}</p>
+        <p className="m-0 text-h3 font-medium text-fg [overflow-wrap:anywhere]">{name}</p>
         <p className="m-0 text-field font-medium text-fg num-col">{t('report.wasWill', { from: base, to: value })}</p>
         <PercentStepper
           base={base}

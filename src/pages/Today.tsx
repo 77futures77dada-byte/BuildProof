@@ -332,13 +332,13 @@ export function Today() {
 
       {!stages.loading && !stages.error && stages.stages.length ? (
         <section className="flex flex-col gap-2">
-          <p className="m-0 text-h3 font-semibold">{t('today.objectPercent', { percent: overall })}</p>
+          <p className="m-0 text-h3 font-medium">{t('today.objectPercent', { percent: overall })}</p>
           <ProgressBar value={overall} thickness="thick" label={t('today.objectPercent', { percent: overall })} />
         </section>
       ) : null}
 
       <section className="flex flex-col gap-3">
-        <h2 className="m-0 text-h2 font-semibold">{t('today.myTasks')}</h2>
+        <h2 className="m-0 text-h2 font-medium">{t('today.myTasks')}</h2>
         {loading ? (
           <Spinner label={t('tasks.loading')} />
         ) : error ? (

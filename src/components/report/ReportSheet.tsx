@@ -220,7 +220,7 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
             </button>
             <div className="flex min-w-0 flex-col gap-1">
               <p className="m-0 truncate text-body font-medium text-fg">{projectName} · {stageName}</p>
-              <p className="m-0 text-h3 font-semibold text-fg" aria-live="polite">
+              <p className="m-0 text-h3 font-medium text-fg" aria-live="polite">
                 {stale ? t('report.yourPercent', { percent: value }) : t('report.wasWill', { from: base, to: value })}
               </p>
             </div>

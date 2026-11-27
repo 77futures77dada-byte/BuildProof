@@ -261,7 +261,7 @@ function ReviewQueue({ myId }: { myId: string | null }) {
       <main className="mx-auto flex max-w-[720px] flex-col gap-4 px-4 py-4">
         <UndoBar count={shownCount} label={t('review.undoN', { count: shownCount })} onUndo={undoAll} />
         <NetBar />
-        <h1 className="m-0 text-h1 font-semibold">{t('review.title')}</h1>
+        <h1 className="m-0 text-h1 font-medium">{t('review.title')}</h1>
 
         {projects.length > 1 ? (
           <FilterChips

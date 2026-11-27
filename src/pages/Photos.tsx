@@ -42,7 +42,7 @@ export function Photos() {
   return (
     <section className="flex flex-col gap-4">
       <NetBar />
-      <h2 className="m-0 text-h2 font-semibold text-fg">{t('photos.title')}</h2>
+      <h2 className="m-0 text-h2 font-medium text-fg">{t('photos.title')}</h2>
 
       {canUpload ? (
         <div className="flex flex-col gap-3 sm:flex-row">

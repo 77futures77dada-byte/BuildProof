@@ -35,7 +35,7 @@ export function StagePicker({ stages, currentId, onPick }: StagePickerProps) {
                 <span className="break-words">{s.name}</span>
                 {current ? <span className="text-body font-medium">{t('stagePicker.current')}</span> : null}
               </span>
-              <span className="num-col shrink-0 font-semibold">{s.progressPercent}%</span>
+              <span className="num-col shrink-0 font-medium">{s.progressPercent}%</span>
             </button>
           </li>
         )

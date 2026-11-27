@@ -81,7 +81,7 @@ export function IssuesView({
   return (
     <section className="flex flex-col gap-4">
       <NetBar />
-      <h2 className="m-0 text-h2 font-semibold text-fg">{t('issues.title')}</h2>
+      <h2 className="m-0 text-h2 font-medium text-fg">{t('issues.title')}</h2>
       {canCreate ? (
         <Button variant="primary" block onClick={() => setShowForm(true)} className="sm:w-auto sm:self-start">{t('issues.create')}</Button>
       ) : null}

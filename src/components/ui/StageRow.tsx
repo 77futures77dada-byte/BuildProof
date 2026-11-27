@@ -27,8 +27,8 @@ export function StageRow({ name, percent, status, meta, onPress, actions, childr
   const body = (
     <>
       <span className="flex items-baseline justify-between gap-3">
-        <span className="min-w-0 text-field font-medium [overflow-wrap:anywhere]">{name}</span>
-        <span className="shrink-0 text-h3 font-semibold">{pct}%</span>
+        <span className="min-w-0 text-field [overflow-wrap:anywhere]">{name}</span>
+        <span className="shrink-0 text-h3 font-medium">{pct}%</span>
       </span>
       <ProgressBar value={pct} />
       {meta ? <span className="text-body">{meta}</span> : null}

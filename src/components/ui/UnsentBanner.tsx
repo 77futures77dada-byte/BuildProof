@@ -60,7 +60,7 @@ export function UnsentBanner({
           {detail && variant === 'full' ? <p className="m-0 text-body">{detail}</p> : null}
         </div>
         <p className="m-0 flex shrink-0 flex-col items-end leading-none">
-          <span className="text-h2 font-semibold">{count}</span>
+          <span className="text-h2 font-medium">{count}</span>
           <span className="text-body">{countLabel}</span>
         </p>
       </div>

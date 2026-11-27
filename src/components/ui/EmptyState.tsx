@@ -21,7 +21,7 @@ export function EmptyState({ text, who, action, title, icon, className }: EmptyS
   return (
     <section className={cx('flex flex-col items-start gap-3 rounded-card border-2 border-dashed border-line bg-page p-5', className)}>
       {title ? (
-        <h3 className="m-0 flex items-center gap-2 text-h3 font-semibold text-fg">
+        <h3 className="m-0 flex items-center gap-2 text-h3 font-medium text-fg">
           {icon ? <StatusIcon kind={icon} /> : null}
           {title}
         </h3>

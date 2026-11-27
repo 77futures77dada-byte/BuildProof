@@ -69,7 +69,7 @@ export function ProjectLayout() {
           {project ? (
             <>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <h1 className="m-0 min-w-0 text-h1 font-semibold [overflow-wrap:anywhere]">{project.name}</h1>
+                <h1 className="m-0 min-w-0 text-h1 font-medium [overflow-wrap:anywhere]">{project.name}</h1>
                 {project.status !== 'active' ? <ProjectStatusBadge status={project.status} /> : null}
               </div>
               {project.address ? <p className="m-0 text-body [overflow-wrap:anywhere]">{project.address}</p> : null}
