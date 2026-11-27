@@ -179,3 +179,53 @@ describe('stage-5 critic fixes', () => {
     expect(store.rows.has('bad')).toBe(true)
   })
 })
+
+describe('second transport: one-shot submitDraft (worker link)', () => {
+  it('sends the whole draft once, skips upload and path lookup, removes it after', async () => {
+    const d = draft({ draftId: 'wl1', userId: 'link-a', photo: null, photos: [new Blob(['a']), new Blob(['b'])], attempts: 2, newPercent: 60 })
+    const store = memoryStore([d])
+    const calls: { id: string; percent: number; reason: string | null }[] = []
+    let lookups = 0
+    let uploads = 0
+    const t: DraftTransport = {
+      async currentPercent() { return 40 },
+      async upload() { uploads += 1 },
+      async reportIdForPath() { lookups += 1; return 'r-old' },
+      async submit() { throw new Error('must not be called') },
+      classify() { return 'other' },
+      async submitDraft(x, percent, reason) { calls.push({ id: x.draftId, percent, reason }) },
+    }
+    const out = await flushQueue(store, t, 'link-a')
+    expect(out).toEqual([{ draftId: 'wl1', result: 'sent' }])
+    expect(calls).toEqual([{ id: 'wl1', percent: 60, reason: null }])
+    expect(lookups + uploads).toBe(0)
+    expect(store.rows.has('wl1')).toBe(false)
+  })
+
+  it('keeps the draft and its error when submitDraft fails; decrease keeps its reason code', async () => {
+    const d = draft({ draftId: 'wl2', userId: 'link-a', seenPercent: 60, newPercent: 50, reason: 'rework' })
+    const store = memoryStore([d])
+    const reasons: (string | null)[] = []
+    const t: DraftTransport = {
+      async currentPercent() { return 60 },
+      async upload() {}, async reportIdForPath() { return null }, async submit() {},
+      classify(err) { return err instanceof Fail ? err.code : 'other' },
+      async submitDraft(_x, _p, reason) { reasons.push(reason); throw new Fail('rate_limit') },
+    }
+    const out = await flushQueue(store, t, 'link-a')
+    expect(reasons).toEqual(['rework'])
+    expect(out[0]).toEqual({ draftId: 'wl2', result: 'failed', error: 'rate_limit' })
+    expect(store.rows.get('wl2')?.state).toBe('queued')
+    expect(needsWorker(store.rows.get('wl2')!)).toBe(false)
+  })
+
+  it('link-page drafts are told apart from other accounts', async () => {
+    const { isLinkDraft } = await import('./drafts')
+    expect(isLinkDraft(draft({ userId: 'link:abc' }))).toBe(true)
+    expect(isLinkDraft(draft({ userId: 'u2' }))).toBe(false)
+  })
+
+  it('a rejected photo waits for the worker', () => {
+    expect(needsWorker(draft({ lastError: 'photo_invalid' }))).toBe(true)
+  })
+})

@@ -27,7 +27,7 @@ export function FilterChips({ chips, selected, onSelect, label, className }: Fil
             aria-pressed={on}
             onClick={() => onSelect(c.id)}
             className={cx(
-              'inline-flex min-h-12 shrink-0 items-center rounded-chip border-2 px-4 text-body font-medium whitespace-nowrap',
+              'inline-flex min-h-12 shrink-0 items-center rounded-chip border px-4 text-body font-medium whitespace-nowrap',
               'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus',
               on ? 'border-fg bg-fg text-page' : 'border-line bg-page text-fg hover:border-fg',
             )}

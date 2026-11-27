@@ -41,7 +41,7 @@ export function IssueCard({ issue, canManage, onUpdateStatus }: IssueCardProps) 
   }
 
   return (
-    <li className={cx('flex list-none flex-col gap-3 rounded-card border-2 border-l-4 border-line bg-page p-4', issueBorder(issue.priority))}>
+    <li className={cx('flex list-none flex-col gap-3 rounded-card border border-l-4 border-line bg-page p-4', issueBorder(issue.priority))}>
       <div className="flex items-start justify-between gap-3">
         <p className="m-0 min-w-0 text-field font-medium text-fg [overflow-wrap:anywhere]">{issue.title}</p>
         <UrgentBadge priority={issue.priority} />

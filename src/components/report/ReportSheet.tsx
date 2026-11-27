@@ -149,9 +149,9 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
               disabled={sending}
               onClick={() => setReason(label)}
               className={cx(
-                'inline-flex min-h-12 items-center rounded-chip border-2 px-4 text-field font-medium',
+                'inline-flex min-h-12 items-center rounded-chip border px-4 text-field font-medium',
                 'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus',
-                on ? 'border-fg bg-fg text-page' : 'border-fg bg-page text-fg hover:bg-surface',
+                on ? 'border-fg bg-fg text-page' : 'border-line bg-page text-fg hover:border-line-strong hover:bg-surface-2',
               )}
             >
               {label}
@@ -214,13 +214,13 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
               type="button"
               onClick={() => setView('preview')}
               disabled={!photoUrl}
-              className="size-[72px] shrink-0 overflow-hidden rounded-control border-2 border-line bg-surface focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              className="size-[72px] shrink-0 overflow-hidden rounded-control border border-line bg-surface focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
             >
               {photoUrl ? <img src={photoUrl} alt={t('report.photoAlt', { stage: stageName })} className="size-full object-cover" /> : null}
             </button>
             <div className="flex min-w-0 flex-col gap-1">
               <p className="m-0 truncate text-body font-medium text-fg">{projectName} · {stageName}</p>
-              <p className="m-0 text-h3 font-semibold text-fg" aria-live="polite">
+              <p className="m-0 text-h3 font-medium text-fg" aria-live="polite">
                 {stale ? t('report.yourPercent', { percent: value }) : t('report.wasWill', { from: base, to: value })}
               </p>
             </div>
@@ -258,7 +258,7 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
           {/* Any draft can be deleted from the phone (same confirm), so a draft stuck on an error never blocks a slot forever. */}
           {/* fresh shot: no red «Удалить» on the 10-second path; only saved / stuck drafts */}
           {draft.state === 'editing' ? null : view === 'delete' ? (
-            <div className="flex flex-col gap-3 rounded-card border-2 border-stale p-3">
+            <div className="flex flex-col gap-3 rounded-card border border-stale p-3">
               <p className="m-0 text-field font-medium text-fg">{t('send.deleteConfirm')}</p>
               <div className="flex flex-wrap gap-3">
                 <Button variant="danger" onClick={() => { void removeDraft(draft.draftId).then(onClose) }}>{t('common.delete')}</Button>

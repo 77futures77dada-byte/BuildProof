@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -25,8 +25,6 @@ import { StageProgressControl } from '../components/StageProgressControl'
 import { HouseModelBlock } from '../features/house3d/HouseModelBlock'
 import { stageColor } from '../features/house3d/palette'
 import { stagesToParts } from '../features/house3d/stagesToParts'
-import { ContactLines } from '../components/ContactLines'
-import { hasLegalContact } from '../lib/emailGate'
 import { UrgentBadge } from '../components/UrgentBadge'
 
 function capabilitiesFor(role: UserRole | undefined): StageActionCapabilities {
@@ -85,10 +83,23 @@ interface StageAction {
   stageName: string
 }
 
-function Section({ title, children, more }: { title: string; children: ReactNode; more?: ReactNode }) {
+function Section({ title, children, more, dense = false }: { title: string; children: ReactNode; more?: ReactNode; dense?: boolean }) {
+  if (dense) {
+    // desktop card of the bottom row: small title with its «Все …» link on the same line
+    return (
+      <section className="flex h-[152px] min-w-0 flex-col gap-1 rounded-card border border-line bg-surface p-3">
+        <div className="flex min-h-10 shrink-0 items-center justify-between gap-2">
+          <h2 className="m-0 text-field font-medium text-fg">{title}</h2>
+          {more}
+        </div>
+        {/* scrolls inside: focusable region so the keyboard can scroll it too */}
+        <div role="region" aria-label={title} tabIndex={0} className="min-h-0 flex-1 overflow-y-auto rounded-control focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus">{children}</div>
+      </section>
+    )
+  }
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="m-0 text-h2 font-semibold text-fg">{title}</h2>
+      <h2 className="m-0 text-h2 font-medium text-fg">{title}</h2>
       {children}
       {more}
     </section>
@@ -152,10 +163,13 @@ export function ProjectDashboardView({
     if (status !== 'active' || !stagesExist || !isManager) return { main: { kind: 'none' } }
     if (day0) {
       if (gateOpen && isGc) return { main: { kind: 'link', label: t('overview.next.inviteOpen'), to: `/project/${projectId}/settings#invite` } }
+      // worker links need no email gate: the owner can bring a worker in on day 0
       return {
         main: { kind: 'mark', label: t('overview.next.action') },
-        line: gateOpen ? undefined : hasLegalContact() ? t('gate.inviteLater') : t('gate.inviteLaterNoContact'),
-        secondary: gateOpen ? undefined : <ContactLines label={t('common.supportLabel')} />,
+        line: isGc ? t('links.invite.hint') : undefined,
+        secondary: isGc ? (
+          <Link to={`/project/${projectId}/links`} className={buttonClass({ variant: 'secondary', block: true })}>{t('links.invite.action')}</Link>
+        ) : undefined,
       }
     }
     if (stale && gateOpen && hasPeople) {
@@ -191,9 +205,61 @@ export function ProjectDashboardView({
     else setAction({ kind, stageId: stage.id, stageName: stage.name })
   }
 
+  const overlays = (
+    <>
+        <Sheet
+          open={markStage !== null}
+          onClose={() => {
+            setMarkStageId(null)
+            onChanged?.()
+          }}
+          title={markStage ? stageLabel(markStage.name) : t('overview.markStage')}
+        >
+          {markStage ? (
+            <StageProgressControl
+              value={markStage.progressPercent}
+              label={stageLabel(markStage.name)}
+              onCommit={(percent) => updateStageProgress(markStage.id, percent)}
+            />
+          ) : null}
+        </Sheet>
+
+        <Modal
+          open={action !== null}
+          onClose={closeAction}
+          label={
+            action?.kind === 'photo'
+              ? t('overview.addPhoto')
+              : action?.kind === 'task'
+                ? t('overview.createTask')
+                : t('overview.reportIssue')
+          }
+        >
+          {action?.kind === 'photo' ? (
+            <PhotoUploadForm
+              projectId={projectId}
+              fixedStageId={action.stageId}
+              heading={t('overview.photoHeading', { stage: stageLabel(action.stageName) })}
+              onUploaded={completeAction}
+              onCancel={closeAction}
+            />
+          ) : null}
+          {action?.kind === 'task' ? (
+            <TaskForm projectId={projectId} defaultStageId={action.stageId} onCreated={completeAction} onCancel={closeAction} />
+          ) : null}
+          {action?.kind === 'issue' ? (
+            <IssueForm projectId={projectId} onCreated={completeAction} onCancel={closeAction} />
+          ) : null}
+        </Modal>
+    </>
+  )
+
+  // Overview, variant B (reference: docs/design-inputs/overview-variant-b.png, 05-ui.md §7).
+  const desktop = useMediaQuery(LG_QUERY)
+
   const stateCard = (
-    <section className="flex flex-col gap-3 rounded-card border-2 border-line bg-surface p-4 shadow-card">
-      <p className="m-0 text-figure font-semibold">{t('overview.readyPercent', { percent: overallPercent })}</p>
+    <section className={desktop ? 'flex flex-col gap-3' : 'flex flex-col gap-3 rounded-card border border-line bg-surface p-4 shadow-card'}>
+      <p className="m-0 text-figure font-medium">{t('overview.readyPercent', { percent: overallPercent })}</p>
       <ProgressBar value={overallPercent} thickness="thick" label={t('overview.readiness')} />
       {isManager ? (
         <FreshnessChip icon={fresh.icon} className="self-start">{fresh.label}</FreshnessChip>
@@ -201,13 +267,13 @@ export function ProjectDashboardView({
         <p className="m-0 text-body">{t('overview.updatedAt', { date: formatDate(lastAt) })}</p>
       ) : null}
       {!stagesExist ? (
-        <p className="m-0 text-field font-medium">{isGc ? t('stages.emptyOwner') : t('stages.emptyAsk')}</p>
+        <p className="m-0 text-field">{isGc ? t('stages.emptyOwner') : t('stages.emptyAsk')}</p>
       ) : status === 'paused' && !isManager ? (
-        <p className="m-0 text-field font-medium">{t('overview.clientPaused')}</p>
+        <p className="m-0 text-field">{t('overview.clientPaused')}</p>
       ) : day0 && !isManager ? (
-        <p className="m-0 text-field font-medium">{t('overview.notStartedReadOnly')}</p>
+        <p className="m-0 text-field">{t('overview.notStartedReadOnly')}</p>
       ) : null}
-      {line ? <p className="m-0 text-body font-medium">{line}</p> : null}
+      {line ? <p className="m-0 text-body">{line}</p> : null}
       {main.kind === 'mark' ? (
         <Button block onClick={() => setMarkStageId(targetStage?.id ?? null)}>{main.label}</Button>
       ) : main.kind === 'link' ? (
@@ -217,56 +283,66 @@ export function ProjectDashboardView({
     </section>
   )
 
-  // Same colour as the stage's lines in the 3D model: on desktop the list beside the model is its
-  // legend; on a phone the model is folded away, so no dots there.
-  const desktop = useMediaQuery(LG_QUERY)
+  // Same colour as the stage's lines in the 3D model: on desktop the list beside the model is its legend.
   const partByStage = new Map(stagesToParts(stages.map((stage) => ({ key: stage.id, name: stage.name, percent: stage.progressPercent, sortOrder: stage.sortOrder }))).map((m) => [m.key, m.part]))
-  const stagesBlock = stagesExist ? (
-    <Section title={t('overview.stages')}>
-      <ul className="m-0 flex flex-col p-0">
-        {stages.map((stage) => (
+  const stageActions = (stage: StageProgress) =>
+    status === 'active' && (capabilities.photo || capabilities.task || capabilities.issue) && isManager ? (
+      <StageActionButtons stageName={stageLabel(stage.name)} capabilities={capabilities} onAction={(kind) => onStageAction(stage, kind)} />
+    ) : undefined
+  const stagesList = (
+    <ul className="m-0 flex flex-col p-0">
+      {stages.map((stage) =>
+        desktop ? (
+          // 40 px rows: name · % · «…» and a thin bar; dates and «Отметил …» live on the «Этапы» tab
+          <StageRow
+            key={stage.id}
+            variant="dense"
+            name={
+              <span className="inline-flex items-center gap-2">
+                {/* stage colour on the model's own navy (3:1 checked there); the navy ring keeps it visible on the light theme */}
+                <span aria-hidden="true" className="inline-block size-3 shrink-0 rounded-full" style={{ background: stageColor(partByStage.get(stage.id) ?? 'other'), boxShadow: '0 0 0 3px var(--house-bg)' }} />
+                {stageLabel(stage.name)}
+              </span>
+            }
+            percent={stage.progressPercent}
+            state={{
+              label: stage.progressPercent >= 100 ? t('house.ready') : stage.progressPercent > 0 ? t('house.working') : t('house.notStarted'),
+              title: stage.lastChangeAt ? formatDateTimeSmart(stage.lastChangeAt) : undefined,
+              fullName: stageLabel(stage.name),
+            }}
+            onPress={isManager && status === 'active' ? () => setMarkStageId(stage.id) : undefined}
+            actions={stageActions(stage)}
+          />
+        ) : (
           <StageRow
             key={stage.id}
             variant={isManager ? 'overview' : 'readonly'}
-            name={
-              desktop ? (
-                <span className="inline-flex items-baseline gap-2">
-                  {/* stage colour on the model's own navy (3:1 checked there); the navy ring keeps it visible on the light theme */}
-                  <span aria-hidden="true" className="inline-block size-3.5 shrink-0 rounded-full" style={{ background: stageColor(partByStage.get(stage.id) ?? 'other'), boxShadow: '0 0 0 3px var(--house-bg)' }} />
-                  {stageLabel(stage.name)}
-                </span>
-              ) : stageLabel(stage.name)
-            }
+            name={stageLabel(stage.name)}
             percent={stage.progressPercent}
             onPress={isManager && status === 'active' ? () => setMarkStageId(stage.id) : undefined}
             meta={stage.lastChangeAt ? formatDateTimeSmart(stage.lastChangeAt) : undefined}
-            actions={
-              status === 'active' && (capabilities.photo || capabilities.task || capabilities.issue) && isManager ? (
-                <StageActionButtons
-                  stageName={stageLabel(stage.name)}
-                  capabilities={capabilities}
-                  onAction={(kind) => onStageAction(stage, kind)}
-                />
-              ) : undefined
-            }
+            actions={stageActions(stage)}
           >
             <MarkedChip stage={stage} />
           </StageRow>
-        ))}
-      </ul>
-    </Section>
-  ) : null
+        ),
+      )}
+    </ul>
+  )
+  const stagesBlock = stagesExist ? <Section title={t('overview.stages')}>{stagesList}</Section> : null
 
+  // Desktop shows two items per card so the row fits the screen; the full lists are one link away.
+  const take = desktop ? 2 : 3
   const feedBlock = isManager ? (
-    <Section title={t('overview.feedTitle')}>
+    <Section title={desktop && feed.length ? `${t('overview.feedTitle')} · ${feed.length}` : t('overview.feedTitle')} dense={desktop}>
       {feed.length === 0 ? (
         <p className="m-0 text-body">{t('overview.feedEmpty')}</p>
       ) : (
         <>
-          <FeedList entries={feed.slice(0, 3)} />
-          {feed.length > 3 ? (
+          <FeedList entries={desktop ? feed : feed.slice(0, take)} dense={desktop} />
+          {!desktop && feed.length > take ? (
             <Disclosure label={t('overview.feedAll')}>
-              <FeedList entries={feed.slice(3)} />
+              <FeedList entries={feed.slice(take)} dense={desktop} />
             </Disclosure>
           ) : null}
         </>
@@ -277,6 +353,8 @@ export function ProjectDashboardView({
   const knownBlock = isGc && known.length > 0 ? (
     <KnownPeople
       rows={known}
+      take={take}
+      dense={desktop}
       onAdd={async (row) => {
         await access.toggleAccess(row.userId, true)
       }}
@@ -289,17 +367,19 @@ export function ProjectDashboardView({
       title={t('overview.recentPhotos')}
       more={<Link to={`/project/${projectId}/photos`} className={buttonClass({ variant: 'ghost' }, 'self-start px-1')}>{t('overview.allPhotos')}</Link>}
     >
-      <ul className="m-0 grid list-none grid-cols-3 gap-2 p-0">
-        {photos.slice(0, 3).map((photo) => <PhotoTile key={photo.id} photo={photo} />)}
+      <ul className="m-0 grid list-none grid-cols-3 gap-2 p-0 lg:grid-cols-6">
+        {photos.slice(0, desktop ? 6 : 3).map((photo) => <PhotoTile key={photo.id} photo={photo} />)}
       </ul>
     </Section>
   ) : null
 
   const issuesBlock = (
     <Section
-      title={t('overview.activeIssues')}
+      // desktop cards scroll inside: the count says how much is there
+      title={desktop && activeIssues.length ? `${t('overview.activeIssues')} · ${activeIssues.length}` : t('overview.activeIssues')}
+      dense={desktop}
       more={
-        activeIssues.length > 3 ? (
+        activeIssues.length > take ? (
           <Link to={`/project/${projectId}/issues`} className={buttonClass({ variant: 'ghost' }, 'self-start px-1')}>{t('overview.allIssues')}</Link>
         ) : undefined
       }
@@ -308,7 +388,7 @@ export function ProjectDashboardView({
         <p className="m-0 text-body">{t('overview.noActiveIssues')}</p>
       ) : (
         <ul className="m-0 flex list-none flex-col gap-2 p-0">
-          {activeIssues.slice(0, 3).map((issue) => <IssueRow key={issue.id} issue={issue} />)}
+          {(desktop ? activeIssues : activeIssues.slice(0, take)).map((issue) => <IssueRow key={issue.id} issue={issue} dense={desktop} />)}
         </ul>
       )}
     </Section>
@@ -321,82 +401,54 @@ export function ProjectDashboardView({
     sortOrder: stage.sortOrder,
   }))
 
-  // Overview, variant B.
-  // Desktop (≥ 1024 px): three columns in reading order = DOM order = Tab order —
-  //   panel 33 % (state + main action, issues, people, feed, photos) │ 3D model │ stage list;
-  //   4/4/4 up to 1279 px (a 3/12 list broke «Фундамент» mid-word at 1024), 4/5/3 from 1280 px.
-  // Phone: panel, stages right under the main action, the rest, then the 3D model
-  //   folded at the very end (on a phone it pushed the main action down: «Март» MED 8).
-  // The model mounts only where it is shown, so a phone never loads the three.js chunk
-  // unless «Показать дом» is opened.
-  return (
-    <div className="flex flex-col gap-8 lg:grid lg:grid-cols-12 lg:items-start lg:gap-6">
-      <div className="flex min-w-0 flex-col gap-8 lg:col-span-4">
-        {stateCard}
-        {desktop ? null : stagesBlock}
-        {issuesBlock}
-        {knownBlock}
-        {feedBlock}
-        {photosBlock}
-        {!desktop && stagesExist ? (
-          <Disclosure label={t('overview.showHouse')}>
-            <HouseModelBlock stages={houseStages} compact />
-          </Disclosure>
-        ) : null}
-      </div>
-      {desktop ? (
-        <>
-          <div className="min-w-0 lg:col-span-4 xl:col-span-5">
+  // Desktop (≥ 1024 px), fits 1366×768 and 1440×900 without scrolling (check-overflow «fit»):
+  //   one band — panel 33 % (state + main action) │ 3D model (height tied to the window) │ stage list —
+  //   then a row of three compact cards: issues │ people │ feed; photos below the fold.
+  //   Reading order = DOM order = Tab order. Columns 4/4/4 up to 1279 px, 4/5/3 from 1280 px.
+  // Phone: panel, the model right under it (~300 px, flat placeholder until it nears the screen,
+  //   then three.js loads), stages, issues, people, feed, photos.
+  if (desktop) {
+    return (
+      <div className="flex flex-col gap-4">
+        <section className="grid grid-cols-12 overflow-hidden rounded-card border border-line bg-surface">
+          <div className="col-span-4 min-w-0 border-r border-line p-4">{stateCard}</div>
+          <div className="col-span-4 min-w-0 p-3 xl:col-span-5">
             {stagesExist ? <HouseModelBlock stages={houseStages} compact /> : null}
           </div>
-          <div className="min-w-0 lg:col-span-4 xl:col-span-3">{stagesBlock}</div>
-        </>
+          <div className="col-span-4 flex min-w-0 flex-col gap-2 border-l border-line p-4 xl:col-span-3">
+            {stagesExist ? (
+              <>
+                <h2 className="m-0 text-field font-medium text-fg">{t('overview.stages')}</h2>
+                {stagesList}
+              </>
+            ) : null}
+          </div>
+        </section>
+        <div data-fit="cards" className="grid grid-cols-3 items-start gap-4">
+          {issuesBlock}
+          {knownBlock ?? <div />}
+          {feedBlock ?? <div />}
+        </div>
+        {photosBlock}
+        {overlays}
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col gap-8">
+      {stateCard}
+      {stagesExist ? (
+        <LazyMount placeholder={<HousePlaceholder />}>
+          <HouseModelBlock stages={houseStages} compact />
+        </LazyMount>
       ) : null}
-
-      <Sheet
-        open={markStage !== null}
-        onClose={() => {
-          setMarkStageId(null)
-          onChanged?.()
-        }}
-        title={markStage ? stageLabel(markStage.name) : t('overview.markStage')}
-      >
-        {markStage ? (
-          <StageProgressControl
-            value={markStage.progressPercent}
-            label={stageLabel(markStage.name)}
-            onCommit={(percent) => updateStageProgress(markStage.id, percent)}
-          />
-        ) : null}
-      </Sheet>
-
-      <Modal
-        open={action !== null}
-        onClose={closeAction}
-        label={
-          action?.kind === 'photo'
-            ? t('overview.addPhoto')
-            : action?.kind === 'task'
-              ? t('overview.createTask')
-              : t('overview.reportIssue')
-        }
-      >
-        {action?.kind === 'photo' ? (
-          <PhotoUploadForm
-            projectId={projectId}
-            fixedStageId={action.stageId}
-            heading={t('overview.photoHeading', { stage: stageLabel(action.stageName) })}
-            onUploaded={completeAction}
-            onCancel={closeAction}
-          />
-        ) : null}
-        {action?.kind === 'task' ? (
-          <TaskForm projectId={projectId} defaultStageId={action.stageId} onCreated={completeAction} onCancel={closeAction} />
-        ) : null}
-        {action?.kind === 'issue' ? (
-          <IssueForm projectId={projectId} onCreated={completeAction} onCancel={closeAction} />
-        ) : null}
-      </Modal>
+      {stagesBlock}
+      {issuesBlock}
+      {knownBlock}
+      {feedBlock}
+      {photosBlock}
+      {overlays}
     </div>
   )
 }
@@ -414,7 +466,7 @@ function MarkedChip({ stage }: { stage: StageProgress }) {
   return <FreshnessChip className="self-start">{t(key)}</FreshnessChip>
 }
 
-function FeedList({ entries }: { entries: FeedEntry[] }) {
+function FeedList({ entries, dense = false }: { entries: FeedEntry[]; dense?: boolean }) {
   const { t } = useTranslation()
   return (
     <ul className="m-0 flex list-none flex-col gap-3 p-0">
@@ -422,13 +474,13 @@ function FeedList({ entries }: { entries: FeedEntry[] }) {
         const name = e.name ?? t('common.noName')
         const stage = stageLabel(e.stage)
         return (
-          <li key={`${e.kind}-${e.id}`} className="flex flex-col gap-1 border-b-2 border-line pb-3 last:border-b-0">
-            <span className="text-body font-medium [overflow-wrap:anywhere]">
+          <li key={`${e.kind}-${e.id}`} className={dense ? 'flex flex-col border-b border-line pb-2 last:border-b-0' : 'flex flex-col gap-1 border-b border-line pb-3 last:border-b-0'}>
+            <span className="text-body [overflow-wrap:anywhere]">
               {e.kind === 'report'
                 ? t('activity.report', { name, stage, from: e.from, to: e.to })
                 : t('activity.photo', { name, stage })}
             </span>
-            <span className="num-col text-body">{formatDateTimeSmart(e.at)}</span>
+            <span className="num-col text-body text-muted-strong lg:text-meta">{formatDateTimeSmart(e.at)}</span>
           </li>
         )
       })}
@@ -436,25 +488,27 @@ function FeedList({ entries }: { entries: FeedEntry[] }) {
   )
 }
 
-function KnownPeople({ rows, onAdd, allTo }: { rows: AccessRow[]; onAdd: (row: AccessRow) => Promise<void>; allTo: string }) {
+function KnownPeople({ rows, onAdd, allTo, take = 3, dense = false }: { rows: AccessRow[]; onAdd: (row: AccessRow) => Promise<void>; allTo: string; take?: number; dense?: boolean }) {
   const { t } = useTranslation()
   const [busy, setBusy] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   return (
     <Section
-      title={t('known.title')}
+      title={dense ? `${t('known.title')} · ${rows.length}` : t('known.title')}
+      dense={dense}
       more={<Link to={allTo} className={buttonClass({ variant: 'ghost' }, 'self-start px-1')}>{t('people.all')}</Link>}
     >
-      <p className="m-0 text-body">{t('known.hint')}</p>
-      <ul className="m-0 flex list-none flex-col gap-3 p-0">
-        {rows.slice(0, 3).map((row) => (
-          <li key={row.userId} className="flex flex-wrap items-center justify-between gap-3 rounded-control border-2 border-line p-3">
-            <span className="min-w-0 text-field font-medium [overflow-wrap:anywhere]">
+      {dense ? null : <p className="m-0 text-body">{t('known.hint')}</p>}
+      <ul className={dense ? 'm-0 flex list-none flex-col gap-1 p-0' : 'm-0 flex list-none flex-col gap-3 p-0'}>
+        {(dense ? rows : rows.slice(0, take)).map((row) => (
+          <li key={row.userId} className={dense ? 'flex items-center justify-between gap-2' : 'flex flex-wrap items-center justify-between gap-3 rounded-control border border-line p-3'}>
+            <span title={dense ? `${row.name} · ${t(`roles.${row.role}`)}` : undefined} className={dense ? 'min-w-0 truncate text-body' : 'min-w-0 text-field [overflow-wrap:anywhere]'}>
               {row.name} · {t(`roles.${row.role}`)}
             </span>
             <Button
               variant="secondary"
+              className={dense ? 'shrink-0 whitespace-nowrap px-3' : undefined}
               loading={busy === row.userId}
               onClick={async () => {
                 setBusy(row.userId)
@@ -474,7 +528,7 @@ function KnownPeople({ rows, onAdd, allTo }: { rows: AccessRow[]; onAdd: (row: A
           </li>
         ))}
       </ul>
-      <p aria-live="polite" className="m-0 text-body font-medium empty:hidden">{message}</p>
+      <p aria-live="polite" className="m-0 text-body empty:hidden">{message}</p>
       <ErrorMessage message={error} />
     </Section>
   )
@@ -500,21 +554,48 @@ function PhotoTile({ photo }: { photo: OverviewPhoto }) {
   )
 }
 
-function IssueRow({ issue }: { issue: ActiveIssue }) {
+function IssueRow({ issue, dense = false }: { issue: ActiveIssue; dense?: boolean }) {
   const { t } = useTranslation()
   const { id } = useParams<{ id: string }>()
   return (
     <li>
       <Link
         to={`/project/${id}/issues`}
-        className={`flex min-h-12 items-start justify-between gap-3 rounded-control border-2 border-l-4 border-line bg-page p-3 text-fg no-underline hover:bg-surface focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus ${issueBorder(issue.priority)}`}
+        className={`flex min-h-12 items-start justify-between gap-3 rounded-control border border-l-4 border-line bg-page ${dense ? 'px-3 py-2 pointer-fine:min-h-10' : 'p-3'} text-fg no-underline hover:bg-surface focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus ${issueBorder(issue.priority)}`}
       >
         <span className="flex min-w-0 flex-col gap-1">
-          <span className="text-field font-medium [overflow-wrap:anywhere]">{issue.title}</span>
-          {issue.dueDate ? <span className="text-body">{t('common.due', { date: formatDate(issue.dueDate) })}</span> : null}
+          <span title={dense ? issue.title : undefined} className={dense ? 'truncate text-body' : 'text-field [overflow-wrap:anywhere]'}>{issue.title}</span>
+          {issue.dueDate ? <span className="text-body text-muted-strong lg:text-meta">{t('common.due', { date: formatDate(issue.dueDate) })}</span> : null}
         </span>
         <UrgentBadge priority={issue.priority} />
       </Link>
     </li>
   )
+}
+
+/** Flat stand-in for the 3D model on a phone (300 px, model navy) until the model is near the screen. */
+function HousePlaceholder() {
+  const { t } = useTranslation()
+  return (
+    <div className="flex h-[300px] items-end rounded-2xl border border-inverse-line p-4 text-body text-on-inverse" style={{ background: 'var(--house-bg)' }}>
+      {t('house.title')}
+    </div>
+  )
+}
+
+/** Mounts `children` only when the placeholder comes within 200 px of the viewport (lazy three.js on phones). */
+function LazyMount({ placeholder, children }: { placeholder: ReactNode; children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null)
+  // no IntersectionObserver (very old browser): just show the model
+  const [shown, setShown] = useState(() => typeof IntersectionObserver !== 'function')
+  useEffect(() => {
+    const el = ref.current
+    if (!el || shown) return
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) { setShown(true); io.disconnect() }
+    }, { rootMargin: '200px' })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [shown])
+  return <div ref={ref}>{shown ? children : placeholder}</div>
 }

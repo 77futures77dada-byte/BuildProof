@@ -37,17 +37,17 @@ export function Tariff() {
         <table className="w-full border-separate border-spacing-0 text-left text-body">
           <thead>
             <tr>
-              <th scope="col" className="border-b-2 border-line px-3 py-3 font-medium">{t('tariff.colObjects')}</th>
-              <th scope="col" className="border-b-2 border-line px-3 py-3 text-right font-medium">{t('tariff.colPrice')}</th>
+              <th scope="col" className="border-b border-line px-3 py-3 font-medium">{t('tariff.colObjects')}</th>
+              <th scope="col" className="border-b border-line px-3 py-3 text-right font-medium">{t('tariff.colPrice')}</th>
             </tr>
           </thead>
           <tbody>
             {priceTable().map((row) => (
               <tr key={row.objects}>
-                <td className={cx('px-3 py-3 align-top', row.capped ? 'rounded-l-control border-y-2 border-l-2 border-fg' : 'border-b-2 border-line')}>
+                <td className={cx('px-3 py-3 align-top', row.capped ? 'rounded-l-control border-y border-l border-fg' : 'border-b border-line')}>
                   {row.capped ? t(email ? 'tariff.capRow' : 'tariff.capRowNoContact', { from: row.objects, max: p.capMaxObjects }) : t('tariff.objects', { count: row.objects })}
                 </td>
-                <td className={cx('px-3 py-3 text-right align-top whitespace-nowrap', row.capped ? 'rounded-r-control border-y-2 border-r-2 border-fg' : 'border-b-2 border-line')}>
+                <td className={cx('px-3 py-3 text-right align-top whitespace-nowrap', row.capped ? 'rounded-r-control border-y border-r border-fg' : 'border-b border-line')}>
                   <span className="num-col text-h3">{row.eur} €</span>
                   {row.capped ? <span className="block font-medium">{t('tariff.capNote', { eur: p.capEur })}</span> : null}
                 </td>

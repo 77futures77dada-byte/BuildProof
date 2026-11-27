@@ -10,6 +10,7 @@ import { Photos } from '../pages/Photos'
 import { Tasks } from '../pages/Tasks'
 import { Issues } from '../pages/Issues'
 import { Settings } from '../pages/Settings'
+import { ProjectLinks } from '../pages/ProjectLinks'
 import { NotFound } from '../pages/NotFound'
 import { Tariff } from '../pages/Tariff'
 import { Review } from '../pages/Review'
@@ -31,6 +32,7 @@ export default function AuthenticatedRoutes() {
         <Route path="tasks" element={<Tasks />} />
         <Route path="issues" element={<Issues />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="links" element={<ProjectLinks />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

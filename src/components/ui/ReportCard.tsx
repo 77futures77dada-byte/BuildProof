@@ -38,7 +38,7 @@ export function ReportCard({ stage, from, to, author, sentAt, status, reason, ph
     <img src={photoUrl} alt={photoAlt} loading="lazy" className="size-[72px] shrink-0 rounded-chip bg-surface object-cover" />
   ) : null
   return (
-    <article className={cx('flex gap-3 rounded-card border-2 border-line bg-surface p-3 text-fg', variant === 'viewer' && 'border-0 bg-transparent p-0', className)}>
+    <article className={cx('flex gap-3 rounded-card border border-line bg-surface p-3 text-fg', variant === 'viewer' && 'border-0 bg-transparent p-0', className)}>
       {thumb && onOpenPhoto ? (
         <button type="button" onClick={onOpenPhoto} className="shrink-0 rounded-chip focus-visible:outline-3 focus-visible:outline-focus">{thumb}</button>
       ) : thumb}

@@ -368,25 +368,119 @@ OVERFLOW not-found signed in /no-such-page @390: scrollWidth 477 > 390; div.flex
 | check-contrast | PASS | pairs=114 failures=0 drift=0 (0s) |
 | check-ru-latin | PASS | offending=0 strings=824 (json=545, landing=279) (0s) |
 | check-overflow | PASS | routes=32 loads=320 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (194s) |
-## 2026-11-27 — worker/client links backend
+## 2026-11-27T15:31:07Z — overview-b плотность: Inter, ≤500, 1px, fit
 
-Изменения проверены в чистой ветке `codex/worker-client-links` от `origin/main` (`64fd2b1`, включает миграцию 006). Ни одна миграция не применялась.
-
-| check | result | details |
+| check | result | key numbers |
 |---|---|---|
+| lint | PASS | warnings=0 errors=0 (3s) |
+| build | PASS | built in 1.49s, VITE_SUPABASE_URL=fixture (20s) |
+| test | PASS | 14 passed (14); 105 passed (105) (11s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 heavy=0 base=0 files=0 scanned=172 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=116 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=850 (json=571, landing=279) (0s) |
+| check-overflow | FAIL | routes=32 loads=320 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=2 fit_blocks=1440x900:3/6,1366x768:3/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (213s) |
+
+<details><summary>check-overflow: first lines of the failure</summary>
+
+```
+FIT overview @1440x900: issues / people / feed bottom 1166 / 900
+FIT overview @1366x768: issues / people / feed bottom 1034 / 768
+check-overflow: routes=32 loads=320 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=2 fit_blocks=1440x900:3/6,1366x768:3/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95
+```
+</details>
+
+## 2026-11-27T15:38:07Z — overview-b плотность: всё на экране 1440x900 / 1366x768
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.10s, VITE_SUPABASE_URL=fixture (17s) |
+| test | PASS | 14 passed (14); 105 passed (105) (9s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 heavy=0 base=0 files=0 scanned=172 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=116 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=850 (json=571, landing=279) (0s) |
+| check-overflow | PASS | routes=32 loads=320 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=0 fit_blocks=1440x900:6/6,1366x768:6/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (187s) |
+
+## 2026-11-27T18:16:38Z — dense r1: счётчики, значки состояния
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (3s) |
+| build | PASS | built in 3.66s, VITE_SUPABASE_URL=fixture (19s) |
+| test | PASS | 14 passed (14); 105 passed (105) (10s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 heavy=0 base=0 files=0 scanned=172 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=116 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=850 (json=571, landing=279) (0s) |
+| check-overflow | PASS | routes=32 loads=320 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=0 fit_blocks=1440x900:6/6,1366x768:6/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (205s) |
+
+## 2026-11-27T18:21:34Z — dense r2: регион прокрутки, title
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.14s, VITE_SUPABASE_URL=fixture (16s) |
+| test | PASS | 14 passed (14); 105 passed (105) (9s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 heavy=0 base=0 files=0 scanned=172 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=116 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=850 (json=571, landing=279) (0s) |
+| check-overflow | PASS | routes=32 loads=320 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=0 fit_blocks=1440x900:6/6,1366x768:6/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (204s) |
+## 2026-11-27 — worker/client links backend
+Изменения проверены в чистой ветке `codex/worker-client-links` от `origin/main` (`64fd2b1`, включает миграцию 006). Ни одна миграция не применялась.
+| check | result | details |
 | `npm run lint` | PASS | без ошибок |
 | `ALLOW_PLACEHOLDERS=1 npm run build` | PASS | production build завершён; только предупреждения Vite о размере чанка и смешанном dynamic/static import |
 | `npm test` | PASS | 14 файлов, 105 тестов |
 | API tests | PASS | 5 тестов: bearer auth, роль, чужой проект, энтропия токена, хэш |
 | `git diff --check` | PASS | whitespace проверка чистая |
 | pgTAP | NOT RUN | 17 утверждений добавлены в `supabase/tests/worker_client_links.sql`; `psql`, Docker и Supabase CLI недоступны в окружении |
-
 Обзор безопасности выполнен для трёх ролей (взломщик с чужой ссылкой, владелец фирмы, бригадир на объекте), по два прохода на каждый пункт. HIGH: 0, MED: 0 в обоих проходах.
-
 | пункт | проход 1 | проход 2 |
-|---|---|---|
 | права подтверждения отчётов | HIGH 0 / MED 0 — роль, самоподтверждение и фирменная область проверены в RPC | HIGH 0 / MED 0 — пакетное подтверждение ограничено accepted и порогом проекта; self-review запрещён |
 | ссылки рабочих | HIGH 0 / MED 0 — проверены хэш токена, срок, отзыв, лимиты и ограничение project_id | HIGH 0 / MED 0 — повтор запроса идемпотентен, фото и последние отчёты привязаны к конкретной ссылке |
 | ссылки заказчиков | HIGH 0 / MED 0 — фильтр status=confirmed и видимость этапа проверены; фото требуют отдельного согласия | HIGH 0 / MED 0 — preview использует ту же RPC-фильтрацию; данные комментариев и соседних фирм не возвращаются |
-
 Ограничение проверки: из-за отсутствия pgTAP runtime выводы по SQL основаны на чтении миграций и тестового сценария, а не на выполнении в PostgreSQL.
+
+## 2026-11-27T18:45:28Z — links-ui: владелец + страницы по ссылке
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.33s, VITE_SUPABASE_URL=fixture (16s) |
+| test | PASS | 18 passed (18); 133 passed (133) (10s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 heavy=0 base=0 files=0 scanned=189 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=116 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=975 (json=696, landing=279) (0s) |
+| check-overflow | FAIL | routes=37 loads=370 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=2 fit_blocks=1440x900:3/6,1366x768:3/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (228s) |
+
+<details><summary>check-overflow: first lines of the failure</summary>
+
+```
+FIT overview @1440x900: issues / people / feed bottom 908 / 900
+FIT overview @1366x768: issues / people / feed bottom 776 / 768
+check-overflow: routes=37 loads=370 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=2 fit_blocks=1440x900:3/6,1366x768:3/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95
+```
+</details>
+
+## 2026-11-27T18:50:12Z — links-ui: интеграция, 3D −10 px
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.28s, VITE_SUPABASE_URL=fixture (18s) |
+| test | PASS | 18 passed (18); 133 passed (133) (10s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 heavy=0 base=0 files=0 scanned=189 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=116 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=975 (json=696, landing=279) (0s) |
+| check-overflow | PASS | routes=37 loads=370 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=0 fit_blocks=1440x900:6/6,1366x768:6/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (234s) |
+
+## 2026-11-27T19:01:37Z — links r1: правки А+Б, токен до отрисовки
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (3s) |
+| build | PASS | built in 1.27s, VITE_SUPABASE_URL=fixture (17s) |
+| test | PASS | 19 passed (19); 137 passed (137) (11s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 heavy=0 base=0 files=0 scanned=191 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=116 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=981 (json=702, landing=279) (0s) |
+| check-overflow | PASS | routes=37 loads=370 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=0 fit_blocks=1440x900:6/6,1366x768:6/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (223s) |

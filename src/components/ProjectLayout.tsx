@@ -7,6 +7,7 @@ import { AppHeader } from './AppHeader'
 import { ProjectStatusBadge } from './ProjectStatusBadge'
 import { Skeleton, Tabs, buttonClass } from './ui'
 import type { TabItem } from './ui'
+import { isReportReviewOn } from '../lib/reportReview'
 
 interface Tab {
   to: string
@@ -24,6 +25,8 @@ const MANAGER_TABS: Tab[] = [
 
 // «Люди» keeps the /settings route (brief §2.3 В2); gc only.
 const PEOPLE_TAB: Tab = { to: 'settings', labelKey: 'nav.people', end: false }
+// «Ссылки»: worker / client links and what the client sees; gc only (owner-only API).
+const LINKS_TAB: Tab = { to: 'links', labelKey: 'nav.links', end: false }
 
 // Workers get a short, action-first strip: their day, then where they report.
 const WORKER_TABS: Tab[] = [
@@ -35,7 +38,7 @@ const WORKER_TABS: Tab[] = [
 
 function tabsFor(role: UserRole | undefined): Tab[] {
   if (role === 'worker') return WORKER_TABS
-  if (role === 'gc') return [...MANAGER_TABS, PEOPLE_TAB]
+  if (role === 'gc') return [...MANAGER_TABS, PEOPLE_TAB, LINKS_TAB]
   return MANAGER_TABS
 }
 
@@ -49,12 +52,15 @@ export function ProjectLayout() {
   const { project, loading, error } = useProject(id)
   const { t } = useTranslation()
   const onPeople = useMatch('/project/:id/settings') !== null
+  const onLinks = useMatch('/project/:id/links') !== null
 
   const role = profile?.role
   // Only the owner ever reaches «Люди» (03 §1): a direct visit goes to the overview.
-  if (onPeople && profile && role !== 'gc') return <Navigate to={`/project/${id}`} replace />
+  if ((onPeople || onLinks) && profile && role !== 'gc') return <Navigate to={`/project/${id}`} replace />
 
   const isWorker = role === 'worker'
+  // K15 queue is cross-project (/review); owner and foreman enter it pre-filtered to this object.
+  const canReview = isReportReviewOn() && (role === 'gc' || role === 'foreman')
   const items: TabItem[] = tabsFor(role).map((tab) => ({
     key: tab.to || 'overview',
     label: t(tab.labelKey),
@@ -65,14 +71,19 @@ export function ProjectLayout() {
   return (
     <div className="min-h-screen bg-page text-fg">
       <AppHeader>
-        <div className="mx-auto flex max-w-[1120px] flex-col gap-1 px-4 pt-2 pb-3">
+        <div className="mx-auto flex max-w-[1120px] flex-col gap-1 px-4 pt-2 pb-3 lg:flex-row lg:flex-wrap lg:items-baseline lg:gap-x-3 lg:pt-0 lg:pb-0">
           {project ? (
             <>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <h1 className="m-0 min-w-0 text-h1 font-semibold [overflow-wrap:anywhere]">{project.name}</h1>
+                <h1 className="m-0 min-w-0 text-h1 font-medium lg:text-h2 [overflow-wrap:anywhere]">{project.name}</h1>
                 {project.status !== 'active' ? <ProjectStatusBadge status={project.status} /> : null}
               </div>
-              {project.address ? <p className="m-0 text-body [overflow-wrap:anywhere]">{project.address}</p> : null}
+              {project.address ? <p className="m-0 text-body text-muted-strong lg:text-meta [overflow-wrap:anywhere]">{project.address}</p> : null}
+              {canReview ? (
+                <Link to={`/review?project=${project.id}`} data-review-entry className={buttonClass({ variant: 'secondary' }, 'self-start lg:ml-auto lg:self-center')}>
+                  {t('review.openQueue')}
+                </Link>
+              ) : null}
             </>
           ) : loading ? (
             <Skeleton variant="header" />
@@ -82,9 +93,9 @@ export function ProjectLayout() {
           <Tabs items={items} label={project?.name ?? t('nav.overview')} variant={isWorker ? 'worker' : 'owner'} className="border-b-0" />
         </div>
       </AppHeader>
-      <main className="mx-auto max-w-[1120px] px-4 py-6">
+      <main className="mx-auto max-w-[1120px] px-4 py-6 lg:py-4">
         {!loading && error ? (
-          <section role="alert" className="flex flex-col items-start gap-3 rounded-card border-2 border-stale bg-page p-5">
+          <section role="alert" className="flex flex-col items-start gap-3 rounded-card border border-stale bg-page p-5">
             <p className="m-0 text-field font-medium">{t('overview.loadFailed')}</p>
             <Link to="/dashboard" className={buttonClass({ variant: 'secondary' })}>{t('tariff.toProjects')}</Link>
           </section>

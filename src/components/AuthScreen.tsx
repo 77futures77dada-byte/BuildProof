@@ -26,7 +26,7 @@ export function AuthScreen({ children, footer }: { children: ReactNode; footer?:
         </div>
       </header>
       <main className="flex flex-1 flex-col items-center px-4 pt-4 pb-8 lg:justify-center">
-        <div className="flex w-full max-w-[420px] flex-col gap-5 lg:rounded-card lg:border-2 lg:border-line lg:p-8 lg:shadow-card">
+        <div className="flex w-full max-w-[420px] flex-col gap-5 lg:rounded-card lg:border lg:border-line lg:p-8 lg:shadow-card">
           {children}
         </div>
         {footer ? <div className="mt-6 flex w-full max-w-[420px] flex-col gap-3">{footer}</div> : null}

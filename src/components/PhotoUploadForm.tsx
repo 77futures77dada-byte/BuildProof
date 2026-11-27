@@ -63,7 +63,7 @@ export function PhotoUploadForm({ projectId, fixedStageId, heading, initialFile 
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {heading ? <h3 className="m-0 text-h3 font-semibold text-fg">{heading}</h3> : null}
+      {heading ? <h3 className="m-0 text-h3 font-medium text-fg">{heading}</h3> : null}
 
       <ImagePicker onChange={(f) => { setFile(f); setError(null) }} disabled={busy} initialFile={initialFile} />
 

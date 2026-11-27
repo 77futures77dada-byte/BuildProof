@@ -6,13 +6,18 @@
 //   colorfn  — rgb( / rgba( / hsl( / hsla( / oklch( / oklab( literals
 //   font     — a font-family / fontFamily declaration whose value is not var(--font-…) / inherit
 //   palette  — a Tailwind fixed-palette colour class (bg-sky-600, text-white, …) in .ts/.tsx
-//   small    — text below 17 px in app code (not src/features/landing/):
+//   small    — text below 17 px in app code (not src/features/landing/); `text-meta` (16 px)
+//              only with an lg:/xl: prefix (desktop secondary captions, owner 2026-11-28):
 //              classes text-xs / text-sm / text-[<17px] / text-[<1.0625rem] in .ts/.tsx,
 //              font-size / font shorthand < 17 px in .css
 //   weight   — in worker-zone files (FIELD_ZONE below) and in CSS rules whose selector
 //              starts with [data-zone="field"] (tokens.css included): weight 400 / normal /
 //              lighter / thin, classes font-normal / font-light / font-thin / font-extralight /
 //              text-base, font-size < 17 px
+//   heavy    — anywhere (landing and tokens.css included): weight above 500 — classes
+//              font-semibold / font-bold / font-extrabold / font-black, CSS font-weight 600–900 /
+//              bold / bolder, `font: 600 …`, SVG font-weight / fontWeight 600–900
+//              (owner 2026-11-28: max 500 on the whole site, hierarchy by size and colour)
 //   base     — tokens.css lacks `input, button, select, textarea { font: inherit`
 // Scans src/**/*.{ts,tsx,css} (not *.test.ts[x]) and index.html. Comments are ignored.
 //
@@ -37,7 +42,7 @@ const REPORT = args.has('--report')
 const VERBOSE = args.has('--verbose')
 const NO_TEMP = args.has('--no-allow')
 const TOKENS_FILE = 'src/styles/tokens.css'
-const KINDS = ['hex', 'colorfn', 'font', 'palette', 'small', 'weight', 'base']
+const KINDS = ['hex', 'colorfn', 'font', 'palette', 'small', 'weight', 'heavy', 'base']
 
 /** Worker and foreman zone (02-type §7.3): route roots + everything they render. */
 const FIELD_ZONE = [
@@ -93,6 +98,13 @@ const px = (n, unit) => (unit === 'rem' ? Number(n) * 16 : Number(n))
 // CSS sizes: `font-size: 15px`, `font: 500 14px/1.3 …`, `font: 12px …`
 const CSS_SIZE = /(?<![\w-])font-size\s*:\s*(\d+(?:\.\d+)?)(px|rem)\b|(?<![\w-])font\s*:\s*(?:[\w-]+\s+){0,3}?(\d+(?:\.\d+)?)(px|rem)\b/g
 const CSS_LIGHT = /(?<![\w-])font-weight\s*:\s*(?:[1-4]00|normal|lighter)\b|(?<![\w-])font\s*:\s*(?:[\w-]+\s+)?[1-4]00\s/g
+const HEAVY = [
+  /(?<![\w-])font-(?:semibold|bold|extrabold|black)(?![\w-])/g,
+  /(?<![\w-])font-weight\s*:\s*(?:[6-9]00|bold|bolder)\b/g,
+  /(?<![\w-])font\s*:\s*(?:[\w-]+\s+)?[6-9]00\s/g,
+  /['"]font-weight['"]\s*:\s*['"]?[6-9]00/g,
+  /fontWeight\s*[=:]\s*\{?['"]?[6-9]00/g,
+]
 const cssPx = (m) => (m[1] ? px(m[1], m[2]) : px(m[3], m[4]))
 
 const violations = []
@@ -116,6 +128,9 @@ for (const file of files) {
   const rawLines = raw.split('\n')
   const field = under(file, FIELD_ZONE)
   const app = !under(file, NOT_APP)
+  code.split('\n').forEach((text, idx) => {
+    for (const re of HEAVY) for (const m of text.matchAll(re)) push(file, idx + 1, 'heavy', rawLines[idx], m[0])
+  })
 
   if (file === TOKENS_FILE) {
     if (!/input,\s*button,\s*select,\s*textarea\s*\{\s*font:\s*inherit/.test(code)) push(file, 1, 'base', 'input, button, select, textarea { font: inherit } missing', 'font: inherit')
@@ -132,6 +147,8 @@ for (const file of files) {
       if (isJs || /@apply\b/.test(text)) {
         for (const m of text.matchAll(PALETTE)) add('palette', m[0])
         if (app) for (const m of text.matchAll(SMALL_CLASS)) if (!m[1] || px(m[1], m[2]) < 17) add('small', m[0])
+        // text-meta (16 px) is for desktop secondary captions only: it must carry an lg:/xl: prefix
+        if (app) for (const m of text.matchAll(/(?<![\w:-])text-meta(?![\w-])/g)) add('small', m[0])
         if (field) for (const m of text.matchAll(FIELD_CLASS)) add('weight', m[0])
       }
       if (isCss && app) for (const m of text.matchAll(CSS_SIZE)) if (cssPx(m) < 17) add('small', m[0])

@@ -18,12 +18,12 @@ export function AppHeader({ logoTo = '/dashboard', children }: { logoTo?: string
   // sticky only from 1024 px: on a phone the header (logo, switches, project
   // title, tabs) is ~250 px and would cover half of a 553 px screen
   return (
-    <header className="top-0 z-[var(--z-header)] border-b-2 border-line bg-page lg:sticky">
+    <header className="top-0 z-[var(--z-header)] border-b border-line bg-page lg:sticky">
       <div className="mx-auto flex max-w-[1120px] flex-wrap items-center gap-x-2 gap-y-1 px-4 py-1">
         <div className="flex min-w-0 items-center gap-4">
           <Link
             to={logoTo}
-            className="inline-flex min-h-12 items-center rounded-control text-h3 font-semibold text-fg no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            className="inline-flex min-h-12 items-center rounded-control text-h3 pointer-fine:min-h-10 font-medium text-fg no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             BuildProof
             <span className="sr-only"> · {t('tariff.toProjects')}</span>

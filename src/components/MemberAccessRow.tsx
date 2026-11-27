@@ -46,13 +46,13 @@ export function MemberAccessRow({ row, variant, onAdd, onRemove, onSendCode, sil
     <li
       data-person={row.userId}
       className={cx(
-        'flex list-none flex-col gap-3 border-b-2 border-line py-3 last:border-b-0',
-        silent && 'rounded-card border-2 border-stale px-3',
+        'flex list-none flex-col gap-3 border-b border-line py-3 last:border-b-0',
+        silent && 'rounded-card border border-stale px-3',
       )}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col">
-          <span className="text-field font-medium text-fg [overflow-wrap:anywhere]">{name}</span>
+          <span className="text-field text-fg [overflow-wrap:anywhere]">{name}</span>
           <span className="text-body text-fg">
             {t(`roles.${row.role}`)}
             {variant === 'on-project' ? <> · <span className="inline-flex items-center gap-1">{silent ? <StatusIcon kind="stale" /> : null}{status}</span></> : null}

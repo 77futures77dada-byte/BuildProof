@@ -3,6 +3,10 @@
 
 .house3d-canvas { height: clamp(300px, 52vw, 420px); touch-action: pan-y; cursor: grab; }
 .house3d-canvas:active { cursor: grabbing; }
+/* overview variant B: ~300 px on a phone; on desktop tied to the window so the whole overview fits
+   1366x768 and 1440x900 (check-overflow «overview-fit»): 240 px at 768, 372 px at 900 */
+.house3d-canvas--fit { height: 300px; }
+@media (min-width: 1024px) { .house3d-canvas--fit { height: clamp(200px, calc(100dvh - 528px), 560px); } }
 .house3d-canvas canvas { display: block; width: 100%; height: 100%; }
 
 /* Landing hero animation (components/SiteLoop.tsx) — SVG text faces */

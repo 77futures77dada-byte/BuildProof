@@ -21,7 +21,7 @@ interface TabsProps {
 
 const tabClass = ({ isActive }: { isActive: boolean }) =>
   cx(
-    'relative inline-flex min-h-12 shrink-0 items-center justify-center text-body leading-[1.2] whitespace-nowrap text-fg no-underline',
+    'relative inline-flex min-h-12 pointer-fine:min-h-10 shrink-0 items-center justify-center text-body leading-[1.2] whitespace-nowrap text-fg no-underline',
     'focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-focus',
     // active: 600 + 4 px --fg bar (02-type §6.1); others 500
     isActive
@@ -32,7 +32,7 @@ const tabClass = ({ isActive }: { isActive: boolean }) =>
 /** Section navigation (links with aria-current, not ARIA tabs: each tab is a route). */
 export function Tabs({ items, label, variant = 'owner', className }: TabsProps) {
   return (
-    <nav aria-label={label} className={cx('border-b-2 border-line', className)}>
+    <nav aria-label={label} className={cx('border-b border-line', className)}>
       <ul className={cx('m-0 flex list-none gap-1 p-0', variant === 'owner' ? 'overflow-x-auto overscroll-x-contain' : '')}>
         {items.map((item) => (
           <li key={item.key} className={variant === 'worker' ? 'flex min-w-0 flex-auto' : 'flex'}>
