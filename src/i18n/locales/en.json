@@ -284,7 +284,8 @@
     "name": "Title",
     "namePlaceholder": "e.g. install formwork along axis 3",
     "nameRequired": "Enter a task title.",
-    "emptyClosed": "No tasks yet. Write one down so it is not forgotten."
+    "emptyClosed": "No tasks yet. Write one down so it is not forgotten.",
+    "overdue": "Overdue"
   },
   "photos": {
     "title": "Photos",

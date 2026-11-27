@@ -284,7 +284,8 @@
     "name": "Nimetus",
     "namePlaceholder": "Näiteks: paigaldada raketis telje 3 juurde",
     "nameRequired": "Sisestage ülesande nimetus.",
-    "emptyClosed": "Ülesandeid veel pole. Kirjutage ülesanne üles, et see ei ununeks."
+    "emptyClosed": "Ülesandeid veel pole. Kirjutage ülesanne üles, et see ei ununeks.",
+    "overdue": "Tähtaeg möödas"
   },
   "photos": {
     "title": "Fotod",

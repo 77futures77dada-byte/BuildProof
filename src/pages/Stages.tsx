@@ -10,7 +10,7 @@ import { useStageHistory } from '../hooks/useStageHistory'
 import { useLastMarks } from '../hooks/useLastMarks'
 import type { LastMark } from '../hooks/useLastMarks'
 import { formatDate, formatDateTimeSmart } from '../lib/format'
-import { Button, NetBar, StageRow, StatusIcon } from '../components/ui'
+import { Button, Disclosure, NetBar, StageRow, StatusIcon } from '../components/ui'
 import type { ChipSpec } from '../components/ui'
 import { StageMarkSheet } from '../components/report/StageMarkSheet'
 import { Spinner } from '../components/Spinner'
@@ -91,11 +91,7 @@ function StageHistory({ stageId, refreshToken }: { stageId: string; refreshToken
   const [open, setOpen] = useState(false)
   const { entries, loading, error } = useStageHistory(stageId, open, refreshToken)
   return (
-    <div className="flex flex-col gap-2">
-      <Button variant="ghost" aria-expanded={open} onClick={() => setOpen((v) => !v)} className="self-start gap-2 px-3">
-        <svg aria-hidden="true" viewBox="0 0 24 24" className={`size-5 transition-transform motion-reduce:transition-none ${open ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg>
-        {t('stages.history')}
-      </Button>
+    <Disclosure label={t('stages.history')} onToggle={setOpen}>
       {open ? (
         loading ? (
           <p className="m-0 text-body font-medium text-fg">{t('stages.historyLoading')}</p>
@@ -117,6 +113,6 @@ function StageHistory({ stageId, refreshToken }: { stageId: string; refreshToken
           </ul>
         )
       ) : null}
-    </div>
+    </Disclosure>
   )
 }

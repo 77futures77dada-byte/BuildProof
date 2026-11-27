@@ -60,7 +60,7 @@ const ROUTES = [
   ['worker today', `${P}/today`, 'w1'],
   ['worker stages', `${P}/stages`, 'w1'],
   ['worker photos', `${P}/photos`, 'w1'],
-  ['worker tasks', `${P}/tasks`, 'w1'],
+  ['worker tasks → today', `${P}/tasks`, 'w1', `${P}/today`],
   ['worker issues', `${P}/issues`, 'w1'],
   ['foreman project', P, 'foreman'],
   ['foreman tasks', `${P}/tasks`, 'foreman'],
