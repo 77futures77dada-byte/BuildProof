@@ -26,6 +26,12 @@ export type DraftError =
   | 'invalid_photo_path'
   | 'comment_required'
   | 'invalid_percent'
+  /** Worker link: too many reports this hour; retry later (worker_link_rate_limit). */
+  | 'rate_limit'
+  /** Worker link: photo type/size rejected; retake needed. */
+  | 'photo_invalid'
+  /** Worker link: the stage is no longer in this object. */
+  | 'stage_not_found'
   | 'other'
 
 export interface Draft {
@@ -51,6 +57,12 @@ export interface Draft {
   lastError: DraftError | null
   /** Current stage % that made the draft `stale` (shown as «этап уже N%»). */
   stalePercent: number | null
+  /** Worker link only: 1–5 compressed photos (the app draft uses `photo`). */
+  photos?: Blob[]
+  /** Worker link only: EXIF DateTimeOriginal read before compression (ISO), or null. */
+  takenAt?: string | null
+  /** Worker link only: device clock when the report was made (ISO). */
+  deviceTime?: string
 }
 
 /** Unsent drafts a phone keeps (01 §3.4 rule 7); only enforced without network. */
@@ -209,6 +221,12 @@ export interface DraftTransport {
   submit(stageId: string, percent: number, reason: string | null, paths: string[]): Promise<void>
   /** Map a thrown error to a DraftError. */
   classify(err: unknown): DraftError
+  /**
+   * Optional one-shot send (worker link): photos travel inside the request and
+   * the server dedupes by `client_request_id` = draftId, so `upload` and
+   * `reportIdForPath` are skipped when this is present.
+   */
+  submitDraft?(d: Draft, percent: number, reason: string | null): Promise<void>
 }
 
 export type SendOutcome =
@@ -223,7 +241,7 @@ export async function sendDraft(store: DraftStore, t: DraftTransport, d: Draft, 
   const attempt: Draft = { ...d, attempts: d.attempts + 1, lastAttemptAt: now }
   const paths = d.photo ? [d.storagePath] : []
   try {
-    if (d.photo && d.attempts > 0 && (await t.reportIdForPath(d.storagePath))) {
+    if (!t.submitDraft && d.photo && d.attempts > 0 && (await t.reportIdForPath(d.storagePath))) {
       await store.remove(d.draftId)
       return { draftId: d.draftId, result: 'sentEarlier' }
     }
@@ -233,9 +251,13 @@ export async function sendDraft(store: DraftStore, t: DraftTransport, d: Draft, 
       await store.put({ ...attempt, state: 'stale', stalePercent: decision.percent, lastError: null })
       return { draftId: d.draftId, result: 'stale', percent: decision.percent }
     }
-    if (d.photo) await t.upload(d.storagePath, d.photo)
     const reason = decision.kind === 'send' && isDecrease(d) ? d.reason : null
-    await t.submit(d.stageId, decision.percent, reason, paths)
+    if (t.submitDraft) {
+      await t.submitDraft(d, decision.percent, reason)
+    } else {
+      if (d.photo) await t.upload(d.storagePath, d.photo)
+      await t.submit(d.stageId, decision.percent, reason, paths)
+    }
     await store.remove(d.draftId)
     return decision.kind === 'stageAhead'
       ? { draftId: d.draftId, result: 'stageAhead', percent: decision.percent }
@@ -253,6 +275,7 @@ export async function sendDraft(store: DraftStore, t: DraftTransport, d: Draft, 
  */
 export const PERMANENT_ERRORS: ReadonlySet<DraftError> = new Set<DraftError>([
   'forbidden', 'photo_required', 'nothing_to_report', 'invalid_photo_path', 'comment_required', 'invalid_percent',
+  'photo_invalid', 'stage_not_found',
 ])
 export function needsWorker(d: Draft): boolean {
   return d.state === 'stale' || (d.lastError !== null && PERMANENT_ERRORS.has(d.lastError))
