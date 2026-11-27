@@ -9,11 +9,14 @@
 - Adds expiring, revocable, named worker links, scoped to a single project, with only SHA-256 token digests stored in the database.
 - Adds expiring, revocable client links. Client view and owner preview use the same server-side filter: only confirmed reports on explicitly visible stages, with photos gated by separate consent.
 - Adds API contracts and pgTAP coverage for scoped access, revoked/expired links, threshold handling, client visibility, and preview parity.
+- Worker page metadata now includes the real project name; owner link lists include worker `report_count`; visibility settings expose persisted hidden-by-default state; client views include nullable contractor contact from existing owner profile/Auth fields.
 
 ## Migration order
 
 1. `supabase/migrations/007_worker_links_and_owner_review.sql`
 2. `supabase/migrations/008_client_links.sql`
+
+No new migration is needed for the additional page metadata; it uses the existing RPCs and tables through owner-validated service-role API handlers.
 
 Do not apply migrations as part of PR review. To roll back, run `supabase/rollback/008_client_links.sql`, then `supabase/rollback/007_worker_links_and_owner_review.sql`. The 007 rollback intentionally keeps `pgcrypto`, because migration 006 and other database functions also depend on it. The 007 rollback removes worker-link reports and their photos/history because those rows cannot satisfy the original non-null `reporter_id` constraint.
 

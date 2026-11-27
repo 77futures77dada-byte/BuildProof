@@ -497,3 +497,15 @@ check-overflow: routes=37 loads=370 overflow_failures=0 render_failures=0 page_e
 | `supabase/tests/worker_client_links.sql` | NOT RUN | pgTAP test updated to 19 assertions; psql, Docker, and Supabase CLI are unavailable. No migrations were applied. |
 
 Added pgTAP coverage for worker-token authorization under `search_path=public,extensions` and a 30-point decrease with threshold 25 remaining `pending` while accepted progress remains unchanged.
+
+## 2026-11-27 — link page metadata for Claude Code UI
+
+| check | result | details |
+|---|---|---|
+| `npm run lint` | PASS | oxlint and token scan passed |
+| `ALLOW_PLACEHOLDERS=1 npm run build` | PASS | production build completed |
+| `npm test` | PASS | 19 files, 137 tests |
+| API tests | PASS | 9 tests, including report counts, project title, visibility defaults, and nullable contact fields |
+| `git diff --check` | PASS | no whitespace errors |
+
+No schema migration was needed; the additions use current project, link, report, visibility, profile, and Auth data via the existing service-role API boundary.

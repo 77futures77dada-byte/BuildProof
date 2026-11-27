@@ -1,6 +1,6 @@
 # Client links
 
-Status: backend contract implemented in migration 008. Links are named, read-only bearer credentials for one project. The owner preview calls the same filtered RPC as the public client link.
+Status: backend contract implemented in migration 008 and `/api/` handlers. Links are named, read-only bearer credentials for one project. The owner preview calls the same filtered RPC as the public client link.
 
 ## Rules
 
@@ -26,17 +26,21 @@ Revoke body: `{"action":"revoke","link_id":"uuid"}`. Response: `{"revoked":true}
 
 Errors: `unauthorized`, `forbidden`, `invalid_action`, `invalid_project_id`, `invalid_display_name`, `invalid_expiry`, `project_not_found`, `client_link_limit`, `link_create_failed`, `link_list_failed`, `invalid_link_id`, `link_not_found`, `revoke_failed`.
 
+### `GET /api/client-visibility?project_id=uuid`
+
+Requires an owning GC JWT. Returns `{visibility: {"<stage_id>": {"visible": false, "photos": false}}}` for every stage in the project. Stages with no saved settings are returned as hidden with photo consent off. This is the persisted setting state, not a device-local preview cache. Errors: `unauthorized`, `forbidden`, `invalid_visibility`, `project_not_found`, `visibility_read_failed`.
+
 ### `POST /api/client-visibility`
 
 Requires an owning GC JWT. Body: `{"project_id":"uuid","stage_id":"uuid","visible":true,"photos_visible":false}`. If `visible=false`, photo visibility is forced off. Errors: `unauthorized`, `forbidden`, `invalid_visibility`, `project_not_found`, `stage_not_found`, `visibility_update_failed`.
 
 ### `GET /api/client-view`
 
-Public client view. `Authorization: Bearer <client-link-token>`. Returns `{project_id, project_name, disclaimer, stages:[{stage_id,name,confirmed_percent,updated_at,photos:[{path,url}]}]}`. Errors: `invalid_client_link`, `server_misconfigured`.
+Public client view. `Authorization: Bearer <client-link-token>`. Returns `{project_id, project_name, disclaimer, contractor_contact:{name,email,phone}, stages:[{stage_id,name,confirmed_percent,updated_at,photos:[{path,url}]}]}`. Contact values come from the owning GC's existing profile and Auth account (`full_name`, email, phone); any missing value is `null`. The current company schema has no separate contractor contact settings. No sample or fallback contact details are fabricated. Errors: `invalid_client_link`, `contractor_contact_unavailable`, `server_misconfigured`.
 
 ### `POST /api/client-view`
 
-Owner preview. Requires the owning GC JWT and body `{"project_id":"uuid"}`. Calls the same `client_project_view` RPC and applies the same photo URL signing as GET. Errors: `unauthorized`, `forbidden`, `invalid_project_id`, `project_not_found`.
+Owner preview. Requires the owning GC JWT and body `{"project_id":"uuid"}`. Calls the same `client_project_view` RPC, returns the same `contractor_contact` fields (each nullable), and applies the same photo URL signing as GET. Errors: `unauthorized`, `forbidden`, `invalid_project_id`, `project_not_found`, `contractor_contact_unavailable`.
 
 ## Database RPCs
 

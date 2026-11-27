@@ -21,7 +21,7 @@ Requires a Supabase JWT for a GC who owns the project. Create body:
 {"action":"create","project_id":"uuid","display_name":"Имя","expires_at":"ISO-8601 optional"}
 ```
 
-Default expiry is 30 days. Response `201` returns `link_id`, one-time `token`, `display_name`, and `expires_at`. The raw token is never retrievable later. To list records without secrets use `{"action":"list","project_id":"uuid"}`; the response contains name, state, expiry, creation, and last use, never `token_hash`.
+Default expiry is 30 days. Response `201` returns `link_id`, one-time `token`, `display_name`, and `expires_at`. The raw token is never retrievable later. To list records without secrets use `{"action":"list","project_id":"uuid"}`; each link includes `report_count` (all reports submitted with that link), alongside its expiry, creation, revocation and last-use fields. The response never includes `token_hash`.
 
 Revoke body: `{"action":"revoke","link_id":"uuid"}`. Response: `{"revoked":true}`.
 
@@ -29,7 +29,7 @@ Errors: `unauthorized`, `forbidden`, `invalid_action`, `invalid_project_id`, `in
 
 ### `GET /api/worker-link-stages`
 
-`Authorization: Bearer <worker-link-token>`. Returns `{project_id, worker_name, stages:[{id,name,progress_percent}]}`. Errors: `invalid_worker_link`, `server_misconfigured`.
+`Authorization: Bearer <worker-link-token>`. Returns `{project_id, project_name, worker_name, stages:[{id,name,progress_percent}]}`. `project_name` is the actual project name from the database. Errors: `invalid_worker_link`, `project_data_unavailable`, `server_misconfigured`.
 
 ### `POST /api/worker-link-submit`
 

@@ -1,4 +1,5 @@
 import { owner, tokenHash, UUID, linkToken, type ApiRequest, type ApiResponse } from './lib/backend.ts'
+import { withReportCounts } from './lib/link-page-data.ts'
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' })
@@ -14,7 +15,13 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       .select('id,project_id,display_name,created_at,expires_at,revoked_at,last_used_at')
       .eq('project_id',project.id).order('created_at',{ ascending:false })
     if (error) return res.status(500).json({ error: 'link_list_failed' })
-    return res.status(200).json({ links:data ?? [] })
+    const links = data ?? []
+    const counts = await Promise.all(links.map(async (link) => {
+      const result = await caller.admin.from('stage_reports').select('id', { count: 'exact', head: true }).eq('worker_link_id',link.id)
+      return { id: link.id, count: result.count, error: result.error }
+    }))
+    if (counts.some((item) => item.error)) return res.status(500).json({ error: 'link_list_failed' })
+    return res.status(200).json({ links: withReportCounts(links,counts.map((item) => ({ id:item.id,count:item.count }))) })
   }
   if (body.action === 'revoke') {
     if (typeof body.link_id !== 'string' || !UUID.test(body.link_id)) return res.status(400).json({ error: 'invalid_link_id' })
