@@ -400,3 +400,15 @@ check-overflow: routes=32 loads=320 overflow_failures=0 render_failures=0 page_e
 | check-contrast | PASS | pairs=116 failures=0 drift=0 (0s) |
 | check-ru-latin | PASS | offending=0 strings=850 (json=571, landing=279) (0s) |
 | check-overflow | PASS | routes=32 loads=320 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=0 fit_blocks=1440x900:6/6,1366x768:6/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (187s) |
+
+## 2026-11-27T18:16:38Z — dense r1: счётчики, значки состояния
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (3s) |
+| build | PASS | built in 3.66s, VITE_SUPABASE_URL=fixture (19s) |
+| test | PASS | 14 passed (14); 105 passed (105) (10s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 heavy=0 base=0 files=0 scanned=172 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=116 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=850 (json=571, landing=279) (0s) |
+| check-overflow | PASS | routes=32 loads=320 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=0 fit_blocks=1440x900:6/6,1366x768:6/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (205s) |

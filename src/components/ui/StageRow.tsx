@@ -19,18 +19,24 @@ interface StageRowProps {
   children?: ReactNode
   /** `dense`: overview desktop — one 40 px line (name · % · actions) with a thin bar; no meta, status or children. */
   variant?: 'overview' | 'stages' | 'readonly' | 'dense'
+  /** `dense` only: state by shape (✓ done · ◐ in progress · ○ not started) with its word for screen readers, and a tooltip (date, who marked). */
+  state?: { label: string; title?: string }
   className?: string
 }
 
 /** Stage line: name, figure, bar, status. Long names (30+ chars) wrap, never overflow. */
-export function StageRow({ name, percent, status, meta, onPress, actions, children, variant = 'overview', className }: StageRowProps) {
+export function StageRow({ name, percent, status, meta, onPress, actions, children, variant = 'overview', className, state }: StageRowProps) {
   const pct = Math.round(percent)
   if (variant === 'dense') {
     const line = (
       <span className="flex min-w-0 flex-1 flex-col justify-center gap-1">
         <span className="flex items-baseline justify-between gap-2">
           <span className="min-w-0 truncate text-body">{name}</span>
-          <span className="shrink-0 text-body font-medium">{pct}%</span>
+          <span className="flex shrink-0 items-baseline gap-1.5 text-body font-medium" title={state?.title}>
+            {pct}%
+            <span aria-hidden="true" className="inline-block w-4 text-center">{pct >= 100 ? '✓' : pct > 0 ? '◐' : '○'}</span>
+            {state ? <span className="sr-only">{state.label}</span> : null}
+          </span>
         </span>
         <ProgressBar value={pct} />
       </span>

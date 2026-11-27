@@ -303,6 +303,10 @@ export function ProjectDashboardView({
               </span>
             }
             percent={stage.progressPercent}
+            state={{
+              label: stage.progressPercent >= 100 ? t('house.ready') : stage.progressPercent > 0 ? t('house.working') : t('house.notStarted'),
+              title: stage.lastChangeAt ? formatDateTimeSmart(stage.lastChangeAt) : undefined,
+            }}
             onPress={isManager && status === 'active' ? () => setMarkStageId(stage.id) : undefined}
             actions={stageActions(stage)}
           />
@@ -327,7 +331,7 @@ export function ProjectDashboardView({
   // Desktop shows two items per card so the row fits the screen; the full lists are one link away.
   const take = desktop ? 2 : 3
   const feedBlock = isManager ? (
-    <Section title={t('overview.feedTitle')} dense={desktop}>
+    <Section title={desktop && feed.length ? `${t('overview.feedTitle')} · ${feed.length}` : t('overview.feedTitle')} dense={desktop}>
       {feed.length === 0 ? (
         <p className="m-0 text-body">{t('overview.feedEmpty')}</p>
       ) : (
@@ -368,7 +372,8 @@ export function ProjectDashboardView({
 
   const issuesBlock = (
     <Section
-      title={t('overview.activeIssues')}
+      // desktop cards scroll inside: the count says how much is there
+      title={desktop && activeIssues.length ? `${t('overview.activeIssues')} · ${activeIssues.length}` : t('overview.activeIssues')}
       dense={desktop}
       more={
         activeIssues.length > take ? (
@@ -487,7 +492,7 @@ function KnownPeople({ rows, onAdd, allTo, take = 3, dense = false }: { rows: Ac
   const [error, setError] = useState<string | null>(null)
   return (
     <Section
-      title={t('known.title')}
+      title={dense ? `${t('known.title')} · ${rows.length}` : t('known.title')}
       dense={dense}
       more={<Link to={allTo} className={buttonClass({ variant: 'ghost' }, 'self-start px-1')}>{t('people.all')}</Link>}
     >
