@@ -321,6 +321,7 @@ function ReviewQueue({ myId }: { myId: string | null }) {
                         </div>
                       </div>
                       {broken.has(item.id) ? <p className="m-0 text-body font-semibold">{t('photos.imageFailed')}</p> : null}
+                      {!ready && !own ? <p aria-live="polite" className="m-0 text-body font-semibold">{t('review.photoLoading')}</p> : null}
                       {closedEarly.has(item.id) && state.kind === 'ready' ? (
                         <p className="m-0 text-body font-semibold">{t('review.closedEarly')}</p>
                       ) : null}

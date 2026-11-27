@@ -253,6 +253,7 @@
     "fromGallery": "From gallery",
     "otherStage": "Another stage",
     "continue": "Continue",
+    "needsAttention": "Need attention: {{count}}",
     "objectPercent": "Site: {{percent}}%",
     "lastReport": "My last report: {{stage}} · {{date}}",
     "staleWaiting_one": "{{count}} report needs a decision",
@@ -535,7 +536,7 @@
     "retake": "Retake",
     "photoAlt": "Report photo: {{stage}}",
     "backToGrowth": "Back to increase",
-    "offlineSaved": "The report will be saved on this phone. Send it again when you have a connection."
+    "offlineSaved": "The report will be saved on this phone. If it does not go by itself when you have a connection, tap «Send again» on «Today»."
   },
   "stagePicker": {
     "title": "Choose a stage",
@@ -556,6 +557,7 @@
     "returnSend": "Send back with this reason",
     "undoN": "Undo all ({{count}})",
     "confirmedRow": "Confirmed",
+    "photoLoading": "Photo is loading…",
     "confirmAllSmall": "Confirm all small ({{count}})",
     "closedEarly": "Not confirmed: the page closed too early.",
     "ownJump": "Your own jump is confirmed by the owner.",

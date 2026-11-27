@@ -253,6 +253,7 @@
     "fromGallery": "Galeriist",
     "otherStage": "Teine etapp",
     "continue": "Jätka",
+    "needsAttention": "Vajavad tähelepanu: {{count}}",
     "objectPercent": "Objekt: {{percent}}%",
     "lastReport": "Minu viimane aruanne: {{stage}} · {{date}}",
     "staleWaiting_one": "{{count}} aruanne vajab otsust",
@@ -535,7 +536,7 @@
     "retake": "Pildista uuesti",
     "photoAlt": "Aruande foto: {{stage}}",
     "backToGrowth": "Tagasi kasvu juurde",
-    "offlineSaved": "Aruanne salvestatakse telefoni. Saatke see uuesti, kui ühendus tekib."
+    "offlineSaved": "Aruanne salvestatakse telefoni. Kui see ühenduse tekkides ise ei lähe, vajutage vaates «Täna» «Saada uuesti»."
   },
   "stagePicker": {
     "title": "Valige etapp",
@@ -556,6 +557,7 @@
     "returnSend": "Saada tagasi selle põhjusega",
     "undoN": "Võta kõik tagasi ({{count}})",
     "confirmedRow": "Kinnitatud",
+    "photoLoading": "Foto laadib…",
     "confirmAllSmall": "Kinnita kõik väikesed ({{count}})",
     "closedEarly": "Kinnitamata: leht suleti liiga vara.",
     "ownJump": "Oma hüppe kinnitab omanik.",

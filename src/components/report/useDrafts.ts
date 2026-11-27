@@ -116,6 +116,9 @@ export function useAutoRetry(userId: string | undefined) {
     window.addEventListener('online', kick)
     window.addEventListener('focus', kick)
     document.addEventListener('visibilitychange', onVisible)
+    // a new cycle (new pending draft or «Отправить снова»): the banner must not say «stopped»
+    // oxlint-disable-next-line react/set-state-in-effect
+    setStopped(false)
     const started = Date.now()
     let step = 0
     let timer: ReturnType<typeof setTimeout> | undefined

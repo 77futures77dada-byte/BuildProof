@@ -248,12 +248,16 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
           {!stale ? (
             <div className="flex items-center justify-between gap-3">
               <p className="m-0 line-clamp-2 min-w-0 text-field font-semibold text-fg [overflow-wrap:anywhere]">{t('report.stage', { stage: stageName })}</p>
-              <Button variant="secondary" disabled={sending} onClick={() => setView('picker')} className="shrink-0">{t('report.changeStage')}</Button>
+              {/* after an attempt the photo may already sit at this stage's path (and the report may have arrived): stage is fixed */}
+              {draft.attempts === 0 ? (
+                <Button variant="secondary" disabled={sending} onClick={() => setView('picker')} className="shrink-0">{t('report.changeStage')}</Button>
+              ) : null}
             </div>
           ) : null}
 
           {/* Any draft can be deleted from the phone (same confirm), so a draft stuck on an error never blocks a slot forever. */}
-          {view === 'delete' ? (
+          {/* fresh shot: no red «Удалить» on the 10-second path; only saved / stuck drafts */}
+          {draft.state === 'editing' ? null : view === 'delete' ? (
             <div className="flex flex-col gap-3 rounded-card border-2 border-stale p-3">
               <p className="m-0 text-field font-semibold text-fg">{t('send.deleteConfirm')}</p>
               <div className="flex flex-wrap gap-3">

@@ -191,7 +191,7 @@ export function Today() {
       return
     }
     const stage = defaultStage
-    if (!stage) return
+    if (!stage) { setNotice(stages.stages.length ? t('errors.generic') : t('stages.emptyAsk')); return }
     const draftId = newDraftId()
     const seen = effectiveSeenPercent(drafts, userId, stage.id, stage.progressPercent)
     // saved right after the shot, before the sheet opens (01 §3.4 rule 1)
@@ -274,7 +274,7 @@ export function Today() {
 
       {waiting.length ? (
         <Button variant="secondary" onClick={() => setSheetDraftId(waiting[0].draftId)} className="self-start">
-          <StatusIcon kind="stale" />{t('today.staleWaiting', { count: waiting.length })}
+          <StatusIcon kind="stale" />{t('today.needsAttention', { count: waiting.length })}
         </Button>
       ) : null}
 
