@@ -111,38 +111,38 @@ export function HouseModel({ stages, height, interactive = true, initialAngle = 
   const playingStage = playingPart ? modelStages.find(stage => stage.part === playingPart) : null
   const rows = stages.map(stage => `${stage.name}: ${Math.round(stage.percent)}%`).join(', ')
 
-  return <section aria-label={t.title} className="bp-native overflow-hidden rounded-2xl border border-slate-800 text-white shadow-sm" style={{ background: HOUSE_BG }}>
+  return <section aria-label={t.title} className="overflow-hidden rounded-2xl border border-inverse-line text-on-inverse shadow-sm" style={{ background: HOUSE_BG }}>
     <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_17rem]">
       {!failed
         ? <div ref={host} className="house3d-canvas w-full" style={height ? { height } : undefined} role="img" aria-label={t.modelLabel(rows)} />
-        : <p className="p-4 text-sm text-slate-300">{t.fallback}</p>}
-      <aside aria-live="polite" className="min-h-24 border-t border-white/10 p-4 lg:border-l lg:border-t-0">
+        : <p className="p-4 text-body text-on-inverse">{t.fallback}</p>}
+      <aside aria-live="polite" className="min-h-24 border-t border-inverse-line p-4 lg:border-l lg:border-t-0">
         {playingStage
           ? <div className="space-y-1">
-              <p className="text-sm text-slate-300">{t.playing}</p>
-              <p className="text-xl font-semibold" style={{ color: STAGE_COLORS[playingStage.part as StagePart] }}>{playingStage.name}</p>
-              <p className="text-xs text-slate-400">{t.playInterrupt}</p>
+              <p className="text-body text-on-inverse">{t.playing}</p>
+              <p className="text-h3 font-semibold" style={{ color: STAGE_COLORS[playingStage.part as StagePart] }}>{playingStage.name}</p>
+              <p className="text-body text-on-inverse">{t.playInterrupt}</p>
             </div>
           : <StageCard stage={selectedStage} part={selected} counts={counts}
               doneStages={modelStages.filter(stage => stage.percent >= 100).length} totalStages={modelStages.length}
               onClose={() => dispatch({ type: 'clear' })} />}
       </aside>
     </div>
-    <div className="space-y-4 border-t border-white/10 p-4">
+    <div className="space-y-4 border-t border-inverse-line p-4">
       <div role="group" aria-label={t.stageLegend} className="flex flex-wrap gap-1.5">
         {modelStages.map(stage => <button key={stage.key} type="button" aria-pressed={selected === stage.part} onClick={() => toggle(stage.part as StagePart)}
-          className="inline-flex min-h-8 cursor-pointer items-center gap-1.5 rounded-full border border-white/15 px-2.5 text-xs text-white transition-colors hover:border-white/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white aria-pressed:border-white/60 aria-pressed:bg-white/15">
+          className="inline-flex min-h-12 cursor-pointer items-center gap-1.5 rounded-full border border-inverse-line px-2.5 text-body text-on-inverse transition-colors hover:border-on-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-inverse aria-pressed:border-on-inverse aria-pressed:bg-inverse-line">
           <span className="size-2.5 shrink-0 rounded-full" style={{ background: STAGE_COLORS[stage.part as StagePart] }} aria-hidden />{stage.name}
         </button>)}
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <ul aria-label={t.stateLegend} className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-300">
-          <li className="flex items-center gap-1.5"><span className="h-0.5 w-5 rounded bg-white shadow-[0_0_6px_1px_rgba(255,255,255,.7)]" aria-hidden />{t.ready} <span className="text-slate-400">({t.readyHint})</span></li>
-          <li className="flex items-center gap-1.5"><span className="flex h-0.5 w-5 overflow-hidden rounded" aria-hidden><span className="w-1/2 bg-white" /><span className="w-1/2 bg-white/15" /></span>{t.working} <span className="text-slate-400">({t.workingHint})</span></li>
-          <li className="flex items-center gap-1.5"><span className="h-0.5 w-5 rounded bg-white/15" aria-hidden />{t.notStarted} <span className="text-slate-400">({t.notStartedHint})</span></li>
+        <ul aria-label={t.stateLegend} className="flex flex-wrap gap-x-4 gap-y-1 text-body text-on-inverse">
+          <li className="flex items-center gap-1.5"><span className="h-0.5 w-5 rounded bg-on-inverse shadow-[0_0_6px_1px_rgba(255,255,255,.7)]" aria-hidden />{t.ready} <span className="text-on-inverse">({t.readyHint})</span></li>
+          <li className="flex items-center gap-1.5"><span className="flex h-0.5 w-5 overflow-hidden rounded" aria-hidden><span className="w-1/2 bg-on-inverse" /><span className="w-1/2 bg-inverse-line" /></span>{t.working} <span className="text-on-inverse">({t.workingHint})</span></li>
+          <li className="flex items-center gap-1.5"><span className="h-0.5 w-5 rounded bg-inverse-line" aria-hidden />{t.notStarted} <span className="text-on-inverse">({t.notStartedHint})</span></li>
         </ul>
         {!failed && modelStages.length ? <button type="button" onClick={play} disabled={!!playingPart}
-          className="inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg bg-white/10 px-3 text-sm font-medium text-white hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-default disabled:opacity-60">
+          className="inline-flex min-h-12 cursor-pointer items-center gap-1.5 rounded-lg bg-inverse-line px-3 text-body font-medium text-on-inverse hover:bg-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-inverse disabled:cursor-default disabled:opacity-60">
           <Play className="size-4" aria-hidden />{t.play}
         </button> : null}
       </div>

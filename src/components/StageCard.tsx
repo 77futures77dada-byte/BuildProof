@@ -1,6 +1,6 @@
 import { stageLabel } from '../i18n/stageLabel'
 import type { EditableStage } from '../hooks/useProjectStages'
-import { ProgressBar } from './ProgressBar'
+import { ProgressBar } from './ui'
 import { StageProgressControl } from './StageProgressControl'
 import { StageHistoryPanel } from './StageHistoryPanel'
 
@@ -13,11 +13,11 @@ interface StageCardProps {
 
 export function StageCard({ stage, canEdit, onCommit, historyToken }: StageCardProps) {
   return (
-    <li className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <li className="flex list-none flex-col gap-3 rounded-card border-2 border-line bg-surface p-4 text-fg shadow-card">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="font-medium text-slate-900">{stageLabel(stage.name)}</h3>
+        <h3 className="m-0 min-w-0 text-h3 font-bold [overflow-wrap:anywhere]">{stageLabel(stage.name)}</h3>
         {!canEdit ? (
-          <span className="text-sm tabular-nums text-slate-500">
+          <span className="shrink-0 text-h3 font-bold">
             {Math.round(stage.progressPercent)}%
           </span>
         ) : null}

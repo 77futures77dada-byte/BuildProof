@@ -17,18 +17,18 @@ class ModelBoundary extends Component<{ children: ReactNode; fallback: ReactNode
 
 /** Shown while the 3D chunk loads (placeholder of the canvas height) and when it fails. */
 function StageListFallback({ stages, loading }: { stages: MappedStage[]; loading: boolean }) {
-  return <div className="bp-native overflow-hidden rounded-2xl border border-slate-800 text-white" style={{ background: HOUSE_BG }}>
+  return <div className="overflow-hidden rounded-2xl border border-inverse-line text-on-inverse" style={{ background: HOUSE_BG }}>
     {loading
-      ? <div className="house3d-canvas flex items-center justify-center text-sm text-slate-300" role="status">{t.loading}</div>
-      : <p className="p-4 pb-0 text-sm text-slate-300" role="status">{t.fallback}</p>}
+      ? <div className="house3d-canvas flex items-center justify-center text-body text-on-inverse" role="status">{t.loading}</div>
+      : <p className="p-4 pb-0 text-body text-on-inverse" role="status">{t.fallback}</p>}
     <div className="p-4"><StageRows stages={stages} /></div>
   </div>
 }
 
 export function HouseModelBlock({ stages }: { stages: HouseStage[] }) {
-  if (!stages.length) return <section className="space-y-3"><h2 className="text-sm font-semibold text-slate-700">{t.title}</h2><p className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600">{t.empty}</p></section>
+  if (!stages.length) return <section className="space-y-3"><h2 className="text-body font-semibold text-fg">{t.title}</h2><p className="rounded-xl border border-line bg-on-inverse p-4 text-body text-fg">{t.empty}</p></section>
   const mapped = stagesToParts(stages)
-  return <section className="space-y-3"><h2 className="text-sm font-semibold text-slate-700">{t.title}</h2>
+  return <section className="space-y-3"><h2 className="text-body font-semibold text-fg">{t.title}</h2>
     <ModelBoundary fallback={<StageListFallback stages={mapped} loading={false} />}>
       <Suspense fallback={<StageListFallback stages={mapped} loading />}><LazyHouse stages={mapped} /></Suspense>
     </ModelBoundary>

@@ -155,7 +155,6 @@
     "pickProject": "Choose a project",
     "createProject": "Create project",
     "loading": "Loading projects…",
-    "emptyOther": "You have not been given access to any project yet.",
     "empty": {
       "title": "Set up your first site",
       "step1": "Create a site: 7 standard stages are added for you.",
@@ -205,7 +204,6 @@
     "issuesOpen_other": "open",
     "updated": "Updated",
     "goToStages": "Go to stages",
-    "noStages": "This project has no stages yet.",
     "recentPhotos": "Latest photos",
     "activeIssues": "Open issues",
     "noActiveIssues": "No open issues.",
@@ -222,7 +220,6 @@
       "title": "What next",
       "step1": "Mark how far the first stage is.",
       "step2": "Reports, photos and issues will appear on this page.",
-      "step3": "Reports, photos and issues will appear on this page.",
       "action": "Mark the first stage",
       "inviteOpen": "Invite a worker"
     },
