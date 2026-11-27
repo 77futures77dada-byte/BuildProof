@@ -4,8 +4,9 @@
 
 - Adds project `review_threshold` (default 25 percentage points) and report status, confirmed percentage, reviewer, review timestamp, and review note fields.
 - Adds a batch review RPC limited to accepted reports from another reporter whose increase is within the project's configured threshold. Larger pending jumps can only be individually reviewed. A foreman cannot review their own report.
-- Makes the firm email domain the domain of the firm's owner account. The server-side invite reservation RPC rejects addresses outside that domain. Onboarding attaches an invited user only to the company recorded for that exact invitation; existing accounts outside their profile firm's domain receive no company scope through the database helper used by RLS.
-- Adds RLS and RPC privilege assertions, cross-company report visibility/review assertions, and review/self-review assertions in `supabase/tests/rls.sql`.
+- Uses the firm's owner email domain for corporate addresses. Public mailbox domains are stored in `public.public_email_domains` so the set can be extended. An owner keeps access to their exact account; other public-domain addresses require an exact matching invitation in `invite_log`. Corporate addresses continue to pass by domain match.
+- The server-side invite reservation RPC records public-mail invites by exact address. Onboarding and the database helper used by RLS admit that exact invited address and reject a different address at the same public provider.
+- Adds RLS and RPC privilege assertions, cross-company report visibility/review assertions, public-mail invite cases, and review/self-review assertions in `supabase/tests/rls.sql`.
 
 ## Migration order
 
@@ -22,8 +23,8 @@ Do not apply this migration as part of this PR review. Rollback instructions are
 ## Validation
 
 - App checks: lint, production build, 80 unit tests, token scan, Russian copy scan, and overflow scan passed on the base application.
-- SQL test file contains 44 pgTAP assertions. Could not execute them locally because PostgreSQL, Docker, and Supabase CLI are unavailable in this environment. No migration was applied.
+- SQL test file contains 48 pgTAP assertions. Could not execute them locally because PostgreSQL, Docker, and Supabase CLI are unavailable in this environment. No migration was applied.
 
 ## Review notes
 
-Firm membership currently uses the owner's email domain as the firm's domain; confirm that this matches the intended company-email policy before applying the migration. The invitation and database access paths enforce the domain. The Supabase Auth OTP delivery itself is outside the database/RPC boundary.
+For an owner with a public mailbox address, the firm has no broad email domain; invited members must match the exact invitation address. The Supabase Auth OTP delivery itself is outside the database/RPC boundary; invitation, onboarding, and RLS-backed data access enforce exact public-mail invitations or corporate-domain membership.

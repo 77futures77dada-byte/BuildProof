@@ -16,6 +16,24 @@ create index if not exists stage_reports_review_queue_idx on public.stage_report
 
 -- The service invite endpoint must verify the recipient belongs to this firm's
 -- configured domain. The domain is derived from the firm's owner account.
+create table if not exists public.public_email_domains (
+  domain text primary key check (domain=lower(domain) and domain !~ '[@[:space:]]'),
+  added_at timestamptz not null default now()
+);
+alter table public.public_email_domains enable row level security;
+revoke all on public.public_email_domains from public,anon,authenticated;
+insert into public.public_email_domains(domain) values
+  ('gmail.com'),('googlemail.com'),('outlook.com'),('hotmail.com'),('live.com'),
+  ('yahoo.com'),('icloud.com'),('mail.ru'),('yandex.ru'),('bk.ru'),('inbox.ru'),('list.ru'),
+  ('proton.me'),('protonmail.com'),('tut.by'),('mail.ee'),('hot.ee'),('online.ee'),('neti.ee'),('list.ee')
+on conflict(domain) do nothing;
+
+create or replace function public.is_public_email_domain(p_domain text)
+returns boolean language sql stable security definer set search_path=public as $$
+  select exists(select 1 from public.public_email_domains where domain=lower(p_domain))
+$$;
+revoke all on function public.is_public_email_domain(text) from public,anon,authenticated;
+
 create or replace function public.company_email_domain(p_company_id uuid)
 returns text language sql stable security definer set search_path=public as $$
   select lower(split_part(u.email,'@',2))
@@ -55,12 +73,39 @@ declare v_domain text; v_email text:=lower(btrim(p_email));
 begin
   if v_email !~ '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$' then raise exception 'invalid_email'; end if;
   v_domain:=public.company_email_domain(p_company_id);
-  if v_domain is null or lower(split_part(v_email,'@',2)) is distinct from v_domain then
+  if v_domain is null then raise exception 'email_not_in_company'; end if;
+  if public.is_public_email_domain(v_domain) then
+    if v_email is distinct from (select lower(u.email) from public.profiles p join auth.users u on u.id=p.id
+      where p.company_id=p_company_id and p.role='gc' order by p.id limit 1)
+      and not exists(select 1 from public.invite_log il where il.company_id=p_company_id and lower(il.email)=v_email) then
+      raise exception 'email_not_in_company';
+    end if;
+  elsif public.is_public_email_domain(split_part(v_email,'@',2)) then
+    if v_email is distinct from (select lower(u.email) from public.profiles p join auth.users u on u.id=p.id
+      where p.company_id=p_company_id and p.role='gc' order by p.id limit 1)
+      and not exists(select 1 from public.invite_log il where il.company_id=p_company_id and lower(il.email)=v_email) then
+      raise exception 'email_not_in_company';
+    end if;
+  elsif lower(split_part(v_email,'@',2)) is distinct from v_domain then
     raise exception 'email_not_in_company';
   end if;
 end $$;
 revoke all on function public.assert_company_email(uuid,text) from public,anon,authenticated;
 grant execute on function public.assert_company_email(uuid,text) to service_role;
+
+create or replace function public.current_user_company_id()
+returns uuid language plpgsql stable security definer set search_path=public as $$
+declare v_company_id uuid;
+begin
+  select p.company_id into v_company_id from public.profiles p where p.id=auth.uid();
+  if v_company_id is null then return null; end if;
+  begin
+    perform public.assert_company_email(v_company_id,auth.jwt()->>'email');
+    return v_company_id;
+  exception when raise_exception then
+    return null;
+  end;
+end $$;
 
 create or replace function public.reserve_company_invite(p_company_id uuid,p_inviter_id uuid,p_email text)
 returns void language plpgsql security definer set search_path=public as $$
@@ -71,7 +116,13 @@ begin
   if not exists(select 1 from public.profiles where id=p_inviter_id and company_id=p_company_id and role='gc') then
     raise exception 'forbidden';
   end if;
-  perform public.assert_company_email(p_company_id,p_email);
+  if lower(p_email) !~ '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$' then raise exception 'invalid_email'; end if;
+  -- Public-mail invitations are bound by exact address in invite_log. Corporate
+  -- addresses must match the firm's owner domain before a new invite is sent.
+  if not public.is_public_email_domain(public.company_email_domain(p_company_id))
+    and not public.is_public_email_domain(split_part(lower(p_email),'@',2)) then
+    perform public.assert_company_email(p_company_id,p_email);
+  end if;
   perform pg_advisory_xact_lock(hashtextextended(p_company_id::text,0));
   select count(*) into v_count from public.invite_log where company_id=p_company_id and created_at>=now()-interval '1 hour';
   if v_count>=20 then raise exception 'invite_rate_limit'; end if;

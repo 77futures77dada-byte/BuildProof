@@ -16,6 +16,8 @@ returns boolean language sql stable security definer set search_path=public as $
 $$;
 drop function if exists public.assert_company_email(uuid,text);
 drop function if exists public.company_email_domain(uuid);
+drop function if exists public.is_public_email_domain(text);
+drop table if exists public.public_email_domains;
 alter table public.stage_reports drop column if exists review_note;
 alter table public.stage_reports drop column if exists reviewed_at;
 alter table public.stage_reports drop column if exists reviewed_by;

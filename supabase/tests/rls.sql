@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(44);
+select plan(48);
 select is(
   (select bool_and(c.relrowsecurity)
    from pg_class c join pg_namespace n on n.oid=c.relnamespace
@@ -89,21 +89,34 @@ insert into auth.users(id,aud,role,email,encrypted_password,email_confirmed_at,r
  ('10000000-0000-4000-8000-000000000006','authenticated','authenticated','locale-a@test.invalid','',now(),
   '{"provider":"email","providers":["email"]}',
   '{"company_name":"Locale Company","full_name":"Locale Owner"}',now(),now()),
- ('10000000-0000-4000-8000-000000000007','authenticated','authenticated','outsider@other.invalid','',now(),'{}','{}',now(),now());
+ ('10000000-0000-4000-8000-000000000007','authenticated','authenticated','outsider@other.invalid','',now(),'{}','{}',now(),now()),
+ ('10000000-0000-4000-8000-000000000008','authenticated','authenticated','owner@gmail.com','',now(),'{}','{}',now(),now()),
+ ('10000000-0000-4000-8000-000000000009','authenticated','authenticated','crew@gmail.com','',now(),'{}','{}',now(),now()),
+ ('10000000-0000-4000-8000-000000000010','authenticated','authenticated','stranger@gmail.com','',now(),'{}','{}',now(),now()),
+ ('10000000-0000-4000-8000-000000000011','authenticated','authenticated','owner@firma.ee','',now(),'{}','{}',now(),now()),
+ ('10000000-0000-4000-8000-000000000012','authenticated','authenticated','crew@firma.ee','',now(),'{}','{}',now(),now());
 select is((select count(*) from public.profiles where id='10000000-0000-4000-8000-000000000005'),0::bigint,
   'signup leaves profile creation to the authenticated onboarding RPC');
 insert into public.profiles(id,company_id,full_name,role) values
  ('10000000-0000-4000-8000-000000000006',null,'Locale Owner','gc');
 insert into public.companies(id,name) values
- ('30000000-0000-4000-8000-000000000001','Tenant A'),('30000000-0000-4000-8000-000000000002','Tenant B');
+ ('30000000-0000-4000-8000-000000000001','Tenant A'),('30000000-0000-4000-8000-000000000002','Tenant B'),
+ ('30000000-0000-4000-8000-000000000003','Public mail firm'),('30000000-0000-4000-8000-000000000004','Corporate firm');
 insert into public.profiles(id,company_id,full_name,role) values
  ('10000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','GC A','gc'),
  ('10000000-0000-4000-8000-000000000002','30000000-0000-4000-8000-000000000001','Worker A','worker'),
  ('10000000-0000-4000-8000-000000000007','30000000-0000-4000-8000-000000000001','Outsider','worker'),
  ('20000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000002','GC B','gc'),
  ('10000000-0000-4000-8000-000000000003','30000000-0000-4000-8000-000000000001','Client A','client'),
- ('10000000-0000-4000-8000-000000000004','30000000-0000-4000-8000-000000000001','Foreman A','foreman')
+ ('10000000-0000-4000-8000-000000000004','30000000-0000-4000-8000-000000000001','Foreman A','foreman'),
+ ('10000000-0000-4000-8000-000000000008','30000000-0000-4000-8000-000000000003','Gmail owner','gc'),
+ ('10000000-0000-4000-8000-000000000009','30000000-0000-4000-8000-000000000003','Invited Gmail worker','worker'),
+ ('10000000-0000-4000-8000-000000000010','30000000-0000-4000-8000-000000000003','Uninvited Gmail user','worker'),
+ ('10000000-0000-4000-8000-000000000011','30000000-0000-4000-8000-000000000004','Corporate owner','gc'),
+ ('10000000-0000-4000-8000-000000000012','30000000-0000-4000-8000-000000000004','Corporate worker','worker')
 on conflict (id) do update set company_id=excluded.company_id,full_name=excluded.full_name,role=excluded.role;
+insert into public.invite_log(company_id,invited_by,email) values
+ ('30000000-0000-4000-8000-000000000003','10000000-0000-4000-8000-000000000008','crew@gmail.com');
 insert into public.projects(id,company_id,name) values
  ('40000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','Project A'),
  ('40000000-0000-4000-8000-000000000002','30000000-0000-4000-8000-000000000002','Project B');
@@ -177,6 +190,18 @@ select throws_ok($$select public.review_stage_report('70000000-0000-4000-8000-00
 select lives_ok($$select public.update_stage_progress('50000000-0000-4000-8000-000000000001',5)$$,'foreman can update stage through RPC');
 select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000007","email":"outsider@other.invalid","role":"authenticated"}',true);
 select is(public.current_user_company_id(),null::uuid,'account with an email outside the firm domain has no company scope');
+select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000008","email":"owner@gmail.com","role":"authenticated"}',true);
+select is(public.current_user_company_id(),'30000000-0000-4000-8000-000000000003'::uuid,
+ 'Gmail owner retains access to own firm');
+select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000010","email":"stranger@gmail.com","role":"authenticated"}',true);
+select is(public.current_user_company_id(),null::uuid,
+ 'different Gmail address without an exact invitation is rejected');
+select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000009","email":"crew@gmail.com","role":"authenticated"}',true);
+select is(public.current_user_company_id(),'30000000-0000-4000-8000-000000000003'::uuid,
+ 'exact invited Gmail address is admitted');
+select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000012","email":"crew@firma.ee","role":"authenticated"}',true);
+select is(public.current_user_company_id(),'30000000-0000-4000-8000-000000000004'::uuid,
+ 'corporate domain member is admitted by matching firm domain');
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000005',true);
 select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000005","email":"onboarding-a@test.invalid","role":"authenticated"}',true);
 select is(
