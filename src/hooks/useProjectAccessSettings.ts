@@ -9,6 +9,8 @@ export interface AccessRow {
   name: string
   role: UserRole
   hasAccess: boolean
+  /** Latest stage_history change by this person on this project (residual М4-7). */
+  lastReportAt: string | null
 }
 
 interface UseProjectAccessSettingsResult {
@@ -46,12 +48,23 @@ export function useProjectAccessSettings(
     let active = true
 
     async function fetchRows(): Promise<AccessRow[]> {
-      const [profilesRes, accessRes] = await Promise.all([
+      const [profilesRes, accessRes, historyRes] = await Promise.all([
         supabase.from('profiles').select('id, full_name, role').eq('company_id', companyId),
         supabase.from('project_access').select('user_id').eq('project_id', projectId),
+        supabase
+          .from('stage_history')
+          .select('changed_by, changed_at, project_stages!inner(project_id)')
+          .eq('project_stages.project_id', projectId)
+          .order('changed_at', { ascending: false })
+          .limit(500),
       ])
       if (profilesRes.error) throw profilesRes.error
       if (accessRes.error) throw accessRes.error
+      const last = new Map<string, string>()
+      // History is optional for this screen: without it, rows say «отчётов ещё нет».
+      for (const r of (historyRes.error ? [] : historyRes.data ?? []) as { changed_by: string | null; changed_at: string }[]) {
+        if (r.changed_by && !last.has(r.changed_by)) last.set(r.changed_by, r.changed_at)
+      }
 
       const granted = new Set((accessRes.data ?? []).map((r) => r.user_id as string))
 
@@ -66,6 +79,7 @@ export function useProjectAccessSettings(
           name: p.full_name ?? '',
           role: p.role,
           hasAccess: granted.has(p.id),
+          lastReportAt: last.get(p.id) ?? null,
         }))
         .sort((a, b) => a.name.localeCompare(b.name))
     }

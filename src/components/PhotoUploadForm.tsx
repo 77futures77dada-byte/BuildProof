@@ -6,7 +6,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useStageOptions } from '../hooks/useStageOptions'
 import { uploadProjectPhoto } from '../lib/photos'
 import { toErrorMessage } from '../lib/format'
-import { Button } from './Button'
+import { Button, FormField, TextField, controlClass } from './ui'
 import { ErrorMessage } from './ErrorMessage'
 import { ImagePicker } from './ImagePicker'
 
@@ -15,29 +15,24 @@ interface PhotoUploadFormProps {
   /** When set, the stage is fixed (no picker) — e.g. a photo attached to a task. */
   fixedStageId?: string
   heading?: string
+  /** Photo already taken (camera first, 03 §5.4). */
+  initialFile?: File | null
   onUploaded: () => void
   onCancel: () => void
 }
 
-const selectClass =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200'
-
-export function PhotoUploadForm({
-  projectId,
-  fixedStageId,
-  heading,
-  onUploaded,
-  onCancel,
-}: PhotoUploadFormProps) {
+/** Photo to a stage: picture · stage · caption · «Загрузить». Lives in a Sheet or Modal. */
+export function PhotoUploadForm({ projectId, fixedStageId, heading, initialFile = null, onUploaded, onCancel }: PhotoUploadFormProps) {
   const { user } = useAuth()
   const { t } = useTranslation()
   const { options, loading: stagesLoading, error: stagesError } = useStageOptions(projectId)
 
-  const [file, setFile] = useState<File | null>(null)
+  const [file, setFile] = useState<File | null>(initialFile)
   const [stageId, setStageId] = useState('')
   const [caption, setCaption] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [stageMissing, setStageMissing] = useState(false)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -47,24 +42,17 @@ export function PhotoUploadForm({
     }
     const effectiveStageId = fixedStageId ?? stageId
     if (!effectiveStageId) {
-      setError(t('photos.pickStage'))
+      setStageMissing(true)
       return
     }
     if (!user) {
       setError(t('common.sessionMissing'))
       return
     }
-
     setError(null)
     setBusy(true)
     try {
-      await uploadProjectPhoto({
-        projectId,
-        projectStageId: effectiveStageId,
-        caption,
-        file,
-        uploadedBy: user.id,
-      })
+      await uploadProjectPhoto({ projectId, projectStageId: effectiveStageId, caption, file, uploadedBy: user.id })
       onUploaded()
     } catch (err) {
       setError(toErrorMessage(err))
@@ -74,60 +62,52 @@ export function PhotoUploadForm({
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
-    >
-      <h2 className="text-base font-semibold text-slate-900">{heading ?? t('photos.formHeading')}</h2>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      {heading ? <h3 className="m-0 text-h3 font-bold text-fg">{heading}</h3> : null}
 
-      <ImagePicker onChange={setFile} disabled={busy} />
+      <ImagePicker onChange={(f) => { setFile(f); setError(null) }} disabled={busy} initialFile={initialFile} />
 
       {fixedStageId ? null : (
         <>
-          <label className="block space-y-1">
-            <span className="text-sm font-medium text-slate-700">
-              {t('photos.stage')} <span className="text-red-600">*</span>
-            </span>
-            <select
-              required
-              value={stageId}
-              disabled={busy || stagesLoading}
-              onChange={(e) => setStageId(e.target.value)}
-              className={selectClass}
-            >
-              <option value="" disabled>
-                {stagesLoading ? t('photos.loadingStages') : t('photos.chooseStage')}
-              </option>
-              {options.map((opt) => (
-                <option key={opt.id} value={opt.id}>
-                  {stageLabel(opt.name)}
+          <FormField label={t('photos.stage')} error={stageMissing ? t('photos.pickStage') : undefined}>
+            {(control) => (
+              <select
+                {...control}
+                required
+                value={stageId}
+                disabled={busy || stagesLoading}
+                onChange={(e) => { setStageId(e.target.value); setStageMissing(false) }}
+                className={controlClass}
+              >
+                <option value="" disabled>
+                  {stagesLoading ? t('photos.loadingStages') : t('photos.chooseStage')}
                 </option>
-              ))}
-            </select>
-          </label>
+                {options.map((opt) => (
+                  <option key={opt.id} value={opt.id}>{stageLabel(opt.name)}</option>
+                ))}
+              </select>
+            )}
+          </FormField>
           <ErrorMessage message={stagesError} />
         </>
       )}
 
-      <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">{t('photos.caption')}</span>
-        <input
-          type="text"
-          value={caption}
-          disabled={busy}
-          onChange={(e) => setCaption(e.target.value)}
-          placeholder={t('common.optional')}
-          className={selectClass}
-        />
-      </label>
+      <TextField
+        label={t('photos.caption')}
+        hint={t('common.optional')}
+        type="text"
+        value={caption}
+        disabled={busy}
+        onChange={(e) => setCaption(e.target.value)}
+      />
 
       <ErrorMessage message={error} />
 
-      <div className="flex gap-2">
-        <Button type="submit" loading={busy}>
+      <div className="flex flex-col gap-3">
+        <Button type="submit" variant="primary" block loading={busy}>
           {busy ? t('photos.uploading') : t('photos.upload')}
         </Button>
-        <Button type="button" variant="secondary" onClick={onCancel} disabled={busy}>
+        <Button type="button" variant="secondary" block onClick={onCancel} disabled={busy}>
           {t('common.cancel')}
         </Button>
       </div>

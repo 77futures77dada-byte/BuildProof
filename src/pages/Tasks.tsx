@@ -1,18 +1,19 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { useTasks } from '../hooks/useTasks'
 import type { TaskItem } from '../hooks/useTasks'
 import { useProjectMembers } from '../hooks/useProjectMembers'
 import { useStageOptions } from '../hooks/useStageOptions'
-import { Button } from '../components/Button'
+import { useProjectStages } from '../hooks/useProjectStages'
+import { isEmailGateOpen } from '../lib/emailGate'
+import { Button, Disclosure, NetBar, Sheet } from '../components/ui'
 import { Spinner } from '../components/Spinner'
 import { ErrorMessage } from '../components/ErrorMessage'
-import { Modal } from '../components/Modal'
 import { TaskForm } from '../components/TaskForm'
 import { TaskCard } from '../components/TaskCard'
-import { PhotoUploadForm } from '../components/PhotoUploadForm'
+import { StageMarkSheet } from '../components/report/StageMarkSheet'
 
 const MANAGER_ROLES = new Set(['gc', 'foreman'])
 
@@ -26,49 +27,45 @@ function byDeadline(a: TaskItem, b: TaskItem): number {
 
 export function Tasks() {
   const { id } = useParams<{ id: string }>()
-  const { profile, user } = useAuth()
+  const { profile } = useAuth()
+  if (profile?.role === 'worker') return <Navigate to={`/project/${id}/today`} replace />
+  return <TasksView projectId={id} manager={profile ? MANAGER_ROLES.has(profile.role) : false} />
+}
+
+function TasksView({ projectId, manager }: { projectId: string | undefined; manager: boolean }) {
   const { t } = useTranslation()
-
-  const role = profile?.role
-  const isManager = role ? MANAGER_ROLES.has(role) : false
-  const isWorker = role === 'worker'
-  const cardVariant = isManager ? 'manager' : isWorker ? 'worker' : 'readonly'
-
-  const { tasks, loading, error, reload, updateTask } = useTasks(
-    id,
-    isWorker ? user?.id : undefined,
-  )
-  // Only the manager cards use these; skip the queries for workers/clients.
-  const { members } = useProjectMembers(isManager ? id : undefined)
-  const { options: stages } = useStageOptions(isManager ? id : undefined)
+  const { tasks, loading, error, reload, updateTask } = useTasks(projectId, undefined)
+  // Only the manager cards use these; skip the queries for clients.
+  const { members } = useProjectMembers(manager ? projectId : undefined)
+  const { options: stageOptions } = useStageOptions(manager ? projectId : undefined)
+  const { stages, commitPercent } = useProjectStages(manager ? projectId : undefined)
 
   const [showForm, setShowForm] = useState(false)
-  const [photoTask, setPhotoTask] = useState<TaskItem | null>(null)
-  const [doneOpen, setDoneOpen] = useState(false)
+  const [markStageId, setMarkStageId] = useState<string | null>(null)
+  const marking = stages.find((s) => s.id === markStageId) ?? null
 
-  const active = tasks.filter((t) => t.status !== 'done').sort(byDeadline)
-  const done = tasks.filter((t) => t.status === 'done')
+  const active = tasks.filter((x) => x.status !== 'done').sort(byDeadline)
+  const done = tasks.filter((x) => x.status === 'done')
+  const variant = manager ? 'manager' : 'readonly'
+
+  const card = (task: TaskItem) => (
+    <TaskCard
+      key={task.id}
+      task={task}
+      variant={variant}
+      members={members}
+      stages={stageOptions}
+      onUpdate={updateTask}
+      onCompletedWithStage={(x) => setMarkStageId(x.projectStageId)}
+    />
+  )
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-sm font-semibold text-slate-700">
-          {isWorker ? t('tasks.myTitle') : t('tasks.title')}
-        </h2>
-        {isManager && !showForm ? (
-          <Button onClick={() => setShowForm(true)}>{t('tasks.create')}</Button>
-        ) : null}
-      </div>
-
-      {isManager && showForm && id ? (
-        <TaskForm
-          projectId={id}
-          onCancel={() => setShowForm(false)}
-          onCreated={() => {
-            setShowForm(false)
-            reload()
-          }}
-        />
+    <section className="flex flex-col gap-4">
+      <NetBar />
+      <h2 className="m-0 text-h2 font-bold text-fg">{t('tasks.title')}</h2>
+      {manager ? (
+        <Button variant="primary" block onClick={() => setShowForm(true)} className="sm:w-auto sm:self-start">{t('tasks.create')}</Button>
       ) : null}
 
       {loading ? (
@@ -76,75 +73,31 @@ export function Tasks() {
       ) : error ? (
         <ErrorMessage message={error} onRetry={reload} />
       ) : tasks.length === 0 ? (
-        <p className="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm">
-          {isWorker ? t('tasks.emptyWorker') : t('tasks.empty')}
+        <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body font-medium text-fg">
+          {!manager ? t('tasks.noActive') : isEmailGateOpen() ? t('tasks.empty') : t('tasks.emptyClosed')}
         </p>
       ) : (
         <>
           {active.length > 0 ? (
-            <ul className="space-y-3">
-              {active.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  variant={cardVariant}
-                  members={members}
-                  stages={stages}
-                  onUpdate={updateTask}
-                  onCompletedWithStage={setPhotoTask}
-                />
-              ))}
-            </ul>
+            <ul className="m-0 flex flex-col gap-3 p-0">{active.map(card)}</ul>
           ) : (
-            <p className="text-sm text-slate-500">{t('tasks.noActive')}</p>
+            <p className="m-0 text-body font-medium text-fg">{t('tasks.noActive')}</p>
           )}
-
           {done.length > 0 ? (
-            <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
-              <button
-                type="button"
-                onClick={() => setDoneOpen((v) => !v)}
-                aria-expanded={doneOpen}
-                className="flex w-full items-center gap-1 px-4 py-3 text-sm font-medium text-slate-600"
-              >
-                <span aria-hidden="true">{doneOpen ? '▾' : '▸'}</span>
-                {t('tasks.completed', { count: done.length })}
-              </button>
-              {doneOpen ? (
-                <ul className="space-y-3 border-t border-slate-100 p-3">
-                  {done.map((task) => (
-                    <TaskCard
-                      key={task.id}
-                      task={task}
-                      variant={cardVariant}
-                      members={members}
-                      stages={stages}
-                      onUpdate={updateTask}
-                      onCompletedWithStage={setPhotoTask}
-                    />
-                  ))}
-                </ul>
-              ) : null}
-            </div>
+            <Disclosure label={t('tasks.completed', { count: done.length })}>
+              <ul className="m-0 flex flex-col gap-3 p-0">{done.map(card)}</ul>
+            </Disclosure>
           ) : null}
         </>
       )}
 
-      <Modal
-        open={photoTask !== null}
-        onClose={() => setPhotoTask(null)}
-        label={t('tasks.attachPhoto')}
-      >
-        {photoTask?.projectStageId && id ? (
-          <PhotoUploadForm
-            projectId={id}
-            fixedStageId={photoTask.projectStageId}
-            heading={t('tasks.photoHeading')}
-            onCancel={() => setPhotoTask(null)}
-            onUploaded={() => setPhotoTask(null)}
-          />
+      <Sheet open={manager && showForm} onClose={() => setShowForm(false)} title={t('tasks.formHeading')} history name="task-form">
+        {projectId ? (
+          <TaskForm projectId={projectId} onCancel={() => setShowForm(false)} onCreated={() => { setShowForm(false); reload() }} />
         ) : null}
-      </Modal>
-    </div>
+      </Sheet>
+
+      <StageMarkSheet stage={marking} onClose={() => setMarkStageId(null)} onSave={commitPercent} />
+    </section>
   )
 }

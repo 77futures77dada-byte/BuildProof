@@ -282,7 +282,8 @@
     "name": "Title",
     "namePlaceholder": "e.g. install formwork along axis 3",
     "nameRequired": "Enter a task title.",
-    "emptyClosed": "No tasks yet. Write one down so it is not forgotten."
+    "emptyClosed": "No tasks yet. Write one down so it is not forgotten.",
+    "overdue": "Overdue"
   },
   "photos": {
     "title": "Photos",
@@ -307,7 +308,10 @@
     "uploadFailed": "Could not send the photo. Check the connection and try again.",
     "saveFailed": "Could not save the photo. Please try again.",
     "takePhoto": "Take a photo",
-    "emptyClient": "No photos yet."
+    "emptyClient": "No photos yet.",
+    "prev": "Previous",
+    "next": "Next",
+    "sentAt": "sent {{date}}"
   },
   "image": {
     "notImage": "The selected file is not an image.",
@@ -352,7 +356,6 @@
     "title": "Stages",
     "loading": "Loading stages…",
     "readOnly": "View only",
-    "empty": "This project has no stages yet.",
     "history": "Change history",
     "historyLoading": "Loading history…",
     "historyEmpty": "No changes yet.",
@@ -361,7 +364,10 @@
     "increase": "Increase progress: {{stage}}",
     "progress": "Stage percentage: {{stage}}",
     "emptyOwner": "This site has no stages.",
-    "emptyAsk": "Stages are not set yet. Ask the owner."
+    "emptyAsk": "Stages are not set yet. Ask the owner.",
+    "mark": "Mark",
+    "markFor": "Mark: {{stage}}",
+    "historyEntry": "was {{from}}%, now {{to}}%"
   },
   "settings": {
     "accessTitle": "Who sees this site",
@@ -414,10 +420,6 @@
     "reportArrived": "Report received {{date}}"
   },
   "invite": {
-    "whatsapp": "Send the worker a link on WhatsApp",
-    "copy": "Copy the text",
-    "copied": "Copied",
-    "message": "Hello! We send photos and reports for “{{project}}” through BuildProof: {{url}}",
     "title": "Invite a worker",
     "foreman": "Invite a foreman",
     "name": "Name",
@@ -549,7 +551,8 @@
     "confirmedRow": "Confirmed",
     "confirmAllSmall": "Confirm all small ({{count}})",
     "closedEarly": "Not confirmed: the page closed too early.",
-    "ownJump": "Your own jump is confirmed by the owner."
+    "ownJump": "Your own jump is confirmed by the owner.",
+    "waiting": "waiting {{count}} h"
   },
   "status": {
     "markedByOwner": "Marked by the owner",
