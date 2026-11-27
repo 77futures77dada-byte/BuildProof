@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { getReportStatus } from '../lib/reportStatus'
+import { isEmailGateOpen } from '../lib/emailGate'
 import type { ReportStatus } from '../lib/reportStatus'
 import { StatusChip } from './ui/StatusChip'
 import type { StatusKind } from './ui/StatusIcon'
@@ -35,7 +36,7 @@ export function ReportStatusBadge({
             ? t('reportStatus.overdue', { count: status.days ?? 0 })
             : waitingFor
               ? t('reportStatus.noneWaiting', { names: waitingFor })
-              : t('reportStatus.none')
+              : isEmailGateOpen() ? t('reportStatus.none') : t('reportStatus.noMarks')
 
   const kind = kindOf(status)
   if (kind) return <StatusChip kind={kind} className="min-w-0">{label}</StatusChip>

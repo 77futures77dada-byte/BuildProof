@@ -422,10 +422,6 @@
     "reportArrived": "Report received {{date}}"
   },
   "invite": {
-    "whatsapp": "Send the worker a link on WhatsApp",
-    "copy": "Copy the text",
-    "copied": "Copied",
-    "message": "Hello! We send photos and reports for “{{project}}” through BuildProof: {{url}}",
     "title": "Invite a worker",
     "foreman": "Invite a foreman",
     "name": "Name",

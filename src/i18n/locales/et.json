@@ -422,10 +422,6 @@
     "reportArrived": "Aruanne saabus {{date}}"
   },
   "invite": {
-    "whatsapp": "Saada töölisele link WhatsAppis",
-    "copy": "Kopeeri tekst",
-    "copied": "Kopeeritud",
-    "message": "Tere! Objekti „{{project}}“ fotod ja aruanded saadame BuildProofi kaudu: {{url}}",
     "title": "Kutsu tööline",
     "foreman": "Kutsu brigadir",
     "name": "Nimi",

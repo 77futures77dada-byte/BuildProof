@@ -193,45 +193,5 @@
     ],
     "temporary": "обзор объекта и оболочка",
     "reason": "migrated in step «обзор объекта и оболочка» (05-ui.md §«Миграция»)"
-  },
-  {
-    "file": "src/pages/Settings.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "вкладки объекта",
-    "reason": "migrated in step «вкладки объекта» (05-ui.md §«Миграция»)"
-  },
-  {
-    "file": "src/components/InviteWorkerLink.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "вкладки объекта",
-    "reason": "migrated in step «вкладки объекта» (05-ui.md §«Миграция»)"
-  },
-  {
-    "file": "src/components/MemberAccessRow.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "вкладки объекта",
-    "reason": "migrated in step «вкладки объекта» (05-ui.md §«Миграция»)"
-  },
-  {
-    "file": "src/components/Toggle.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "вкладки объекта",
-    "reason": "migrated in step «вкладки объекта» (05-ui.md §«Миграция»)"
   }
 ]
