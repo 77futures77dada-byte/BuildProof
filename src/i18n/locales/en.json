@@ -246,7 +246,6 @@
   },
   "today": {
     "loadingProgress": "Loading progress…",
-    "overall": "Overall progress",
     "report": "Take a photo",
     "myTasks": "My tasks",
     "allDone": "All your tasks are done. Report on a stage with the button above.",
@@ -257,9 +256,7 @@
     "continue": "Continue",
     "needsAttention": "Need attention: {{count}}",
     "objectPercent": "Site: {{percent}}%",
-    "lastReport": "My last report: {{stage}} · {{date}}",
-    "staleWaiting_one": "{{count}} report needs a decision",
-    "staleWaiting_other": "{{count}} reports need a decision"
+    "lastReport": "My last report: {{stage}} · {{date}}"
   },
   "tasks": {
     "title": "Tasks",
@@ -453,10 +450,8 @@
     "sending": "Sending",
     "sent": "Sent",
     "sentEarlier": "Sent: it arrived earlier",
-    "queued": "Saved on the phone, not sent. Open “Today” in BuildProof when you have signal.",
     "queuedOwner": "Saved on the phone, not sent. Open “Project overview” in BuildProof when you have signal.",
     "unknown": "We do not know if the report arrived. The photo is saved on the phone.",
-    "unknownHint": "Open “Today” when you have signal and we will check.",
     "unknownHintOwner": "Open “Project overview” when you have signal and we will check.",
     "unknownAction": "Check again",
     "queuedToday": "Saved on this phone, not sent. When you have a connection, tap «Send again».",
@@ -466,7 +461,6 @@
     "staleResend": "Send with new %",
     "stageAhead": "The stage is already {{percent}}%. Your photo was added.",
     "bar": "Not sent: {{count}}",
-    "barChecking": "Not sure if they arrived: {{count}}",
     "lastPhoto": "last photo {{time}}",
     "lastAttempt": "last attempt {{time}}",
     "resend": "Send again",
@@ -481,7 +475,7 @@
     "reasonComment": "a reason for the decrease is needed"
   },
   "gate": {
-    "inviteLater": "We connect new people by hand. Write to us:",
+    "inviteLater": "We connect new people by hand. Write to us.",
     "inviteLaterNoContact": "Right now you can add people who already work for you.",
     "startEarlier": "Want to start sooner: {{phone}}"
   },

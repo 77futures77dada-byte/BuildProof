@@ -171,7 +171,7 @@ function PasswordForm({ gateOpen }: { gateOpen: boolean }) {
       ) : (
         <div className="flex flex-col gap-1">
           <p className="m-0 text-body text-fg">{hasLegalContact() ? t('auth.recoveryLater') : t('auth.recoveryOwner')}</p>
-          <ContactLines />
+          <ContactLines label={t('common.supportLabel')} />
         </div>
       )}
     </>
@@ -188,7 +188,7 @@ function LoginFooter({ gateOpen }: { gateOpen: boolean }) {
       ) : (
         <div className="flex flex-col gap-1">
           <p className="m-0 text-body text-fg">{hasLegalContact() ? t('auth.signupLater') : t('auth.signupLaterNoContact')}</p>
-          <ContactLines />
+          <ContactLines label={t('common.supportLabel')} />
         </div>
       )}
       <Link to="/" className={buttonClass({ variant: 'ghost', block: true })}>{t('auth.backHome')}</Link>

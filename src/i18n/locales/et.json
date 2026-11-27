@@ -246,7 +246,6 @@
   },
   "today": {
     "loadingProgress": "Edenemise laadimine…",
-    "overall": "Üldine valmidus",
     "report": "Pildista",
     "myTasks": "Minu ülesanded",
     "allDone": "Kõik teie ülesanded on tehtud. Etapi aruanne — ülal oleva nupuga.",
@@ -257,9 +256,7 @@
     "continue": "Jätka",
     "needsAttention": "Vajavad tähelepanu: {{count}}",
     "objectPercent": "Objekt: {{percent}}%",
-    "lastReport": "Minu viimane aruanne: {{stage}} · {{date}}",
-    "staleWaiting_one": "{{count}} aruanne vajab otsust",
-    "staleWaiting_other": "{{count}} aruannet vajab otsust"
+    "lastReport": "Minu viimane aruanne: {{stage}} · {{date}}"
   },
   "tasks": {
     "title": "Ülesanded",
@@ -453,10 +450,8 @@
     "sending": "Saadetakse",
     "sent": "Saadetud",
     "sentEarlier": "Saadetud: jõudis kohale varem",
-    "queued": "Telefoni salvestatud, saatmata. Avage BuildProofis „Täna“, kui levi on olemas.",
     "queuedOwner": "Telefoni salvestatud, saatmata. Avage BuildProofis „Objekti ülevaade“, kui levi on olemas.",
     "unknown": "Me ei tea, kas aruanne jõudis kohale. Foto on telefoni salvestatud.",
-    "unknownHint": "Avage „Täna“, kui levi on olemas, — kontrollime.",
     "unknownHintOwner": "Avage „Objekti ülevaade“, kui levi on olemas, — kontrollime.",
     "unknownAction": "Kontrolli uuesti",
     "queuedToday": "Salvestatud telefoni, saatmata. Kui ühendus tekib, vajutage «Saada uuesti».",
@@ -466,7 +461,6 @@
     "staleResend": "Saada uue %-ga",
     "stageAhead": "Etapp on juba {{percent}}%. Teie foto lisati.",
     "bar": "Saatmata: {{count}}",
-    "barChecking": "Pole teada, kas jõudsid: {{count}}",
     "lastPhoto": "viimane foto {{time}}",
     "lastAttempt": "viimane katse {{time}}",
     "resend": "Saada uuesti",
@@ -481,7 +475,7 @@
     "reasonComment": "vähendamiseks on vaja põhjust"
   },
   "gate": {
-    "inviteLater": "Uusi inimesi liidame käsitsi. Kirjutage meile:",
+    "inviteLater": "Uusi inimesi liidame käsitsi. Kirjutage meile.",
     "inviteLaterNoContact": "Praegu saate objektile lisada need, kes juba teie juures töötavad.",
     "startEarlier": "Soovite varem alustada: {{phone}}"
   },

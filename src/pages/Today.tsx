@@ -76,6 +76,7 @@ export function Today() {
     setParams(next, { replace: true })
   }, [stageParam, stages.loading, params, setParams])
   const [sheetDraftId, setSheetDraftId] = useState<string | null>(null)
+  const [discard, setDiscard] = useState<string | null>(null)
   // What the camera is open for; set right before click(), consumed once (critic r1 HIGH-2).
   const shot = useRef<ShotIntent | null>(null)
 
@@ -279,9 +280,21 @@ export function Today() {
       ) : null}
 
       {editing ? (
-        <section className="flex items-center gap-3 rounded-card border-2 border-line bg-surface p-3">
+        <section className="flex flex-wrap items-center gap-3 rounded-card border-2 border-line bg-surface p-3">
           <p className="m-0 min-w-0 flex-1 text-field font-semibold">{t('report.unfinished')}</p>
           <Button variant="secondary" onClick={() => setSheetDraftId(editing.draftId)}>{t('today.continue')}</Button>
+          {/* an accidental shot can be thrown away here, off the send path (critic r3 LOW-1) */}
+          {discard === editing.draftId ? (
+            <div className="flex w-full flex-col gap-3 rounded-card border-2 border-stale bg-page p-3">
+              <p className="m-0 text-field font-semibold">{t('send.deleteConfirm')}</p>
+              <div className="flex flex-wrap gap-3">
+                <Button variant="danger" onClick={() => { setDiscard(null); void removeDraft(editing.draftId) }}>{t('common.delete')}</Button>
+                <Button variant="secondary" onClick={() => setDiscard(null)}>{t('common.cancel')}</Button>
+              </div>
+            </div>
+          ) : (
+            <Button variant="danger" onClick={() => setDiscard(editing.draftId)}>{t('common.delete')}</Button>
+          )}
         </section>
       ) : null}
 
