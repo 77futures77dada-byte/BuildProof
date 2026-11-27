@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ChangeEvent } from 'react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { useTasks } from '../hooks/useTasks'
@@ -23,6 +23,7 @@ import { draftErrorKey } from '../components/report/draftErrors'
 import { StagePicker } from '../components/report/StagePicker'
 import { removeDraft, saveDraft, useAutoRetry, useDrafts } from '../components/report/useDrafts'
 import { DraftThumb } from '../components/report/DraftThumb'
+import { stageFromParam } from '../components/report/stageParam'
 
 /** In-progress first, then by deadline (soonest first, no-deadline last). */
 function byUrgency(a: TaskItem, b: TaskItem): number {
@@ -61,6 +62,19 @@ export function Today() {
   const camera = useRef<HTMLInputElement>(null)
   const gallery = useRef<HTMLInputElement>(null)
   const [chosenStageId, setChosenStageId] = useState<string | null>(null)
+  // «Отметить» on «Этапы» → ?stage=<id>: preselect it for the next shot, then drop the param.
+  const [params, setParams] = useSearchParams()
+  const stageParam = params.get('stage')
+  if (stageParam && !stages.loading) {
+    const picked = stageFromParam(stageParam, stages.stages)
+    if (picked && picked !== chosenStageId) setChosenStageId(picked)
+  }
+  useEffect(() => {
+    if (!stageParam || stages.loading) return
+    const next = new URLSearchParams(params)
+    next.delete('stage')
+    setParams(next, { replace: true })
+  }, [stageParam, stages.loading, params, setParams])
   const [sheetDraftId, setSheetDraftId] = useState<string | null>(null)
   // What the camera is open for; set right before click(), consumed once (critic r1 HIGH-2).
   const shot = useRef<ShotIntent | null>(null)

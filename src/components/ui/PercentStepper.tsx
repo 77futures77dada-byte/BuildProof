@@ -27,7 +27,8 @@ interface PercentStepperProps {
 const clamp = (v: number) => Math.max(0, Math.min(100, v))
 
 /**
- * «−10 / +10 / +25 / 100%» (brief §2.1б п.7, same on the landing).
+ * «−10 / +10 / +25 / 100%» (brief §2.1б п.7 «Готово 100%»; the label is «100%»
+ * by 04-copy L1 / CT C8 ред. 2 — a third of 328 px does not fit «Готово 100%»).
  * Growth: row «+10 · +25 · 100%» (≥ 56 px, gap 12), below at 24 px a secondary «−10».
  * Decrease (brief §2.5, wins over 03 §6.2): «−10» turns the sheet into the
  * decrease mode — the growth row is replaced by a selected «−10» chip (tap again

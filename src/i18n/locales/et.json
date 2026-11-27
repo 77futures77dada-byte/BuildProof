@@ -472,7 +472,7 @@
     "limit": "Telefon hoiab kuni {{max}} aruannet. Saatke või kustutage vanad.",
     "deleteConfirm": "Kas kustutada see aruanne telefonist? Fotot ei säilitata.",
     "reasonNetwork": "ei jõudnud kohale, proovime uuesti",
-    "reasonTimeout": "pole kindel, kas jõudis",
+    "reasonTimeout": "vastust pole veel, kontrollige hiljem",
     "reasonAuth": "logige uuesti sisse",
     "reasonComment": "vähendamiseks on vaja põhjust"
   },

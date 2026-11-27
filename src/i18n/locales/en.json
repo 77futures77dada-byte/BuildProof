@@ -472,7 +472,7 @@
     "limit": "The phone keeps at most {{max}} reports. Send or delete old ones.",
     "deleteConfirm": "Delete this report from the phone? The photo will not be kept.",
     "reasonNetwork": "did not go through, will try again",
-    "reasonTimeout": "not sure it arrived",
+    "reasonTimeout": "no reply yet, check later",
     "reasonAuth": "sign in again",
     "reasonComment": "a reason for the decrease is needed"
   },
