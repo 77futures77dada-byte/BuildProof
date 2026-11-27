@@ -75,47 +75,7 @@
     "reason": "migrated in step «вход и системные экраны» (05-ui.md §«Миграция»)"
   },
   {
-    "file": "src/pages/Dashboard.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "объекты и тариф",
-    "reason": "migrated in step «объекты и тариф» (05-ui.md §«Миграция»)"
-  },
-  {
     "file": "src/pages/Tariff.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "объекты и тариф",
-    "reason": "migrated in step «объекты и тариф» (05-ui.md §«Миграция»)"
-  },
-  {
-    "file": "src/components/ProjectListCard.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "объекты и тариф",
-    "reason": "migrated in step «объекты и тариф» (05-ui.md §«Миграция»)"
-  },
-  {
-    "file": "src/components/WorkerProjectCard.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "объекты и тариф",
-    "reason": "migrated in step «объекты и тариф» (05-ui.md §«Миграция»)"
-  },
-  {
-    "file": "src/components/CreateProjectForm.tsx",
     "kinds": [
       "palette",
       "small",

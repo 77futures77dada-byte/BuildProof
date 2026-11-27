@@ -3,8 +3,7 @@ import type { FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { createProjectWithStages } from '../lib/projects'
 import { toErrorMessage } from '../lib/format'
-import { Button } from './Button'
-import { TextField } from './TextField'
+import { Button, TextField } from './ui'
 import { ErrorMessage } from './ErrorMessage'
 
 interface CreateProjectFormProps {
@@ -13,20 +12,23 @@ interface CreateProjectFormProps {
   onCancel: () => void
 }
 
+/** 03 §4.2 `create-project`: name (required), address, deadline; hints under labels, no placeholders. */
 export function CreateProjectForm({ companyId, onCreated, onCancel }: CreateProjectFormProps) {
   const { t } = useTranslation()
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
   const [deadline, setDeadline] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [nameError, setNameError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!name.trim()) {
-      setError(t('createProject.nameRequired'))
+      setNameError(t('createProject.nameRequired'))
       return
     }
+    setNameError(null)
     setError(null)
     setSubmitting(true)
     try {
@@ -42,24 +44,26 @@ export function CreateProjectForm({ companyId, onCreated, onCancel }: CreateProj
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+      noValidate
+      className="flex flex-col gap-4 rounded-card border-2 border-line bg-surface p-4 shadow-card"
     >
-      <h2 className="text-base font-semibold text-slate-900">{t('createProject.heading')}</h2>
+      <h2 className="m-0 text-h2 font-bold text-fg">{t('createProject.heading')}</h2>
 
       <TextField
         label={t('createProject.name')}
+        hint={t('createProject.namePlaceholder')}
         required
         value={name}
         onChange={(e) => setName(e.target.value)}
         disabled={submitting}
-        placeholder={t('createProject.namePlaceholder')}
+        error={nameError}
       />
       <TextField
         label={t('createProject.address')}
+        hint={t('createProject.addressPlaceholder')}
         value={address}
         onChange={(e) => setAddress(e.target.value)}
         disabled={submitting}
-        placeholder={t('createProject.addressPlaceholder')}
       />
       <TextField
         label={t('createProject.deadline')}
@@ -69,10 +73,11 @@ export function CreateProjectForm({ companyId, onCreated, onCancel }: CreateProj
         disabled={submitting}
         hint={t('createProject.deadlineHint')}
       />
+      <p className="m-0 text-body font-medium text-fg">{t('createProject.stagesHint')}</p>
 
       <ErrorMessage message={error} />
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-3">
         <Button type="submit" loading={submitting}>
           {t('createProject.submit')}
         </Button>
@@ -80,9 +85,6 @@ export function CreateProjectForm({ companyId, onCreated, onCancel }: CreateProj
           {t('common.cancel')}
         </Button>
       </div>
-      <p className="text-xs text-slate-500">
-        {t('createProject.stagesHint')}
-      </p>
     </form>
   )
 }
