@@ -80,8 +80,8 @@ export function StageMarkSheet({ stage, onClose, onSave, onSaved }: StageMarkShe
     >
       <div className="flex flex-col gap-4">
         <NetBar />
-        <p className="m-0 text-h3 font-bold text-fg [overflow-wrap:anywhere]">{name}</p>
-        <p className="m-0 text-field font-semibold text-fg num-col">{t('report.wasWill', { from: base, to: value })}</p>
+        <p className="m-0 text-h3 font-semibold text-fg [overflow-wrap:anywhere]">{name}</p>
+        <p className="m-0 text-field font-medium text-fg num-col">{t('report.wasWill', { from: base, to: value })}</p>
         <PercentStepper
           base={base}
           value={value}
@@ -97,7 +97,7 @@ export function StageMarkSheet({ stage, onClose, onSave, onSaved }: StageMarkShe
             {t('report.noChange')}
           </Button>
         ) : null}
-        {failed ? <p role="alert" className="m-0 text-body font-semibold text-fg">{t('common.unexpectedError')}</p> : null}
+        {failed ? <p role="alert" className="m-0 text-body font-medium text-fg">{t('common.unexpectedError')}</p> : null}
       </div>
     </Sheet>
   )

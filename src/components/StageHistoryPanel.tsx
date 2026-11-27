@@ -18,12 +18,12 @@ export function StageHistoryPanel({ projectStageId, refreshToken }: StageHistory
   const { entries, loading, error } = useStageHistory(projectStageId, open, refreshToken)
 
   return (
-    <div className="text-body font-medium text-fg">
+    <div className="text-body text-fg">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="inline-flex min-h-12 items-center gap-2 rounded-control px-1 text-field font-semibold text-fg underline underline-offset-4 hover:no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        className="inline-flex min-h-12 items-center gap-2 rounded-control px-1 text-field font-medium text-fg underline underline-offset-4 hover:no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >
         <svg aria-hidden="true" viewBox="0 0 20 20" width="20" height="20" className={open ? 'rotate-90' : undefined}>
           <path d="M7 4l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -43,7 +43,7 @@ export function StageHistoryPanel({ projectStageId, refreshToken }: StageHistory
             <ul className="m-0 flex list-none flex-col gap-2 p-0">
               {entries.map((entry) => (
                 <li key={entry.id} className="flex flex-wrap items-baseline gap-x-3">
-                  <span className="num-col inline-flex items-center gap-1 font-semibold">
+                  <span className="num-col inline-flex items-center gap-1 font-medium">
                     {entry.oldPercent}%
                     <svg aria-hidden="true" viewBox="0 0 20 20" width="18" height="18">
                       <path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />

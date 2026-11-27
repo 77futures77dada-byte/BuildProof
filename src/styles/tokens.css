@@ -39,42 +39,61 @@
 @font-face { font-family: "Onest Fallback Arial"; font-weight: 550 900; src: local("Arial Bold"), local("Arial-BoldMT");
   size-adjust: 99.35%; ascent-override: 97.64%; descent-override: 30.70%; line-gap-override: 0%; }
 
-/* ---------- colour: light (default) ---------- */
+/* ---------- colour: light (navy palette on white) ---------- */
+/* Brand navy (owner 2026-11-28: «чёрный выглядит дёшево и просто»). Every pair is
+   checked by scripts/check-contrast.mjs; a failing pair changes the colour, not the threshold. */
 :root {
   color-scheme: light;
   --bg: #FFFFFF;
-  --surface: #F3F4F6;
-  --fg: #111418;
-  --muted-strong: #3D434B;   /* not for worker text: under glare 3.50 < 4.5 */
-  --muted: #5B636E;          /* owner desktop ≥ 1024 px long text only */
-  --line: #D9DDE2;
-  --accent: #FFD84D;         /* brand yellow, main button only */
-  --accent-pressed: #F5C518;
-  --on-accent: #111418;
-  --accent-border: #111418;
-  --pending-ink: #6E4400;
-  --ok-ink: #0F5C2B;
-  --stale-ink: #9E1C1C;      /* also error, returned, danger */
-  --warn-bg: #FFE4CC;        /* «не отправлено» — not the main-button yellow */
-  --warn-border: #3F1A00;
-  --scrim: rgba(0, 0, 0, .72);
+  --surface: #EEF3F9;        /* light grey-blue: cards, chips */
+  --surface-2: #E1EAF4;      /* hover / selected on surface */
+  --fg: #0B2A4A;             /* navy: all text and headings */
+  --muted-strong: #2E4B6B;   /* owner secondary text; not for worker text */
+  --muted: #4A6582;          /* owner long text only */
+  --line: #C9D7E6;
+  --link: #0A4478;           /* links and text actions (≥ 7:1: the worker sees them) */
+  --accent: #FFC72C;         /* brand yellow, main button only */
+  --accent-pressed: #F0B400;
+  --on-accent: #0B2A4A;
+  --accent-border: #0B2A4A;
+  --pending-ink: #8A5300;    /* waiting for review (amber, darkened for white) */
+  --ok-ink: #11683F;         /* accepted (green, darkened for white) */
+  --stale-ink: #B3261E;      /* problem, error, returned, danger */
+  --warn-bg: #FFE6CC;        /* «не отправлено» — not the main-button yellow */
+  --warn-border: #5A2E00;
+  --scrim: rgba(4, 16, 30, .72);
   --on-scrim: #FFFFFF;
-  --focus: #111418;
-  --elev-card: 0 1px 2px rgba(17, 20, 24, .06), 0 8px 24px -12px rgba(17, 20, 24, .22);
-  --elev-sheet: 0 -8px 32px rgba(17, 20, 24, .22);
-  --elev-press: 0 2px 0 rgba(0, 0, 0, .18);
+  --focus: #0A4478;
+  --elev-card: 0 1px 2px rgba(11, 42, 74, .06), 0 8px 24px -12px rgba(11, 42, 74, .22);
+  --elev-sheet: 0 -8px 32px rgba(11, 42, 74, .22);
+  --elev-press: 0 2px 0 rgba(11, 42, 74, .22);
 
-  /* always-dark bands (landing night sections, phone bezel, logo tile) */
-  --inverse-bg: #111418;
-  --inverse-deep: #0B0D10;
-  --inverse-fg: #F1F3F5;
-  --inverse-muted: #A3ABB5;
-  --inverse-line: #3A4049;
-  --inverse-field: #1B1E22;
+  /* always-dark navy bands (landing night sections, phone bezel, logo tile) */
+  --inverse-bg: #0B2A4A;
+  --inverse-deep: #08213B;
+  --inverse-fg: #EEF3F9;
+  --inverse-muted: #9DB3CC;
+  --inverse-line: #24476F;
+  --inverse-field: #12365C;
   --inverse-warn: #FF9A4D;
   /* photo placeholders and blueprint grid */
-  --photo-ph: #CDD2D8;
-  --grid-line: rgba(17, 20, 24, .12);
+  --photo-ph: #CBD8E6;
+  --grid-line: rgba(11, 42, 74, .12);
+
+  /* 3D object model (src/features/house3d): fixed navy stage, same in both themes.
+     Colour = stage; pinned and checked for ΔE under deuteranopia by palette.test.ts. */
+  --house-bg: #0B2A4A;
+  --house-grid: #24516F;
+  --house-grid-sub: #173E5E;
+  --house-contour: #FFFFFF;
+  --house-other: #94A3B8;
+  --house-foundation: #E3CBA8;
+  --house-frame: #FF9F40;
+  --house-roof: #FF6B6B;
+  --house-windows: #5EEAD4;
+  --house-electric: #FFF176;
+  --house-plumbing: #60A5FA;
+  --house-finish: #F0ABFC;
 
   /* illustration palette: landing demo plan (fixed artwork, same in both themes) */
   --illu-plan: #0B2A4A;
@@ -103,39 +122,45 @@
   --z-toast: 60;
 }
 
-/* ---------- colour: dark (system, unless forced light) ---------- */
+/* ---------- colour: dark navy (system, unless forced light) ---------- */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #121417; --surface: #1B1E22; --fg: #F1F3F5;
-    --muted-strong: #C9CED5; --muted: #A3ABB5; --line: #2C3138;
-    --accent-border: #FFD84D; --focus: #FFD84D;
-    --pending-ink: #F0B429; --ok-ink: #5FD08A; --stale-ink: #FF9C94;
-    --warn-bg: #3B1D05; --warn-border: #FF9A4D;
-    --elev-card: 0 8px 24px -12px rgba(0, 0, 0, .6);
-    --elev-sheet: 0 -8px 32px rgba(0, 0, 0, .6);
-    --inverse-bg: #0B0D10; --inverse-deep: #07080A; --inverse-field: #16191C;
-    --photo-ph: #3A4049; --grid-line: rgba(255, 255, 255, .10);
+    --bg: #08213B; --surface: #0B2A4A; --surface-2: #12365C; --fg: #EEF3F9;
+    --muted-strong: #C3D3E4; --muted: #9DB3CC; --line: #24476F; --link: #7DD3FC;
+    --accent-pressed: #FFD45C; --accent-border: #FFC72C; --focus: #7DD3FC;
+    --pending-ink: #D9962B; --ok-ink: #2FB67E; --stale-ink: #FF6B6B;
+    --warn-bg: #3A2408; --warn-border: #FF9A4D;
+    --scrim: rgba(2, 10, 20, .72);
+    --elev-card: 0 8px 24px -12px rgba(0, 0, 0, .55);
+    --elev-sheet: 0 -8px 32px rgba(0, 0, 0, .55);
+    --elev-press: 0 2px 0 rgba(0, 0, 0, .35);
+    --inverse-bg: #061A30; --inverse-deep: #041426; --inverse-field: #0B2A4A; --inverse-line: #24476F;
+    --photo-ph: #24476F; --grid-line: rgba(238, 243, 249, .10);
   }
 }
-/* ---------- colour: dark (forced) ---------- */
+/* ---------- colour: dark navy (forced; keep identical to the block above — check-contrast checks drift) ---------- */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #121417; --surface: #1B1E22; --fg: #F1F3F5;
-  --muted-strong: #C9CED5; --muted: #A3ABB5; --line: #2C3138;
-  --accent-border: #FFD84D; --focus: #FFD84D;
-  --pending-ink: #F0B429; --ok-ink: #5FD08A; --stale-ink: #FF9C94;
-  --warn-bg: #3B1D05; --warn-border: #FF9A4D;
-  --elev-card: 0 8px 24px -12px rgba(0, 0, 0, .6);
-  --elev-sheet: 0 -8px 32px rgba(0, 0, 0, .6);
-  --inverse-bg: #0B0D10; --inverse-deep: #07080A; --inverse-field: #16191C;
-  --photo-ph: #3A4049; --grid-line: rgba(255, 255, 255, .10);
+  --bg: #08213B; --surface: #0B2A4A; --surface-2: #12365C; --fg: #EEF3F9;
+  --muted-strong: #C3D3E4; --muted: #9DB3CC; --line: #24476F; --link: #7DD3FC;
+  --accent-pressed: #FFD45C; --accent-border: #FFC72C; --focus: #7DD3FC;
+  --pending-ink: #D9962B; --ok-ink: #2FB67E; --stale-ink: #FF6B6B;
+  --warn-bg: #3A2408; --warn-border: #FF9A4D;
+  --scrim: rgba(2, 10, 20, .72);
+  --elev-card: 0 8px 24px -12px rgba(0, 0, 0, .55);
+  --elev-sheet: 0 -8px 32px rgba(0, 0, 0, .55);
+  --elev-press: 0 2px 0 rgba(0, 0, 0, .35);
+  --inverse-bg: #061A30; --inverse-deep: #041426; --inverse-field: #0B2A4A; --inverse-line: #24476F;
+  --photo-ph: #24476F; --grid-line: rgba(238, 243, 249, .10);
 }
 
 /* ---------- Tailwind v4 mapping: bg-surface, text-fg, border-line, … ---------- */
 @theme inline {
   --color-page: var(--bg);
   --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-link: var(--link);
   --color-fg: var(--fg);
   --color-muted-strong: var(--muted-strong);
   --color-muted: var(--muted);
@@ -194,7 +219,7 @@
     background: var(--bg);
     color: var(--fg);
     font-size: 17px;
-    font-weight: 500;
+    font-weight: 400; /* owner zone; the worker zone keeps 500 below (owner feedback 2026-11-28: «слишком жирно») */
     line-height: 1.4;
   }
   input, button, select, textarea { font: inherit; color: inherit; letter-spacing: inherit; }

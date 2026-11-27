@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- theme-color mirrors --bg of src/styles/tokens.css (meta cannot read CSS vars; allowlisted in scripts/check-tokens.allow.json) -->
     <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#121417" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#08213B" media="(prefers-color-scheme: dark)" />
+    <!-- theme before first paint (no dark/light flash); same rule as src/lib/theme.ts applyTheme(): stored choice, else worker/foreman light, else navy dark -->
+    <script>try{var p=localStorage.getItem("bp-theme"),r=localStorage.getItem("bp-theme-role");p=p==="light"||p==="dark"||p==="system"?p:(r==="worker"||r==="foreman"?"light":"dark");if(p!=="system"){document.documentElement.dataset.theme=p;document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){m.content=p==="dark"?"#08213B":"#FFFFFF"})}}catch(e){document.documentElement.dataset.theme="dark"}</script>
     <link rel="preload" href="/fonts/onest/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/onest/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <meta name="description" content="BuildProof — прозрачность строительных объектов: этапы, фото, задачи, замечания." />

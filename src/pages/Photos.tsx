@@ -42,7 +42,7 @@ export function Photos() {
   return (
     <section className="flex flex-col gap-4">
       <NetBar />
-      <h2 className="m-0 text-h2 font-bold text-fg">{t('photos.title')}</h2>
+      <h2 className="m-0 text-h2 font-semibold text-fg">{t('photos.title')}</h2>
 
       {canUpload ? (
         <div className="flex flex-col gap-3 sm:flex-row">
@@ -67,7 +67,7 @@ export function Photos() {
       ) : error ? (
         <ErrorMessage message={error} onRetry={reload} />
       ) : photos.length === 0 ? (
-        <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body font-medium text-fg">
+        <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body text-fg">
           {stageFilter !== 'all' ? t('photos.emptyStage') : canUpload ? t('photos.empty') : t('photos.emptyClient')}
         </p>
       ) : (
@@ -83,9 +83,9 @@ export function Photos() {
                 {photo.url ? (
                   <img src={photo.url} alt="" loading="lazy" className="block size-full object-cover" />
                 ) : (
-                  <span className="flex size-full items-center justify-center p-2 text-body font-semibold text-fg">{t('common.noPreview')}</span>
+                  <span className="flex size-full items-center justify-center p-2 text-body font-medium text-fg">{t('common.noPreview')}</span>
                 )}
-                <span aria-hidden="true" className="absolute inset-x-0 bottom-0 bg-scrim px-2 py-1 text-left text-body font-semibold text-on-scrim [overflow-wrap:anywhere]">
+                <span aria-hidden="true" className="absolute inset-x-0 bottom-0 bg-scrim px-2 py-1 text-left text-body font-medium text-on-scrim [overflow-wrap:anywhere]">
                   {line(photo)}
                 </span>
               </button>
@@ -115,7 +115,7 @@ export function Photos() {
         failedLabel={t('photos.imageFailed')}
         caption={active ? (
           <>
-            {active.caption ? <p className="m-0 text-field font-semibold">{active.caption}</p> : null}
+            {active.caption ? <p className="m-0 text-field font-medium">{active.caption}</p> : null}
             <p className="m-0">
               {[t('photos.sentAt', { date: formatDate(active.uploadedAt) }), active.uploaderName, active.stageName ? stageLabel(active.stageName) : null].filter(Boolean).join(' · ')}
             </p>

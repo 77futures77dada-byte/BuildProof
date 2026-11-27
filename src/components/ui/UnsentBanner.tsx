@@ -48,7 +48,7 @@ export function UnsentBanner({
     <section
       data-unsent={state}
       className={cx(
-        'flex flex-col gap-3 rounded-card border-2 border-warn-border bg-warn-bg text-field leading-[1.3] font-semibold text-fg',
+        'flex flex-col gap-3 rounded-card border-2 border-warn-border bg-warn-bg text-field leading-[1.3] font-medium text-fg',
         variant === 'full' ? 'p-4' : 'p-3',
         className,
       )}
@@ -57,14 +57,14 @@ export function UnsentBanner({
         <StatusIcon kind={ICON[state]} size={22} className="mt-0.5" />
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <p className="m-0">{title}</p>
-          {detail && variant === 'full' ? <p className="m-0 text-body font-medium">{detail}</p> : null}
+          {detail && variant === 'full' ? <p className="m-0 text-body">{detail}</p> : null}
         </div>
         <p className="m-0 flex shrink-0 flex-col items-end leading-none">
-          <span className="text-h2 font-bold">{count}</span>
-          <span className="text-body font-medium">{countLabel}</span>
+          <span className="text-h2 font-semibold">{count}</span>
+          <span className="text-body">{countLabel}</span>
         </p>
       </div>
-      <p aria-live="polite" className="m-0 text-body font-semibold empty:hidden">{retryStatus}</p>
+      <p aria-live="polite" className="m-0 text-body font-medium empty:hidden">{retryStatus}</p>
       {canRetry ? (
         <Button variant="primary" block loading={state === 'retrying'} onClick={onRetry}>{retryLabel}</Button>
       ) : null}

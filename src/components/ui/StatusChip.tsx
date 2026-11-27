@@ -20,7 +20,7 @@ export function StatusChip({ kind, children, className }: StatusChipProps) {
     <span
       data-status={kind}
       className={cx(
-        'inline-flex min-h-8 max-w-full items-center gap-2 rounded-chip border-l-4 bg-surface py-1 pr-3 pl-2 text-body font-semibold text-fg',
+        'inline-flex min-h-8 max-w-full items-center gap-2 rounded-chip border-l-4 bg-surface py-1 pr-3 pl-2 text-body font-medium text-fg',
         className,
       )}
       style={{ borderLeftColor: STATUS_COLOR[kind] }}

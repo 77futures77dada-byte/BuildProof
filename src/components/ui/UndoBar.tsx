@@ -28,7 +28,7 @@ export function UndoBar({ count, label, onUndo, note, className }: UndoBarProps)
         className,
       )}
     >
-      {note ? <p className="m-0 text-body font-semibold text-fg">{note}</p> : null}
+      {note ? <p className="m-0 text-body font-medium text-fg">{note}</p> : null}
       <Button variant="secondary" onClick={onUndo} className="ml-auto">{label}</Button>
     </div>
   )

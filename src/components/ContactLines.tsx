@@ -13,14 +13,14 @@ export function ContactLines({ label }: { label?: string }) {
   if (!hasLegalContact()) return null
   return (
     <div className="flex flex-col">
-      {label ? <p className="m-0 text-body font-semibold text-fg">{label}</p> : null}
+      {label ? <p className="m-0 text-body font-medium text-fg">{label}</p> : null}
       {phone ? (
-        <a href={`tel:${phone.replace(/\s+/g, '')}`} className="inline-flex min-h-12 items-center text-body font-semibold text-fg underline underline-offset-4">
+        <a href={`tel:${phone.replace(/\s+/g, '')}`} className="inline-flex min-h-12 items-center text-body font-medium text-link underline underline-offset-4">
           {t('common.contactPhone', { phone })}
         </a>
       ) : null}
       {email ? (
-        <a href={`mailto:${email}`} className="inline-flex min-h-12 items-center text-body font-semibold text-fg underline underline-offset-4">
+        <a href={`mailto:${email}`} className="inline-flex min-h-12 items-center text-body font-medium text-link underline underline-offset-4">
           {t('common.contactEmail', { email })}
         </a>
       ) : null}

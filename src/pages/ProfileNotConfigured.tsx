@@ -42,7 +42,7 @@ export function ProfileNotConfigured() {
       </Button>
       {contact.email ? (
         <p className="m-0 text-body text-fg">
-          <a href={`mailto:${contact.email}`} className="inline-flex min-h-12 items-center text-fg underline underline-offset-4">
+          <a href={`mailto:${contact.email}`} className="inline-flex min-h-12 items-center text-link underline underline-offset-4">
             {t('onboarding.contact', { email: contact.email })}
           </a>
         </p>

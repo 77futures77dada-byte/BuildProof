@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { syncProfileLocale } from '../lib/locale'
+import { applyRoleTheme, forgetRole } from '../lib/theme'
 import { supabase } from '../lib/supabaseClient'
 import { toErrorMessage } from '../lib/format'
 import type { Profile } from '../types'
@@ -18,6 +19,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Tracks the latest user we started fetching a profile for, so out-of-order
   // responses (fast sign-out after sign-in) don't clobber newer state.
   const activeUserId = useRef<string | null>(null)
+
+  // Theme default follows the role (worker/foreman light, others navy dark) until
+  // the user picks one in the header; the role is remembered for the next start.
+  const role = profile?.role
+  useEffect(() => { if (role) applyRoleTheme(role) }, [role])
 
   const loadProfile = useCallback(async (userId: string) => {
     activeUserId.current = userId
@@ -89,6 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return
     }
     activeUserId.current = null
+    forgetRole()
     setSession(null)
     setProfile(null)
   }, [])

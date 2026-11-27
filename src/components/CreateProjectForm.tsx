@@ -47,7 +47,7 @@ export function CreateProjectForm({ companyId, onCreated, onCancel }: CreateProj
       noValidate
       className="flex flex-col gap-4 rounded-card border-2 border-line bg-surface p-4 shadow-card"
     >
-      <h2 className="m-0 text-h2 font-bold text-fg">{t('createProject.heading')}</h2>
+      <h2 className="m-0 text-h2 font-semibold text-fg">{t('createProject.heading')}</h2>
 
       <TextField
         label={t('createProject.name')}
@@ -73,7 +73,7 @@ export function CreateProjectForm({ companyId, onCreated, onCancel }: CreateProj
         disabled={submitting}
         hint={t('createProject.deadlineHint')}
       />
-      <p className="m-0 text-body font-medium text-fg">{t('createProject.stagesHint')}</p>
+      <p className="m-0 text-body text-fg">{t('createProject.stagesHint')}</p>
 
       <ErrorMessage message={error} />
 

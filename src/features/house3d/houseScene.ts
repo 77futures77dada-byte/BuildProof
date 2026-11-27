@@ -4,7 +4,7 @@ import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js'
 import { HOUSE, HOUSE_BOUNDS, HOUSE_LINES, type HouseLine } from './houseGeometry'
 import { DEFAULT_VIEW, EXPLODE_DIRECTION, EXPLODE_DISTANCE, STAGE_VIEWS, buildStageGroups, doneCount, type StageGroup } from './stageElements'
-import { CONTOUR_COLOR, GLOW_WIDTH, HOUSE_BG, HOUSE_OPACITY, STAGE_COLORS } from './palette'
+import { CONTOUR_COLOR, GLOW_WIDTH, HOUSE_BG, HOUSE_GRID, HOUSE_GRID_SUB, HOUSE_OPACITY, STAGE_COLORS, resolveColor } from './palette'
 import { STAGE_PARTS, type HouseRendererSnapshot, type StagePart } from './types'
 
 export const TIMING = {
@@ -68,7 +68,7 @@ export interface HouseScene {
 /** Throws when WebGL is unavailable. */
 export function createHouseScene(root: HTMLElement, options: HouseSceneOptions): HouseScene {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'low-power' })
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); renderer.setClearColor(HOUSE_BG)
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); renderer.setClearColor(resolveColor(HOUSE_BG))
   renderer.localClippingEnabled = true
   root.appendChild(renderer.domElement)
 
@@ -100,7 +100,7 @@ export function createHouseScene(root: HTMLElement, options: HouseSceneOptions):
   const groups = buildStageGroups()
   const parts = {} as Record<StagePart, PartView>
   for (const part of STAGE_PARTS) {
-    const group = groups[part], color = STAGE_COLORS[part]
+    const group = groups[part], color = resolveColor(STAGE_COLORS[part])
     const donePlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0) // keeps y ≤ built height
     const ghostPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0) // keeps y ≥ built height
     const vertical = group.kind === 'vertical'
@@ -134,13 +134,13 @@ export function createHouseScene(root: HTMLElement, options: HouseSceneOptions):
   }
 
   const contour = segments(HOUSE_LINES.filter(line => line.part === 'handover'))
-  const contourLine = lineMaterial(CONTOUR_COLOR, 1), contourGlow = glowMaterial(CONTOUR_COLOR)
+  const contourLine = lineMaterial(resolveColor(CONTOUR_COLOR), 1), contourGlow = glowMaterial(resolveColor(CONTOUR_COLOR))
   const contourRoot = new THREE.Group()
   contourRoot.add(new THREE.LineSegments(contour.lineGeometry, contourLine), new LineSegments2(contour.glowGeometry, contourGlow))
   scene.add(contourRoot)
   const contourDim = new Tween(1)
 
-  const grid = new THREE.GridHelper(18, 36, '#24516f', '#173e5e'); grid.position.y = -.42; scene.add(grid)
+  const grid = new THREE.GridHelper(18, 36, resolveColor(HOUSE_GRID), resolveColor(HOUSE_GRID_SUB)); grid.position.y = -.42; scene.add(grid)
 
   // --- state on the shared timeline ---
   let reduced = options.reducedMotion

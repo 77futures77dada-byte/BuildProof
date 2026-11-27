@@ -52,8 +52,8 @@ export function MemberAccessRow({ row, variant, onAdd, onRemove, onSendCode, sil
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col">
-          <span className="text-field font-semibold text-fg [overflow-wrap:anywhere]">{name}</span>
-          <span className="text-body font-medium text-fg">
+          <span className="text-field font-medium text-fg [overflow-wrap:anywhere]">{name}</span>
+          <span className="text-body text-fg">
             {t(`roles.${row.role}`)}
             {variant === 'on-project' ? <> · <span className="inline-flex items-center gap-1">{silent ? <StatusIcon kind="stale" /> : null}{status}</span></> : null}
           </span>
@@ -82,7 +82,7 @@ export function MemberAccessRow({ row, variant, onAdd, onRemove, onSendCode, sil
         <Button variant="danger" onClick={() => { setMenu(false); onRemove(row) }} className="self-start">{t('people.remove')}</Button>
       ) : null}
       {state === 'error' ? (
-        <p role="alert" className="m-0 flex items-center gap-2 text-body font-semibold text-fg"><StatusIcon kind="error" />{t('known.addFailed')}</p>
+        <p role="alert" className="m-0 flex items-center gap-2 text-body font-medium text-fg"><StatusIcon kind="error" />{t('known.addFailed')}</p>
       ) : null}
     </li>
   )

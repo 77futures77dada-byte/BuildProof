@@ -41,7 +41,7 @@ export function ReportStatusBadge({
   const kind = kindOf(status)
   if (kind) return <StatusChip kind={kind} className="min-w-0">{label}</StatusChip>
   return (
-    <span className="inline-flex min-h-8 min-w-0 items-center rounded-chip border-2 border-line px-3 text-body font-semibold text-fg">
+    <span className="inline-flex min-h-8 min-w-0 items-center rounded-chip border-2 border-line px-3 text-body font-medium text-fg">
       {label}
     </span>
   )

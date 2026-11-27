@@ -36,12 +36,12 @@ export function PhotoViewer({ open, onClose, title, src, alt, caption, failedLab
       <div className="flex flex-col gap-3">
         <div className="flex min-h-48 items-center justify-center overflow-hidden rounded-card bg-scrim">
           {failed ? (
-            <p className="m-0 flex items-center gap-2 p-6 text-body font-semibold text-on-scrim"><StatusIcon kind="error" />{failedLabel}</p>
+            <p className="m-0 flex items-center gap-2 p-6 text-body font-medium text-on-scrim"><StatusIcon kind="error" />{failedLabel}</p>
           ) : (
             <img src={src} alt={alt} onError={() => setFailedSrc(src)} className="block max-h-[60vh] w-full object-contain" />
           )}
         </div>
-        {caption ? <div className="text-body font-semibold text-fg">{caption}</div> : null}
+        {caption ? <div className="text-body font-medium text-fg">{caption}</div> : null}
         {onPrev || onNext ? (
           <div className="flex justify-between gap-3">
             <Button variant="secondary" disabled={!onPrev} onClick={onPrev}>{prevLabel}</Button>

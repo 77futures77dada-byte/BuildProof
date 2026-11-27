@@ -120,7 +120,7 @@ export function HouseModel({ stages, height, interactive = true, initialAngle = 
         {playingStage
           ? <div className="space-y-1">
               <p className="text-body text-on-inverse">{t.playing}</p>
-              <p className="text-h3 font-semibold" style={{ color: STAGE_COLORS[playingStage.part as StagePart] }}>{playingStage.name}</p>
+              <p className="text-h3 font-medium" style={{ color: STAGE_COLORS[playingStage.part as StagePart] }}>{playingStage.name}</p>
               <p className="text-body text-on-inverse">{t.playInterrupt}</p>
             </div>
           : <StageCard stage={selectedStage} part={selected} counts={counts}
@@ -142,7 +142,7 @@ export function HouseModel({ stages, height, interactive = true, initialAngle = 
           <li className="flex items-center gap-1.5"><span className="h-0.5 w-5 rounded bg-inverse-line" aria-hidden />{t.notStarted} <span className="text-on-inverse">({t.notStartedHint})</span></li>
         </ul>
         {!failed && modelStages.length ? <button type="button" onClick={play} disabled={!!playingPart}
-          className="inline-flex min-h-12 cursor-pointer items-center gap-1.5 rounded-lg bg-inverse-line px-3 text-body font-medium text-on-inverse hover:bg-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-inverse disabled:cursor-default disabled:opacity-60">
+          className="inline-flex min-h-12 cursor-pointer items-center gap-1.5 rounded-lg bg-inverse-line px-3 text-body text-on-inverse hover:bg-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-inverse disabled:cursor-default disabled:opacity-60">
           <Play className="size-4" aria-hidden />{t.play}
         </button> : null}
       </div>

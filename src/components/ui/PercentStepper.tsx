@@ -47,7 +47,7 @@ export function PercentStepper({ base, value, onChange, labels, decreaseSlot, di
           aria-pressed="true"
           disabled={disabled || value <= 0}
           onClick={() => step(-10)}
-          className="inline-flex min-h-12 items-center self-start rounded-chip border-2 border-fg bg-fg px-5 text-field font-semibold text-page focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex min-h-12 items-center self-start rounded-chip border-2 border-fg bg-fg px-5 text-field font-medium text-page focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60"
         >
           {labels.minus10}
         </button>

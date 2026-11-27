@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { ThemeSwitcher } from './ThemeSwitcher'
 import { Button, buttonClass } from './ui'
 import { useSignOutGuard } from './report/SignOutDraftsConfirm'
 
@@ -14,34 +15,41 @@ export function AppHeader({ logoTo = '/dashboard', children }: { logoTo?: string
   const { profile, user, signOut } = useAuth()
   const { t } = useTranslation()
   const guard = useSignOutGuard(user?.id, signOut)
+  // sticky only from 1024 px: on a phone the header (logo, switches, project
+  // title, tabs) is ~250 px and would cover half of a 553 px screen
   return (
-    <header className="sticky top-0 z-[var(--z-header)] border-b-2 border-line bg-page">
-      <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-2 px-4 py-1">
+    <header className="top-0 z-[var(--z-header)] border-b-2 border-line bg-page lg:sticky">
+      <div className="mx-auto flex max-w-[1120px] flex-wrap items-center gap-x-2 gap-y-1 px-4 py-1">
         <div className="flex min-w-0 items-center gap-4">
           <Link
             to={logoTo}
-            className="inline-flex min-h-12 items-center rounded-control text-h3 font-bold text-fg no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            className="inline-flex min-h-12 items-center rounded-control text-h3 font-semibold text-fg no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             BuildProof
             <span className="sr-only"> · {t('tariff.toProjects')}</span>
           </Link>
           {profile ? (
-            <span className="hidden text-body font-medium text-muted-strong lg:inline">
+            <span className="hidden text-body text-muted-strong lg:inline">
               {profile.full_name ?? user?.email} · {t(`roles.${profile.role}`)}
             </span>
           ) : null}
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        {/* phone: row 1 = logo · Тариф · Выйти, row 2 = theme + language; desktop: one row.
+            No CSS order: DOM order = visual order = Tab order at every width. */}
+        <div className="ml-auto flex items-center gap-2">
           {profile?.role === 'gc' ? (
             // NavLink marks «Тариф» with aria-current="page" on /tariff itself.
             <NavLink to="/tariff" className={buttonClass({ variant: 'ghost', size: 'md' }, 'px-3 aria-[current=page]:underline')}>
               {t('tariff.link')}
             </NavLink>
           ) : null}
-          <LanguageSwitcher />
           <Button variant="ghost" size="md" className="px-3" onClick={guard.request}>
             {t('common.signOut')}
           </Button>
+        </div>
+        <div className="flex w-full flex-wrap items-center gap-2 lg:w-auto">
+          <ThemeSwitcher />
+          <LanguageSwitcher />
         </div>
       </div>
       {children}

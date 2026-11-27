@@ -67,7 +67,7 @@ export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
   }
 
   const choice = (on: boolean) => cx(
-    'inline-flex min-h-12 flex-1 items-center justify-center rounded-control border-2 px-3 text-field font-semibold',
+    'inline-flex min-h-12 flex-1 items-center justify-center rounded-control border-2 px-3 text-field font-medium',
     'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:opacity-60',
     on ? 'border-fg bg-fg text-page' : 'border-line bg-page text-fg hover:border-fg',
   )
@@ -75,7 +75,7 @@ export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <p className="m-0 text-field font-medium text-fg">{t('issues.photo')}</p>
+        <p className="m-0 text-field text-fg">{t('issues.photo')}</p>
         <ImagePicker onChange={setFile} disabled={busy} camera />
       </div>
 
@@ -90,7 +90,7 @@ export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
       />
 
       <div role="group" aria-label={t('issues.urgency')} className="flex flex-col gap-1.5">
-        <p className="m-0 text-field font-medium text-fg">{t('issues.urgency')}</p>
+        <p className="m-0 text-field text-fg">{t('issues.urgency')}</p>
         <div className="flex gap-3">
           <button type="button" aria-pressed={urgent} disabled={busy} onClick={() => setUrgent(true)} className={choice(urgent)}>{t('issues.urgent')}</button>
           <button type="button" aria-pressed={!urgent} disabled={busy} onClick={() => setUrgent(false)} className={choice(!urgent)}>{t('issues.notUrgent')}</button>

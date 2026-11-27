@@ -1,7 +1,7 @@
 // Runs every check of the redesign in order and appends the result to
 // docs/design/test-log.md:
 //   lint → build (fixture Supabase, ALLOW_PLACEHOLDERS=1) → test → check-tokens →
-//   check-ru-latin → check-overflow
+//   check-contrast → check-ru-latin → check-overflow
 //
 //   node scripts/run-checks.mjs [--step "<name>"] [--tokens-report] [--strict-a11y]
 // --tokens-report   run check-tokens in report mode (counts only, never fails)
@@ -69,6 +69,10 @@ const CHECKS = [
   {
     name: TOKENS_REPORT ? 'check-tokens (report)' : 'check-tokens', cmd: 'scripts/check-tokens.mjs', args: TOKENS_REPORT ? ['--report'] : [], report: TOKENS_REPORT,
     numbers: (o) => lastLine(o, 'check-tokens:'),
+  },
+  {
+    name: 'check-contrast', cmd: 'scripts/check-contrast.mjs', args: [],
+    numbers: (o) => lastLine(o, 'check-contrast:'),
   },
   {
     name: 'check-ru-latin', cmd: 'scripts/check-ru-latin.mjs', args: [],

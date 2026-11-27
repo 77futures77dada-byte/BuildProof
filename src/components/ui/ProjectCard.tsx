@@ -42,20 +42,20 @@ export function ProjectCard({ to, name, subtitle, percent, percentLabel, chips, 
       to={to}
       className={cx(
         'group flex min-h-12 flex-col gap-3 rounded-card border-2 border-line bg-surface p-4 text-fg no-underline shadow-card',
-        'hover:border-fg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus active:border-fg',
+        'hover:border-fg hover:bg-surface-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus active:border-fg',
         layout === 'row' && 'lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,2fr)] lg:items-center',
         className,
       )}
     >
       <div className="flex min-w-0 flex-col gap-1">
-        <h3 className="m-0 text-h3 font-bold [overflow-wrap:anywhere]">{name}</h3>
-        {subtitle ? <p className="m-0 text-body font-medium [overflow-wrap:anywhere]">{subtitle}</p> : null}
+        <h3 className="m-0 text-h3 font-semibold [overflow-wrap:anywhere]">{name}</h3>
+        {subtitle ? <p className="m-0 text-body [overflow-wrap:anywhere]">{subtitle}</p> : null}
       </div>
       {percent !== undefined ? (
         <div className="flex flex-col gap-2">
           <p className="m-0 flex items-baseline gap-2">
-            <span className="text-figure font-bold">{Math.round(percent)}%</span>
-            {percentLabel ? <span className="text-body font-medium">{percentLabel}</span> : null}
+            <span className="text-figure font-semibold">{Math.round(percent)}%</span>
+            {percentLabel ? <span className="text-body">{percentLabel}</span> : null}
           </p>
           <ProgressBar value={percent} />
         </div>
@@ -64,7 +64,7 @@ export function ProjectCard({ to, name, subtitle, percent, percentLabel, chips, 
         <div className="flex flex-col items-start gap-2">
           {chips?.map((c, i) => <StatusChip key={i} kind={c.kind}>{c.label}</StatusChip>)}
           {badges}
-          {note ? <p className="m-0 text-body font-semibold">{note}</p> : null}
+          {note ? <p className="m-0 text-body font-medium">{note}</p> : null}
         </div>
       ) : null}
     </Link>

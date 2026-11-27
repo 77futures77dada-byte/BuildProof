@@ -135,7 +135,7 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
 
   const reasonBlock = (
     <div className="flex flex-col gap-2">
-      <p className="m-0 text-field font-semibold text-fg">{t('report.reasonTitle')}</p>
+      <p className="m-0 text-field font-medium text-fg">{t('report.reasonTitle')}</p>
       <div role="radiogroup" aria-label={t('report.reasonTitle')} className="flex flex-wrap gap-2">
         {REASONS.map((r) => {
           const label = t(`report.reason.${r}`)
@@ -149,7 +149,7 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
               disabled={sending}
               onClick={() => setReason(label)}
               className={cx(
-                'inline-flex min-h-12 items-center rounded-chip border-2 px-4 text-field font-semibold',
+                'inline-flex min-h-12 items-center rounded-chip border-2 px-4 text-field font-medium',
                 'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus',
                 on ? 'border-fg bg-fg text-page' : 'border-fg bg-page text-fg hover:bg-surface',
               )}
@@ -170,11 +170,11 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
       {!online && !sending ? (
         <div className="flex flex-col gap-1" data-offline-hint>
           <NetBar />
-          <p className="m-0 text-body font-semibold text-fg">{t('report.offlineSaved')}</p>
+          <p className="m-0 text-body font-medium text-fg">{t('report.offlineSaved')}</p>
         </div>
       ) : null}
       {sending ? (
-        <p aria-live="polite" className="m-0 flex items-center gap-2 text-body font-semibold text-fg">
+        <p aria-live="polite" className="m-0 flex items-center gap-2 text-body font-medium text-fg">
           <StatusIcon kind="sending" />{t('send.sending')}
         </p>
       ) : null}
@@ -204,7 +204,7 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
       ) : (
         <div className="flex flex-col gap-4" data-report-body>
           {stale ? (
-            <p data-stale className="m-0 flex items-start gap-2 text-field font-semibold text-fg">
+            <p data-stale className="m-0 flex items-start gap-2 text-field font-medium text-fg">
               <StatusIcon kind="stale" className="mt-0.5" />
               {t('send.stale', { percent: draft.stalePercent ?? 0 })}
             </p>
@@ -219,8 +219,8 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
               {photoUrl ? <img src={photoUrl} alt={t('report.photoAlt', { stage: stageName })} className="size-full object-cover" /> : null}
             </button>
             <div className="flex min-w-0 flex-col gap-1">
-              <p className="m-0 truncate text-body font-semibold text-fg">{projectName} · {stageName}</p>
-              <p className="m-0 text-h3 font-bold text-fg" aria-live="polite">
+              <p className="m-0 truncate text-body font-medium text-fg">{projectName} · {stageName}</p>
+              <p className="m-0 text-h3 font-semibold text-fg" aria-live="polite">
                 {stale ? t('report.yourPercent', { percent: value }) : t('report.wasWill', { from: base, to: value })}
               </p>
             </div>
@@ -247,7 +247,7 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
 
           {!stale ? (
             <div className="flex items-center justify-between gap-3">
-              <p className="m-0 line-clamp-2 min-w-0 text-field font-semibold text-fg [overflow-wrap:anywhere]">{t('report.stage', { stage: stageName })}</p>
+              <p className="m-0 line-clamp-2 min-w-0 text-field font-medium text-fg [overflow-wrap:anywhere]">{t('report.stage', { stage: stageName })}</p>
               {/* after an attempt the photo may already sit at this stage's path (and the report may have arrived): stage is fixed */}
               {draft.attempts === 0 ? (
                 <Button variant="secondary" disabled={sending} onClick={() => setView('picker')} className="shrink-0">{t('report.changeStage')}</Button>
@@ -259,7 +259,7 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
           {/* fresh shot: no red «Удалить» on the 10-second path; only saved / stuck drafts */}
           {draft.state === 'editing' ? null : view === 'delete' ? (
             <div className="flex flex-col gap-3 rounded-card border-2 border-stale p-3">
-              <p className="m-0 text-field font-semibold text-fg">{t('send.deleteConfirm')}</p>
+              <p className="m-0 text-field font-medium text-fg">{t('send.deleteConfirm')}</p>
               <div className="flex flex-wrap gap-3">
                 <Button variant="danger" onClick={() => { void removeDraft(draft.draftId).then(onClose) }}>{t('common.delete')}</Button>
                 <Button variant="secondary" onClick={() => setView('main')}>{t('common.cancel')}</Button>
@@ -270,12 +270,12 @@ export function ReportSheet({ draft, stages, projectName, userId, paused, onClos
           )}
 
           {error ? (
-            <p role="alert" className="m-0 flex items-start gap-2 text-field font-semibold text-fg">
+            <p role="alert" className="m-0 flex items-start gap-2 text-field font-medium text-fg">
               <StatusIcon kind="error" className="mt-0.5" />{t(draftErrorKey(error))}
             </p>
           ) : null}
 
-          {notices.length ? <p className="m-0 text-body font-semibold text-fg">{notices.join(' · ')}</p> : null}
+          {notices.length ? <p className="m-0 text-body font-medium text-fg">{notices.join(' · ')}</p> : null}
         </div>
       )}
     </Sheet>

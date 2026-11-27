@@ -42,8 +42,8 @@ export function ConfirmDialog({
         </div>
       }
     >
-      <p className="m-0 text-field font-medium text-fg">{body}</p>
-      {error ? <p role="alert" className="m-0 mt-3 text-body font-semibold text-fg">{error}</p> : null}
+      <p className="m-0 text-field text-fg">{body}</p>
+      {error ? <p role="alert" className="m-0 mt-3 text-body font-medium text-fg">{error}</p> : null}
     </Sheet>
   )
 }
