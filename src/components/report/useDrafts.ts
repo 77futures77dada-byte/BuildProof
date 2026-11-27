@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useSyncExternalStore } from 'react'
-import { draftStore, expireEditing, flushQueue, nextRetryDelay, requestPersistentStorage, sendable } from '../../lib/drafts'
+import { draftStore, expireEditing, flushQueue, nextRetryDelay, requestPersistentStorage, sendDraft, sendable } from '../../lib/drafts'
 import type { Draft, SendOutcome } from '../../lib/drafts'
 import { supabaseDraftTransport } from '../../lib/draftTransport'
 
@@ -62,6 +62,23 @@ export function flushDrafts(userId: string): Promise<SendOutcome[]> {
     })
     .finally(() => { running = null; emit({ sending: false }) })
   return running
+}
+
+/** Send one draft right away (the sheet's «Отправить»), after any running flush. */
+export async function sendDraftNow(d: Draft): Promise<SendOutcome> {
+  await running?.catch(() => undefined)
+  emit({ sending: true })
+  const job = sendDraft(draftStore(), supabaseDraftTransport, d, Date.now())
+  running = job.then((o) => [o])
+  try {
+    const o = await job
+    emit({ outcomes: { ...snap.outcomes, [o.draftId]: o } })
+    await reloadDrafts()
+    return o
+  } finally {
+    running = null
+    emit({ sending: false })
+  }
 }
 
 export function useDrafts() {
