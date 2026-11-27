@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { effectiveSeenPercent, newDraftId } from '../../lib/drafts'
 import type { Draft, SendOutcome } from '../../lib/drafts'
@@ -9,6 +9,7 @@ import { StagePicker } from '../report/StagePicker'
 import { readTakenAt } from './exif'
 import { compressPhotos, MAX_PHOTOS, PhotosTooLargeError } from './photos'
 import { saveLinkDraft } from './useLinkDrafts'
+import { useObjectUrls } from './useObjectUrls'
 
 /** Contract reason code → existing app label key (report.reason.*). */
 const REASON_LABEL: Record<DecreaseReason, string> = {
@@ -77,8 +78,7 @@ export function LinkReportSheet({ open, stages, projectId, owner, drafts, initia
     }
   }
 
-  const urls = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files])
-  useEffect(() => () => { for (const u of urls) URL.revokeObjectURL(u) }, [urls])
+  const urls = useObjectUrls(files)
 
   if (!open) return null
   const sending = phase !== 'idle'
@@ -205,7 +205,7 @@ export function LinkReportSheet({ open, stages, projectId, owner, drafts, initia
             {files.length ? (
               <ul className="m-0 flex list-none flex-wrap gap-2 p-0" data-link-photos>
                 {urls.map((u, i) => (
-                  <li key={u} className="relative">
+                  <li key={`${i}-${u}`} className="relative">
                     <img src={u} alt={t('workerLink.photoAlt', { stage: stage?.name ?? '' })} className="size-[72px] rounded-control border border-line object-cover" />
                     <button
                       type="button"

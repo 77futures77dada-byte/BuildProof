@@ -139,7 +139,7 @@ function WorkerLinkBody({ token, owner }: { token: string; owner: string }) {
         ) : null}
       </section>
 
-      <LinkRecentReports reports={reports} stageName={stageName} error={reportsError} />
+      {invalid ? null : <LinkRecentReports reports={reports} stageName={stageName} error={reportsError} />}
 
       {data ? (
         <LinkReportSheet

@@ -1,14 +1,15 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { isUnsent, needsWorker, resolveStale } from '../../lib/drafts'
 import type { Draft, SendOutcome } from '../../lib/drafts'
 import { linkDraftErrorKey } from '../../lib/linkTransport'
 import { Button, StatusIcon } from '../ui'
 import { removeLinkDraft, saveLinkDraft } from './useLinkDrafts'
+import { useObjectUrls } from './useObjectUrls'
 
 function Thumb({ blob, alt }: { blob: Blob | undefined; alt: string }) {
-  const url = useMemo(() => (blob ? URL.createObjectURL(blob) : null), [blob])
-  useEffect(() => () => { if (url) URL.revokeObjectURL(url) }, [url])
+  const blobs = useMemo(() => (blob ? [blob] : []), [blob])
+  const url = useObjectUrls(blobs)[0]
   return url
     ? <img src={url} alt={alt} className="size-14 shrink-0 rounded-control border border-line object-cover" />
     : <span aria-hidden="true" className="size-14 shrink-0 rounded-control border border-line bg-surface" />
