@@ -25,8 +25,6 @@ import { StageProgressControl } from '../components/StageProgressControl'
 import { HouseModelBlock } from '../features/house3d/HouseModelBlock'
 import { stageColor } from '../features/house3d/palette'
 import { stagesToParts } from '../features/house3d/stagesToParts'
-import { ContactLines } from '../components/ContactLines'
-import { hasLegalContact } from '../lib/emailGate'
 import { UrgentBadge } from '../components/UrgentBadge'
 
 function capabilitiesFor(role: UserRole | undefined): StageActionCapabilities {
@@ -165,10 +163,13 @@ export function ProjectDashboardView({
     if (status !== 'active' || !stagesExist || !isManager) return { main: { kind: 'none' } }
     if (day0) {
       if (gateOpen && isGc) return { main: { kind: 'link', label: t('overview.next.inviteOpen'), to: `/project/${projectId}/settings#invite` } }
+      // worker links need no email gate: the owner can bring a worker in on day 0
       return {
         main: { kind: 'mark', label: t('overview.next.action') },
-        line: gateOpen ? undefined : hasLegalContact() ? t('gate.inviteLater') : t('gate.inviteLaterNoContact'),
-        secondary: gateOpen ? undefined : <ContactLines label={t('common.supportLabel')} />,
+        line: isGc ? t('links.invite.hint') : undefined,
+        secondary: isGc ? (
+          <Link to={`/project/${projectId}/links`} className={buttonClass({ variant: 'secondary', block: true })}>{t('links.invite.action')}</Link>
+        ) : undefined,
       }
     }
     if (stale && gateOpen && hasPeople) {
