@@ -92,7 +92,11 @@ function browserStorage(): SessionStorageLike | null {
 /** Read the link session for the current page and wipe the token from the address bar. */
 export function takeLinkSession(kind: LinkKind): LinkSession | null {
   if (typeof window === 'undefined') return null
-  const { hash, pathname, search } = window.location
+  const { pathname, search } = window.location
+  // index.html already moved a `#t=` fragment into memory before the first paint (no token flash)
+  const early = (window as Window & { __bpLinkHash?: string }).__bpLinkHash
+  const hash = early ?? window.location.hash
+  if (early !== undefined) delete (window as Window & { __bpLinkHash?: string }).__bpLinkHash
   const session = resolveLinkSession(kind, hash, browserStorage())
   if (tokenFromHash(hash) !== null || /(^#|&)t=/.test(hash)) {
     try { window.history.replaceState(window.history.state, '', `${pathname}${search}${hashWithoutToken(hash)}`) } catch { /* ignore */ }
