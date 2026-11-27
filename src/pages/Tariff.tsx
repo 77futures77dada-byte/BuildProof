@@ -1,6 +1,7 @@
 import { Link, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LanguageSwitcher } from '../components/LanguageSwitcher'
+import { AppHeader } from '../components/AppHeader'
+import { AppLoading } from '../components/AppLoading'
 import { buttonClass, cx } from '../components/ui'
 import { useAuth } from '../hooks/useAuth'
 import { legalContact } from '../lib/emailGate'
@@ -8,9 +9,11 @@ import { PRICING, priceTable } from '../config/pricing'
 
 /**
  * 03 §4.6 «Тариф» (gc only): only the owner's decisions — price, the table with
- * the cap row, the trial, «оплаты пока нет». The billing-days rule waits for
- * K19; `tariff.included` / `tariff.invoice` are not shown. Main action:
- * «Написать о продолжении» when legal.ts has an e-mail, else «К объектам».
+ * the cap row, the trial, «оплаты в приложении нет». The billing-days rule
+ * waits for K19; `tariff.included` / `tariff.invoice` are not shown. Main
+ * action «Написать о продолжении» only when legal.ts has an e-mail; «К
+ * объектам» is always there. Without a contact the cap row does not promise
+ * «по договорённости».
  */
 export function Tariff() {
   const { t } = useTranslation()
@@ -18,18 +21,12 @@ export function Tariff() {
   const p = PRICING
   const { email } = legalContact()
 
-  if (profile && profile.role !== 'gc') return <Navigate to="/dashboard" replace />
+  if (!profile) return <AppLoading />
+  if (profile.role !== 'gc') return <Navigate to="/dashboard" replace />
 
   return (
     <div className="min-h-svh bg-page text-fg">
-      <header className="border-b-2 border-line">
-        <div className="mx-auto flex max-w-[1120px] items-center justify-between gap-3 px-4 py-2">
-          <Link to="/dashboard" className="inline-flex min-h-12 items-center text-h3 text-fg no-underline">
-            BuildProof
-          </Link>
-          <LanguageSwitcher />
-        </div>
-      </header>
+      <AppHeader />
 
       <main className="mx-auto flex max-w-[1120px] flex-col gap-6 px-4 py-6 lg:grid lg:grid-cols-[560px_1fr] lg:items-start lg:gap-10">
         <div className="flex flex-col gap-4 lg:col-span-2">
@@ -48,7 +45,7 @@ export function Tariff() {
             {priceTable().map((row) => (
               <tr key={row.objects}>
                 <td className={cx('px-3 py-3 align-top', row.capped ? 'rounded-l-control border-y-2 border-l-2 border-fg' : 'border-b-2 border-line')}>
-                  {row.capped ? t('tariff.capRow', { from: row.objects, max: p.capMaxObjects }) : t('tariff.objects', { count: row.objects })}
+                  {row.capped ? t(email ? 'tariff.capRow' : 'tariff.capRowNoContact', { from: row.objects, max: p.capMaxObjects }) : t('tariff.objects', { count: row.objects })}
                 </td>
                 <td className={cx('px-3 py-3 text-right align-top whitespace-nowrap', row.capped ? 'rounded-r-control border-y-2 border-r-2 border-fg' : 'border-b-2 border-line')}>
                   <span className="num-col text-h3">{row.eur} €</span>
@@ -66,11 +63,10 @@ export function Tariff() {
             <a href={`mailto:${email}`} data-main="" className={buttonClass({ variant: 'primary', block: true })}>
               {t('tariff.contact')}
             </a>
-          ) : (
-            <Link to="/dashboard" className={buttonClass({ variant: 'secondary', block: true })}>
-              {t('tariff.toProjects')}
-            </Link>
-          )}
+          ) : null}
+          <Link to="/dashboard" className={buttonClass({ variant: 'secondary', block: true })}>
+            {t('tariff.toProjects')}
+          </Link>
         </div>
       </main>
     </div>

@@ -18,3 +18,8 @@ export function legalContact(): { phone: string | null; email: string | null } {
     email: isPlaceholder(LEGAL.email) ? null : LEGAL.email,
   }
 }
+
+/** Founder's name for «Делает {имя}, Эстония», only when legal.ts is filled (decisions §1 п.5). */
+export function founderName(): string | null {
+  return isPlaceholder(LEGAL.founderName) ? null : LEGAL.founderName
+}

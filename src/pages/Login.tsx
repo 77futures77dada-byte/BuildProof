@@ -4,7 +4,7 @@ import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabaseClient'
 import { signInErrorMessage } from '../lib/authErrors'
-import { isEmailGateOpen, legalContact } from '../lib/emailGate'
+import { founderName, isEmailGateOpen, legalContact } from '../lib/emailGate'
 import { parseLinkError } from '../lib/authCode'
 import type { LinkError } from '../lib/authCode'
 import { isProfileConfigured } from '../lib/profile'
@@ -138,6 +138,7 @@ function PasswordForm({ gateOpen }: { gateOpen: boolean }) {
       <div className="flex flex-col gap-2">
         <h1 className="m-0 text-h1 text-fg">{t('common.signIn')}</h1>
         <p className="m-0 text-body text-fg">{gateOpen ? t('auth.taglineOpen') : t('auth.tagline')}</p>
+        {founderName() ? <p className="m-0 text-body text-fg">{t('auth.madeBy', { name: founderName() })}</p> : null}
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
         <TextField
@@ -169,7 +170,7 @@ function PasswordForm({ gateOpen }: { gateOpen: boolean }) {
         </div>
       ) : (
         <div className="flex flex-col gap-1">
-          <p className="m-0 text-body text-fg">{t('auth.recoveryLater')}</p>
+          <p className="m-0 text-body text-fg">{contact.phone || contact.email ? t('auth.recoveryLater') : t('auth.recoveryOwner')}</p>
           <ContactLines phone={contact.phone} email={contact.email} />
         </div>
       )}
