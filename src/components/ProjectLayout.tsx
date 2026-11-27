@@ -1,11 +1,12 @@
-import { NavLink, Outlet, useMatch, useParams } from 'react-router-dom'
+import { Link, Navigate, Outlet, useMatch, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LanguageSwitcher } from './LanguageSwitcher'
 import { useAuth } from '../hooks/useAuth'
 import { useProject } from '../hooks/useProject'
 import type { UserRole } from '../types'
-import { Button } from './Button'
+import { AppHeader } from './AppHeader'
 import { ProjectStatusBadge } from './ProjectStatusBadge'
+import { Skeleton, Tabs, buttonClass } from './ui'
+import type { TabItem } from './ui'
 
 interface Tab {
   to: string
@@ -21,7 +22,8 @@ const MANAGER_TABS: Tab[] = [
   { to: 'issues', labelKey: 'nav.issues', end: false },
 ]
 
-const SETTINGS_TAB: Tab = { to: 'settings', labelKey: 'nav.settings', end: false }
+// «Люди» keeps the /settings route (brief §2.3 В2); gc only.
+const PEOPLE_TAB: Tab = { to: 'settings', labelKey: 'nav.people', end: false }
 
 // Workers get a short, action-first strip: their day, then where they report.
 const WORKER_TABS: Tab[] = [
@@ -33,81 +35,62 @@ const WORKER_TABS: Tab[] = [
 
 function tabsFor(role: UserRole | undefined): Tab[] {
   if (role === 'worker') return WORKER_TABS
-  if (role === 'gc') return [...MANAGER_TABS, SETTINGS_TAB]
+  if (role === 'gc') return [...MANAGER_TABS, PEOPLE_TAB]
   return MANAGER_TABS
 }
 
 /**
- * Chrome shared by every /project/:id/* screen: top bar + a horizontally
- * scrollable tab strip (foremen and workers open these on a phone).
+ * 03 §2.2 `shell-project`: header, project name + status chip (if not active),
+ * address, tabs by role. Tabs show while the project loads.
  */
 export function ProjectLayout() {
   const { id } = useParams<{ id: string }>()
-  const { profile, user, signOut } = useAuth()
-  const { project } = useProject(id)
+  const { profile } = useAuth()
+  const { project, loading, error } = useProject(id)
   const { t } = useTranslation()
+  const onPeople = useMatch('/project/:id/settings') !== null
 
-  const isWorker = profile?.role === 'worker'
-  const tabs = tabsFor(profile?.role)
-  // The landing skin's dark theme is switched on only for the overview tab;
-  // the other tabs are not redrawn yet (see styles/legacy-bridge.css).
-  const onOverview = useMatch('/project/:id') !== null
+  const role = profile?.role
+  // Only the owner ever reaches «Люди» (03 §1): a direct visit goes to the overview.
+  if (onPeople && profile && role !== 'gc') return <Navigate to={`/project/${id}`} replace />
+
+  const isWorker = role === 'worker'
+  const items: TabItem[] = tabsFor(role).map((tab) => ({
+    key: tab.to || 'overview',
+    label: t(tab.labelKey),
+    to: tab.to ? `/project/${id}/${tab.to}` : `/project/${id}`,
+    end: tab.end,
+  }))
 
   return (
-    <div className="bp" data-skin-dark={onOverview ? '' : undefined}>
-      <header className="bp-nav">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-2">
-          <NavLink to="/dashboard" className="bp-logo">
-            BuildProof
-          </NavLink>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span className="hidden text-xs text-slate-500 lg:inline">
-              {profile?.full_name ?? user?.email}
-              {profile ? ` · ${t(`roles.${profile.role}`)}` : ''}
-            </span>
-            <LanguageSwitcher className="bp-lang" />
-            <Button variant="ghost" onClick={() => void signOut()} className="px-2">
-              {t('common.signOut')}
-            </Button>
-          </div>
+    <div className="min-h-screen bg-page text-fg">
+      <AppHeader>
+        <div className="mx-auto flex max-w-[1120px] flex-col gap-1 px-4 pt-2 pb-3">
+          {project ? (
+            <>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <h1 className="m-0 min-w-0 text-h1 font-bold [overflow-wrap:anywhere]">{project.name}</h1>
+                {project.status !== 'active' ? <ProjectStatusBadge status={project.status} /> : null}
+              </div>
+              {project.address ? <p className="m-0 text-body font-medium [overflow-wrap:anywhere]">{project.address}</p> : null}
+            </>
+          ) : loading ? (
+            <Skeleton variant="header" />
+          ) : null}
         </div>
-        {project ? (
-          <div className="mx-auto max-w-5xl px-4 pb-3">
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <h1 className="bp-title text-slate-900">{project.name}</h1>
-              <ProjectStatusBadge status={project.status} />
-            </div>
-            {project.address ? (
-              <p className="text-sm text-slate-500">{project.address}</p>
-            ) : null}
-          </div>
-        ) : null}
-        <nav className="bp-tabs mx-auto max-w-5xl overflow-x-auto px-2">
-          <ul className={`flex gap-1 pb-px ${isWorker ? '' : 'min-w-max'}`}>
-            {tabs.map((tab) => (
-              <li key={tab.to || 'overview'} className={isWorker ? 'flex-1' : undefined}>
-                <NavLink
-                  to={tab.to ? `/project/${id}/${tab.to}` : `/project/${id}`}
-                  end={tab.end}
-                  className={({ isActive }) =>
-                    `whitespace-nowrap border-b-2 px-3 ${
-                      isWorker ? 'block py-3 text-center text-base' : 'inline-block py-2 text-sm'
-                    } ${
-                      isActive
-                        ? 'border-sky-600 font-medium text-sky-700'
-                        : 'border-transparent text-slate-600 hover:text-slate-900'
-                    }`
-                  }
-                >
-                  {t(tab.labelKey)}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </header>
-      <main className="mx-auto max-w-5xl px-4 py-6">
-        <Outlet />
+        <div className="mx-auto max-w-[1120px] px-2">
+          <Tabs items={items} label={project?.name ?? t('nav.overview')} variant={isWorker ? 'worker' : 'owner'} className="border-b-0" />
+        </div>
+      </AppHeader>
+      <main className="mx-auto max-w-[1120px] px-4 py-6">
+        {!loading && error ? (
+          <section role="alert" className="flex flex-col items-start gap-3 rounded-card border-2 border-stale bg-page p-5">
+            <p className="m-0 text-field font-semibold">{t('overview.loadFailed')}</p>
+            <Link to="/dashboard" className={buttonClass({ variant: 'secondary' })}>{t('tariff.toProjects')}</Link>
+          </section>
+        ) : (
+          <Outlet />
+        )}
       </main>
     </div>
   )

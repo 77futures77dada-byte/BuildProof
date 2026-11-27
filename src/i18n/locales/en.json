@@ -87,7 +87,8 @@
     "photos": "Photos",
     "tasks": "Tasks",
     "issues": "Issues",
-    "settings": "Settings"
+    "settings": "Settings",
+    "people": "People"
   },
   "auth": {
     "subtitle": "Sign in to see your sites",

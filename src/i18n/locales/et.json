@@ -87,7 +87,8 @@
     "photos": "Fotod",
     "tasks": "Ülesanded",
     "issues": "Probleemid",
-    "settings": "Seaded"
+    "settings": "Seaded",
+    "people": "Inimesed"
   },
   "auth": {
     "subtitle": "Logige sisse, et näha oma objekte",
