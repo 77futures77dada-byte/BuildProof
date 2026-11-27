@@ -1,5 +1,6 @@
 -- 007 rollback. Worker-submitted report rows cannot be retained after dropping
 -- worker_link_id/reporter_id nullability; remove their dependent records first.
+-- Keep pgcrypto installed: migration 006 and other schema functions also use digest().
 drop function if exists public.submit_worker_link_report(text,uuid,integer,timestamptz,timestamptz,text[],text,uuid,text);
 drop function if exists public.worker_link_reports(text,integer);
 drop function if exists public.worker_link_stages(text);

@@ -1,31 +1,31 @@
-# PR: K15 report review and company email gate
+# PR: worker and client links, corrected worker report handling
 
 ## Changes
 
-- Adds project `review_threshold` (default 25 percentage points) and report status, confirmed percentage, reviewer, review timestamp, and review note fields.
-- Adds a batch review RPC limited to accepted reports from another reporter whose increase is within the project's configured threshold. The RPC only changes report status; sending already updates the stage, so confirming a report cannot restore an older percentage. Larger pending jumps can only be individually reviewed. A foreman cannot review their own report.
-- Uses the firm's owner email domain for corporate addresses. Public mailbox domains are stored in `public.public_email_domains` so the set can be extended. An owner keeps access to their exact account; other public-domain addresses require an exact matching invitation in `invite_log`. Corporate addresses continue to pass by domain match.
-- The server-side invite reservation RPC records public-mail invites by exact address. Onboarding and the database helper used by RLS admit that exact invited address and reject a different address at the same public provider.
-- Adds RLS and RPC privilege assertions, cross-company report visibility/review assertions, public-mail invite cases, and review/self-review assertions in `supabase/tests/rls.sql`.
-- Backfills one exact-address `invite_log` record for each existing worker or foreman without a matching invite, attributed to a GC in the firm and timestamped one day earlier. This preserves access for existing public-mail accounts; the anti-duplicate condition is safe to rerun.
+- Migration 007 explicitly installs `pgcrypto` in `extensions`; every function that calls `digest()` pins `search_path=public,extensions`.
+- `authorize_worker_link` updates `last_used_at` into a row variable, then returns that row through `RETURN QUERY`.
+- Worker report review thresholds apply to the absolute change. A decrease larger than the project's `review_threshold` stays `pending` and does not change accepted stage progress.
+- GC and foremen can review reports; self-review is rejected.
+- Adds expiring, revocable, named worker links, scoped to a single project, with only SHA-256 token digests stored in the database.
+- Adds expiring, revocable client links. Client view and owner preview use the same server-side filter: only confirmed reports on explicitly visible stages, with photos gated by separate consent.
+- Adds API contracts and pgTAP coverage for scoped access, revoked/expired links, threshold handling, client visibility, and preview parity.
+- Worker page metadata now includes the real project name; owner link lists include worker `report_count`; visibility settings expose persisted hidden-by-default state; client views include nullable contractor contact from existing owner profile/Auth fields.
 
 ## Migration order
 
-1. `supabase/migrations/006_report_review_and_company_email.sql`
+1. `supabase/migrations/007_worker_links_and_owner_review.sql`
+2. `supabase/migrations/008_client_links.sql`
 
-Do not apply this migration as part of this PR review. Rollback instructions are in `supabase/rollback/006_report_review_and_company_email.sql`; restore the replaced RPCs from migrations 002, 003, and 005 after removing the new fields.
+No new migration is needed for the additional page metadata; it uses the existing RPCs and tables through owner-validated service-role API handlers.
 
-## Excluded
-
-- K34 is excluded because it concerns Supabase email templates and is waiting on SMTP setup.
-- K35 is excluded pending a concrete description.
-- Landing and application UI changes are excluded while Claude Code is editing the redesign.
+Do not apply migrations as part of PR review. To roll back, run `supabase/rollback/008_client_links.sql`, then `supabase/rollback/007_worker_links_and_owner_review.sql`. The 007 rollback intentionally keeps `pgcrypto`, because migration 006 and other database functions also depend on it. The 007 rollback removes worker-link reports and their photos/history because those rows cannot satisfy the original non-null `reporter_id` constraint.
 
 ## Validation
 
-- App checks: lint, production build, 80 unit tests, token scan, Russian copy scan, and overflow scan passed on the base application.
-- SQL test file contains 50 pgTAP assertions, including sequential report confirmation and an existing-worker backfill/access case. Could not execute them locally because PostgreSQL, Docker, and Supabase CLI are unavailable in this environment. No migration was applied.
+- pgTAP tests include a worker-token authorization call with `search_path=public,extensions` and a large-decrease case that remains pending without changing stage progress.
+- The SQL tests must run in the configured Supabase/PostgreSQL test environment before applying the migrations. They were not applied by this change.
 
-## Review notes
+## Waiting on owner
 
-For an owner with a public mailbox address, the firm has no broad email domain; invited members must match the exact invitation address. The Supabase Auth OTP delivery itself is outside the database/RPC boundary; invitation, onboarding, and RLS-backed data access enforce exact public-mail invitations or corporate-domain membership.
+- Confirm whether exact SHA-256 image matching is sufficient as a duplicate signal, or whether perceptual matching is required.
+- Supply the final approved UI copy for link states and the client disclaimer localization key.

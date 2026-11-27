@@ -1,3 +1,5 @@
+create extension if not exists pgcrypto with schema extensions;
+
 -- Let the firm's owner make the same report-review decisions as a foreman.
 create or replace function public.review_stage_reports(p_report_ids uuid[])
 returns integer language plpgsql security definer set search_path=public as $$
@@ -120,19 +122,21 @@ grant execute on function public.revoke_worker_link(uuid,uuid) to service_role;
 
 create or replace function public.authorize_worker_link(p_token text)
 returns table(link_id uuid,project_id uuid,display_name text)
-language plpgsql security definer set search_path=public as $$
+language plpgsql security definer set search_path=public,extensions as $$
+declare v_link public.worker_links%rowtype;
 begin
   if auth.role() is distinct from 'service_role' then raise exception 'forbidden'; end if;
-  return query update public.worker_links wl set last_used_at=now()
+  update public.worker_links wl set last_used_at=now()
     where wl.token_hash=encode(digest(p_token,'sha256'),'hex') and wl.revoked_at is null and wl.expires_at>now()
-    returning wl.id,wl.project_id,wl.display_name;
+    returning wl.* into v_link;
   if not found then raise exception 'invalid_worker_link'; end if;
+  return query select v_link.id,v_link.project_id,v_link.display_name;
 end $$;
 revoke all on function public.authorize_worker_link(text) from public,anon,authenticated;
 grant execute on function public.authorize_worker_link(text) to service_role;
 
 create or replace function public.worker_link_stages(p_token text)
-returns jsonb language plpgsql security definer set search_path=public as $$
+returns jsonb language plpgsql security definer set search_path=public,extensions as $$
 declare v_link public.worker_links%rowtype; v_result jsonb;
 begin
   if auth.role() is distinct from 'service_role' then raise exception 'forbidden'; end if;
@@ -149,7 +153,7 @@ revoke all on function public.worker_link_stages(text) from public,anon,authenti
 grant execute on function public.worker_link_stages(text) to service_role;
 
 create or replace function public.worker_link_reports(p_token text,p_limit integer default 20)
-returns jsonb language plpgsql security definer set search_path=public as $$
+returns jsonb language plpgsql security definer set search_path=public,extensions as $$
 declare v_link public.worker_links%rowtype; v_result jsonb;
 begin
   if auth.role() is distinct from 'service_role' then raise exception 'forbidden'; end if;
@@ -170,7 +174,7 @@ grant execute on function public.worker_link_reports(text,integer) to service_ro
 create or replace function public.submit_worker_link_report(
   p_token text,p_stage_id uuid,p_claimed_percent integer,p_taken_at timestamptz,p_device_time timestamptz,
   p_photo_paths text[],p_phash text,p_client_request_id uuid,p_decrease_reason text default null
-) returns jsonb language plpgsql security definer set search_path=public as $$
+) returns jsonb language plpgsql security definer set search_path=public,extensions as $$
 declare v_link public.worker_links%rowtype; v_project_id uuid; v_old integer; v_threshold integer;
   v_status text; v_report_id uuid; v_duplicate uuid; v_count integer; v_paths text[]:=coalesce(p_photo_paths,'{}'::text[]);
 begin
@@ -196,7 +200,7 @@ begin
   if v_count>=10 then raise exception 'worker_link_rate_limit'; end if;
   if p_claimed_percent<v_old and (p_decrease_reason is null or p_decrease_reason not in ('rework','count_error','demolition')) then raise exception 'decrease_reason_required'; end if;
   if p_claimed_percent>=v_old and p_decrease_reason is not null then raise exception 'invalid_decrease_reason'; end if;
-  v_status:=case when p_claimed_percent-v_old>v_threshold then 'pending' else 'accepted' end;
+  v_status:=case when abs(p_claimed_percent-v_old)>v_threshold then 'pending' else 'accepted' end;
   if p_phash is not null then
     select sr.id into v_duplicate from public.stage_reports sr where sr.project_id=v_project_id and sr.phash=p_phash limit 1;
   end if;
