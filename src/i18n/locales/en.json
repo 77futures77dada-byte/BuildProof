@@ -28,7 +28,8 @@
     "undo": "Undo",
     "actions": "Actions",
     "stay": "Stay",
-    "signOutAnyway": "Sign out anyway"
+    "signOutAnyway": "Sign out anyway",
+    "backOnline": "Connection is back"
   },
   "language": {
     "label": "Interface language",
@@ -459,7 +460,11 @@
     "others_one": "This phone has {{count}} report from another person. It will go when they sign in.",
     "others_other": "This phone has {{count}} reports from another person. They will go when that person signs in.",
     "limit": "The phone keeps at most {{max}} reports. Send or delete old ones.",
-    "deleteConfirm": "Delete this report from the phone? The photo will not be kept."
+    "deleteConfirm": "Delete this report from the phone? The photo will not be kept.",
+    "reasonNetwork": "did not go through, will try again",
+    "reasonTimeout": "not sure it arrived",
+    "reasonAuth": "sign in again",
+    "reasonComment": "a reason for the decrease is needed"
   },
   "gate": {
     "inviteLater": "Inviting workers turns on once email sending is set up.",
@@ -518,10 +523,12 @@
     "send": "Send",
     "closeSending": "Close. The report is saved on the phone.",
     "retake": "Retake",
-    "photoAlt": "Report photo: {{stage}}"
+    "photoAlt": "Report photo: {{stage}}",
+    "backToGrowth": "Back to increase"
   },
   "stagePicker": {
-    "title": "Choose a stage"
+    "title": "Choose a stage",
+    "current": "Selected now"
   },
   "review": {
     "title": "Big jumps",

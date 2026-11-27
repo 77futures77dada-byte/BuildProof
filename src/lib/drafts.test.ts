@@ -17,7 +17,10 @@ function draft(p: Partial<Draft> = {}): Draft {
   }
 }
 
-class Fail extends Error { constructor(public code: DraftError) { super(code) } }
+class Fail extends Error {
+  code: DraftError
+  constructor(code: DraftError) { super(code); this.code = code }
+}
 
 function transport(percents: Record<string, number>, failFor: Record<string, DraftError> = {}) {
   const submitted: { stageId: string; percent: number; reason: string | null; paths: string[] }[] = []
