@@ -19,15 +19,27 @@ interface SheetProps {
    * `busy-closable`: working, but may be closed.
    */
   busy?: 'busy-locked' | 'busy-closable'
+  /** Label of the close button (default `common.close`), e.g. `report.closeSending` in busy-closable. */
+  closeLabel?: ReactNode
+  /**
+   * Write a browser-history entry while open, so the system «Back» closes the
+   * sheet (03 §1). Back during `busy-locked` is ignored, like «Закрыть».
+   */
+  history?: boolean
+  /** Stable hook for DOM checks, rendered as `data-sheet` on the dialog. */
+  name?: string
   className?: string
 }
+
+// Deferred history.back() per sheet, so a StrictMode remount reuses the entry.
+const pendingBack = new Map<string, ReturnType<typeof setTimeout>>()
 
 /**
  * Bottom sheet (phone) / centered dialog ≥ 1024 px, max 560 px wide, ≤ 90vh.
  * Portals into the themed root (#bp-root) so it keeps theme + data-zone (03 Ж8).
  * Focus moves in, is trapped, and returns to the opener on close.
  */
-export function Sheet({ open, onClose, title, children, footer, busy, className }: SheetProps) {
+export function Sheet({ open, onClose, title, children, footer, busy, closeLabel, history: withHistory, name, className }: SheetProps) {
   const { t } = useTranslation()
   const titleId = useId()
   const panel = useRef<HTMLDivElement>(null)
@@ -68,6 +80,31 @@ export function Sheet({ open, onClose, title, children, footer, busy, className 
     }
   }, [open])
 
+  useEffect(() => {
+    if (!open || !withHistory) return
+    const key = `bp-sheet-${titleId}`
+    const pending = pendingBack.get(key)
+    if (pending) { clearTimeout(pending); pendingBack.delete(key) }
+    else window.history.pushState({ ...(window.history.state ?? {}), bpSheet: key }, '')
+    let popped = false
+    const onPop = () => {
+      // a sheet stacked on top of this one went back to our entry
+      if (window.history.state?.bpSheet === key) return
+      if (lockedRef.current) {
+        window.history.pushState({ ...(window.history.state ?? {}), bpSheet: key }, '')
+        return
+      }
+      popped = true
+      closeRef.current()
+    }
+    window.addEventListener('popstate', onPop)
+    return () => {
+      window.removeEventListener('popstate', onPop)
+      if (popped || window.history.state?.bpSheet !== key) return
+      pendingBack.set(key, setTimeout(() => { pendingBack.delete(key); window.history.back() }, 0))
+    }
+  }, [open, withHistory, titleId])
+
   if (!open) return null
   return createPortal(
     <div className="fixed inset-0 z-[var(--z-sheet)] flex items-end justify-center bg-scrim lg:items-center lg:p-6" onClick={() => { if (!locked) onClose() }}>
@@ -77,6 +114,7 @@ export function Sheet({ open, onClose, title, children, footer, busy, className 
         aria-modal="true"
         aria-labelledby={titleId}
         aria-busy={busy ? true : undefined}
+        data-sheet={name}
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         className={cx(
@@ -93,7 +131,7 @@ export function Sheet({ open, onClose, title, children, footer, busy, className 
             disabled={locked}
             className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-control px-3 text-field font-semibold text-fg underline-offset-4 hover:underline focus-visible:outline-3 focus-visible:outline-focus disabled:opacity-60"
           >
-            {t('common.close')}
+            {closeLabel ?? t('common.close')}
           </button>
         </header>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">{children}</div>

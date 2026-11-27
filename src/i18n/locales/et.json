@@ -28,7 +28,8 @@
     "undo": "Võta tagasi",
     "actions": "Toimingud",
     "stay": "Jää",
-    "signOutAnyway": "Logi ikkagi välja"
+    "signOutAnyway": "Logi ikkagi välja",
+    "backOnline": "Ühendus on tagasi"
   },
   "language": {
     "label": "Kasutajaliidese keel",
@@ -459,7 +460,11 @@
     "others_one": "Telefonis on {{count}} teise inimese aruanne. See läheb teele, kui ta sisse logib.",
     "others_other": "Telefonis on {{count}} teise inimese aruannet. Need lähevad teele, kui ta sisse logib.",
     "limit": "Telefon hoiab kuni {{max}} aruannet. Saatke või kustutage vanad.",
-    "deleteConfirm": "Kas kustutada see aruanne telefonist? Fotot ei säilitata."
+    "deleteConfirm": "Kas kustutada see aruanne telefonist? Fotot ei säilitata.",
+    "reasonNetwork": "ei jõudnud kohale, proovime uuesti",
+    "reasonTimeout": "pole kindel, kas jõudis",
+    "reasonAuth": "logige uuesti sisse",
+    "reasonComment": "vähendamiseks on vaja põhjust"
   },
   "gate": {
     "inviteLater": "Tööliste kutsumine lülitub sisse, kui e-posti saatmine on seadistatud.",
@@ -518,10 +523,12 @@
     "send": "Saada",
     "closeSending": "Sulge. Aruanne on telefoni salvestatud.",
     "retake": "Pildista uuesti",
-    "photoAlt": "Aruande foto: {{stage}}"
+    "photoAlt": "Aruande foto: {{stage}}",
+    "backToGrowth": "Tagasi kasvu juurde"
   },
   "stagePicker": {
-    "title": "Valige etapp"
+    "title": "Valige etapp",
+    "current": "Praegu valitud"
   },
   "review": {
     "title": "Suured hüpped",
