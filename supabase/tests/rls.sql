@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(48);
+select plan(50);
 select is(
   (select bool_and(c.relrowsecurity)
    from pg_class c join pg_namespace n on n.oid=c.relnamespace
@@ -94,7 +94,8 @@ insert into auth.users(id,aud,role,email,encrypted_password,email_confirmed_at,r
  ('10000000-0000-4000-8000-000000000009','authenticated','authenticated','crew@gmail.com','',now(),'{}','{}',now(),now()),
  ('10000000-0000-4000-8000-000000000010','authenticated','authenticated','stranger@gmail.com','',now(),'{}','{}',now(),now()),
  ('10000000-0000-4000-8000-000000000011','authenticated','authenticated','owner@firma.ee','',now(),'{}','{}',now(),now()),
- ('10000000-0000-4000-8000-000000000012','authenticated','authenticated','crew@firma.ee','',now(),'{}','{}',now(),now());
+ ('10000000-0000-4000-8000-000000000012','authenticated','authenticated','crew@firma.ee','',now(),'{}','{}',now(),now()),
+ ('10000000-0000-4000-8000-000000000013','authenticated','authenticated','oldcrew@gmail.com','',now(),'{}','{}',now(),now());
 select is((select count(*) from public.profiles where id='10000000-0000-4000-8000-000000000005'),0::bigint,
   'signup leaves profile creation to the authenticated onboarding RPC');
 insert into public.profiles(id,company_id,full_name,role) values
@@ -113,10 +114,24 @@ insert into public.profiles(id,company_id,full_name,role) values
  ('10000000-0000-4000-8000-000000000009','30000000-0000-4000-8000-000000000003','Invited Gmail worker','worker'),
  ('10000000-0000-4000-8000-000000000010','30000000-0000-4000-8000-000000000003','Uninvited Gmail user','worker'),
  ('10000000-0000-4000-8000-000000000011','30000000-0000-4000-8000-000000000004','Corporate owner','gc'),
- ('10000000-0000-4000-8000-000000000012','30000000-0000-4000-8000-000000000004','Corporate worker','worker')
+ ('10000000-0000-4000-8000-000000000012','30000000-0000-4000-8000-000000000004','Corporate worker','worker'),
+ ('10000000-0000-4000-8000-000000000013','30000000-0000-4000-8000-000000000003','Existing Gmail worker','worker')
 on conflict (id) do update set company_id=excluded.company_id,full_name=excluded.full_name,role=excluded.role;
 insert into public.invite_log(company_id,invited_by,email) values
  ('30000000-0000-4000-8000-000000000003','10000000-0000-4000-8000-000000000008','crew@gmail.com');
+-- Exercise the migration backfill twice for a pre-existing public-mail member.
+insert into public.invite_log(company_id,invited_by,email,created_at)
+select member.company_id,owner.id,lower(account.email),now()-interval '1 day'
+from public.profiles member join auth.users account on account.id=member.id
+join lateral (select gc.id from public.profiles gc where gc.company_id=member.company_id and gc.role='gc' order by gc.id limit 1) owner on true
+where member.id='10000000-0000-4000-8000-000000000013'
+  and not exists(select 1 from public.invite_log sent where sent.company_id=member.company_id and lower(sent.email)=lower(account.email));
+insert into public.invite_log(company_id,invited_by,email,created_at)
+select member.company_id,owner.id,lower(account.email),now()-interval '1 day'
+from public.profiles member join auth.users account on account.id=member.id
+join lateral (select gc.id from public.profiles gc where gc.company_id=member.company_id and gc.role='gc' order by gc.id limit 1) owner on true
+where member.id='10000000-0000-4000-8000-000000000013'
+  and not exists(select 1 from public.invite_log sent where sent.company_id=member.company_id and lower(sent.email)=lower(account.email));
 insert into public.projects(id,company_id,name) values
  ('40000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','Project A'),
  ('40000000-0000-4000-8000-000000000002','30000000-0000-4000-8000-000000000002','Project B');
@@ -141,7 +156,11 @@ insert into public.stage_reports(id,project_stage_id,project_id,reporter_id,old_
  ('70000000-0000-4000-8000-000000000004','50000000-0000-4000-8000-000000000001',
  '40000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000002',20,55,'pending'),
  ('70000000-0000-4000-8000-000000000005','50000000-0000-4000-8000-000000000001',
- '40000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000004',0,5,'pending');
+ '40000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000004',0,5,'pending'),
+ ('70000000-0000-4000-8000-000000000006','50000000-0000-4000-8000-000000000001',
+ '40000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000002',20,30,'accepted'),
+ ('70000000-0000-4000-8000-000000000007','50000000-0000-4000-8000-000000000001',
+ '40000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000002',30,35,'accepted');
 insert into public.tasks(id,project_id,title,assigned_to,created_by) values
  ('60000000-0000-4000-8000-000000000001','40000000-0000-4000-8000-000000000001','Worker task',
   '10000000-0000-4000-8000-000000000002','10000000-0000-4000-8000-000000000001');
@@ -181,6 +200,20 @@ select throws_ok($$select public.review_stage_reports(array['70000000-0000-4000-
  'P0001','report_not_reviewable','foreman from tenant A cannot confirm tenant B report');
 select is(public.review_stage_reports(array['70000000-0000-4000-8000-000000000002']::uuid[]),1,
  'foreman can batch confirm a different reporter report with a jump at or under threshold');
+select public.update_stage_progress('50000000-0000-4000-8000-000000000001',35);
+select is(
+  (with first_confirmation as materialized (
+     select public.review_stage_reports(array['70000000-0000-4000-8000-000000000006']::uuid[]) as result
+   ), second_confirmation as materialized (
+     select public.review_stage_reports(array['70000000-0000-4000-8000-000000000007']::uuid[]) as result
+     from first_confirmation
+   )
+   select first_confirmation.result=1 and second_confirmation.result=1
+     and (select progress_percent from public.project_stages where id='50000000-0000-4000-8000-000000000001')=35
+   from first_confirmation cross join second_confirmation),
+  true,
+  'confirming two sent reports in sequence does not roll the stage back'
+);
 select throws_ok($$select public.review_stage_reports(array['70000000-0000-4000-8000-000000000003']::uuid[])$$,
  'P0001','report_not_reviewable','foreman cannot batch confirm own report');
 select is(public.review_stage_report('70000000-0000-4000-8000-000000000004',true,null),'confirmed',
@@ -202,6 +235,13 @@ select is(public.current_user_company_id(),'30000000-0000-4000-8000-000000000003
 select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000012","email":"crew@firma.ee","role":"authenticated"}',true);
 select is(public.current_user_company_id(),'30000000-0000-4000-8000-000000000004'::uuid,
  'corporate domain member is admitted by matching firm domain');
+select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000013","email":"oldcrew@gmail.com","role":"authenticated"}',true);
+select is(
+  public.current_user_company_id()='30000000-0000-4000-8000-000000000003'::uuid
+  and (select count(*)=1 from public.invite_log where company_id='30000000-0000-4000-8000-000000000003' and email='oldcrew@gmail.com'),
+  true,
+  'backfilled exact invite preserves access for an existing public-mail worker without duplicates'
+);
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000005',true);
 select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000005","email":"onboarding-a@test.invalid","role":"authenticated"}',true);
 select is(

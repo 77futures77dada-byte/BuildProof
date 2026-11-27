@@ -235,8 +235,6 @@ begin
     where sr.id=any(p_report_ids) and sr.status='accepted' and sr.reporter_id<>v_uid;
   get diagnostics v_count=row_count;
   if v_count<>v_requested then raise exception 'report_not_reviewable'; end if;
-  update public.project_stages ps set progress_percent=sr.new_percent,updated_at=now(),updated_by=v_uid
-    from public.stage_reports sr where sr.id=any(p_report_ids) and ps.id=sr.project_stage_id;
   return v_count;
 end $$;
 revoke all on function public.review_stage_reports(uuid[]) from public,anon;
@@ -267,5 +265,24 @@ begin
 end $$;
 revoke all on function public.review_stage_report(uuid,boolean,text) from public,anon;
 grant execute on function public.review_stage_report(uuid,boolean,text) to authenticated;
+
+-- Existing foremen and workers of public-mail firms already belong to those
+-- firms. Preserve their access by seeding exact-address invitations once.
+insert into public.invite_log(company_id,invited_by,email,created_at)
+select member.company_id,owner.id,lower(account.email),now()-interval '1 day'
+from public.profiles member
+join auth.users account on account.id=member.id
+join lateral (
+  select gc.id from public.profiles gc
+  where gc.company_id=member.company_id and gc.role='gc'
+  order by gc.id limit 1
+) owner on true
+where member.role in ('worker','foreman')
+  and member.company_id is not null
+  and account.email is not null
+  and not exists (
+    select 1 from public.invite_log sent
+    where sent.company_id=member.company_id and lower(sent.email)=lower(account.email)
+  );
 
 notify pgrst,'reload schema';

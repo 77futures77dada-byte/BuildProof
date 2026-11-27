@@ -222,3 +222,14 @@ check-overflow: routes=31 loads=248 overflow_failures=0 render_failures=2 page_e
 | check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=169 allowlisted=5 temporary=0 (1s) |
 | check-ru-latin | PASS | offending=0 strings=819 (json=540, landing=279) (0s) |
 | check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 send_checks=8 send_failures=0 landing_small_targets=8 landing_small_text=95 (a11y = warnings; --strict-a11y to fail) (140s) |
+
+## 2026-11-27T14:41:50Z — C 006 backfill and sequential confirmation
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (4s) |
+| build | PASS | built in 2.37s, VITE_SUPABASE_URL=fixture (24s) |
+| test | PASS | 13 passed (13); 80 passed (80) (17s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=169 allowlisted=5 temporary=0 (1s) |
+| check-ru-latin | PASS | offending=0 strings=819 (json=540, landing=279) (0s) |
+| check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 send_checks=8 send_failures=0 landing_small_targets=8 landing_small_text=95 (a11y = warnings; --strict-a11y to fail) (183s) |

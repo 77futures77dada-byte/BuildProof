@@ -28,3 +28,7 @@ alter table public.projects drop column if exists review_threshold;
 -- Reapply source RPC bodies in order 002, 003, 005 (report submit, invite
 -- reservation, onboarding) after this script. The helper RPC definitions above
 -- restore the originals from 000_baseline.sql.
+-- The 006 migration backfill rows are retained on rollback: invite_log has no
+-- provenance column, so deleting rows by their backdated timestamp could erase
+-- a real invitation. The entries are historical records; after the old helper
+-- and RPC definitions are restored, they do not bypass the old RLS rules.
