@@ -368,3 +368,25 @@ OVERFLOW not-found signed in /no-such-page @390: scrollWidth 477 > 390; div.flex
 | check-contrast | PASS | pairs=114 failures=0 drift=0 (0s) |
 | check-ru-latin | PASS | offending=0 strings=824 (json=545, landing=279) (0s) |
 | check-overflow | PASS | routes=32 loads=320 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (194s) |
+## 2026-11-27 — worker/client links backend
+
+Изменения проверены в чистой ветке `codex/worker-client-links` от `origin/main` (`64fd2b1`, включает миграцию 006). Ни одна миграция не применялась.
+
+| check | result | details |
+|---|---|---|
+| `npm run lint` | PASS | без ошибок |
+| `ALLOW_PLACEHOLDERS=1 npm run build` | PASS | production build завершён; только предупреждения Vite о размере чанка и смешанном dynamic/static import |
+| `npm test` | PASS | 14 файлов, 105 тестов |
+| API tests | PASS | 5 тестов: bearer auth, роль, чужой проект, энтропия токена, хэш |
+| `git diff --check` | PASS | whitespace проверка чистая |
+| pgTAP | NOT RUN | 17 утверждений добавлены в `supabase/tests/worker_client_links.sql`; `psql`, Docker и Supabase CLI недоступны в окружении |
+
+Обзор безопасности выполнен для трёх ролей (взломщик с чужой ссылкой, владелец фирмы, бригадир на объекте), по два прохода на каждый пункт. HIGH: 0, MED: 0 в обоих проходах.
+
+| пункт | проход 1 | проход 2 |
+|---|---|---|
+| права подтверждения отчётов | HIGH 0 / MED 0 — роль, самоподтверждение и фирменная область проверены в RPC | HIGH 0 / MED 0 — пакетное подтверждение ограничено accepted и порогом проекта; self-review запрещён |
+| ссылки рабочих | HIGH 0 / MED 0 — проверены хэш токена, срок, отзыв, лимиты и ограничение project_id | HIGH 0 / MED 0 — повтор запроса идемпотентен, фото и последние отчёты привязаны к конкретной ссылке |
+| ссылки заказчиков | HIGH 0 / MED 0 — фильтр status=confirmed и видимость этапа проверены; фото требуют отдельного согласия | HIGH 0 / MED 0 — preview использует ту же RPC-фильтрацию; данные комментариев и соседних фирм не возвращаются |
+
+Ограничение проверки: из-за отсутствия pgTAP runtime выводы по SQL основаны на чтении миграций и тестового сценария, а не на выполнении в PostgreSQL.
