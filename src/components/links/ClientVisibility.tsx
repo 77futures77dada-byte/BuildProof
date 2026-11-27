@@ -77,6 +77,7 @@ export function ClientVisibility({ projectId }: { projectId: string }) {
       <Button variant="secondary" className="self-start" disabled={!online || previewLoading || !!previewError} onClick={() => setShowPreview(true)}>
         {t('links.preview.open')}
       </Button>
+      {!online ? <p className="m-0 text-body font-medium text-fg" data-offline-hint>{t('links.offline')}</p> : null}
       {previewError ? <ErrorMessage message={previewError} onRetry={refresh} /> : null}
 
       {loading ? (

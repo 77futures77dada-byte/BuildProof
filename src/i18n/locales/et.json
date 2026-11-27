@@ -667,7 +667,7 @@
     "copyFailed": "Kopeerimine ei õnnestunud. Vali link ja kopeeri käsitsi.",
     "worker": {
       "title": "Töötajate lingid",
-      "hint": "Töötaja avab lingi telefonis ja saadab fotodega aruande. E-posti ega parooli pole vaja.",
+      "hint": "Töötaja avab lingi telefonis ja saadab fotodega aruande. E-posti ega parooli pole vaja. Aegunud linki pikendada ei saa: loo uus.",
       "create": "Loo töötajale link",
       "empty": "Töötajate linke veel pole.",
       "nameLabel": "Töötaja nimi",
@@ -678,7 +678,7 @@
     },
     "client": {
       "title": "Tellija lingid",
-      "hint": "Tellija näeb ainult kinnitatud edenemist nende etappide kohta, mille allpool avad.",
+      "hint": "Tellija näeb ainult kinnitatud edenemist nende etappide kohta, mille allpool avad. Aegunud linki pikendada ei saa: loo uus.",
       "create": "Loo tellijale link",
       "empty": "Tellija linke veel pole.",
       "nameLabel": "Tellija nimi",
@@ -721,7 +721,8 @@
       "stage_not_found": "Etappi ei leitud. Värskenda lehte.",
       "network": "Ühendus puudub. Proovi uuesti.",
       "generic": "Midagi läks valesti. Proovi uuesti."
-    }
+    },
+    "offline": "Linkide loomiseks, tühistamiseks ja nähtavuse muutmiseks on vaja võrku."
   },
   "workerLink": {
     "title": "Objekti aruanne",

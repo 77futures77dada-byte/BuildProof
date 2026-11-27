@@ -667,7 +667,7 @@
     "copyFailed": "Could not copy. Select the link and copy it by hand.",
     "worker": {
       "title": "Worker links",
-      "hint": "The worker opens the link on a phone and sends a report with photos. No e-mail or password needed.",
+      "hint": "The worker opens the link on a phone and sends a report with photos. No e-mail or password needed. An expired link cannot be extended: create a new one.",
       "create": "Create a worker link",
       "empty": "No worker links yet.",
       "nameLabel": "Worker name",
@@ -678,7 +678,7 @@
     },
     "client": {
       "title": "Client links",
-      "hint": "The client sees only confirmed progress for the stages you open below.",
+      "hint": "The client sees only confirmed progress for the stages you open below. An expired link cannot be extended: create a new one.",
       "create": "Create a client link",
       "empty": "No client links yet.",
       "nameLabel": "Client name",
@@ -721,7 +721,8 @@
       "stage_not_found": "Stage not found. Refresh the page.",
       "network": "No connection. Try again.",
       "generic": "Something went wrong. Try again."
-    }
+    },
+    "offline": "A connection is needed to create or revoke links and change what the client sees."
   },
   "workerLink": {
     "title": "Site report",

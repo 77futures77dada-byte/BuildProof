@@ -26,9 +26,14 @@ export function LinkSection({ kind, projectId }: { kind: LinkKind; projectId: st
   const [revoking, setRevoking] = useState<LinkRecord | null>(null)
   const [revokeBusy, setRevokeBusy] = useState(false)
   const [revokeError, setRevokeError] = useState<string | null>(null)
-  const [now] = useState(() => Date.now())
+  // Ticks once a minute: a link that expires while the tab stays open must not stay «Действует».
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 60e3)
+    return () => clearInterval(timer)
+  }, [])
 
-  const reload = useCallback(() => setNonce((n) => n + 1), [])
+  const reload = useCallback(() => { setNow(Date.now()); setNonce((n) => n + 1) }, [])
 
   useEffect(() => {
     let active = true
@@ -63,6 +68,7 @@ export function LinkSection({ kind, projectId }: { kind: LinkKind; projectId: st
       <h2 id={`links-${kind}-title`} className="m-0 text-h2 font-medium text-fg">{t(`${k}.title`)}</h2>
       <p className="m-0 text-body text-fg">{t(`${k}.hint`)}</p>
       <Button variant="primary" className="self-start" disabled={!online} onClick={() => setCreating(true)}>{t(`${k}.create`)}</Button>
+      {!online ? <p className="m-0 text-body font-medium text-fg" data-offline-hint>{t('links.offline')}</p> : null}
 
       {loading ? (
         <SkeletonRows label={t('links.loading')} />
@@ -204,6 +210,7 @@ function CreateLinkSheet({ kind, projectId, open, onClose, onCreated }: {
           error={daysError ? t('links.error.invalid_expiry') : undefined}
           onChange={(e) => { setDays(e.target.value); setDaysError(false) }}
         />
+        {!online ? <p className="m-0 text-body font-medium text-fg" data-offline-hint>{t('links.offline')}</p> : null}
         {failed ? <p role="alert" className="m-0 text-body font-medium text-fg">{failed}</p> : null}
       </form>
     </Sheet>
