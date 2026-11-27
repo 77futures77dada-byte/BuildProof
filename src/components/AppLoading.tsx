@@ -21,7 +21,7 @@ export function AppLoading({ slowAfterMs = 10_000 }: { slowAfterMs?: number }) {
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="inline-flex min-h-12 items-center justify-center rounded-control border-2 border-fg bg-page px-5 text-field font-semibold text-fg hover:bg-surface"
+            className="inline-flex min-h-12 items-center justify-center rounded-control border-2 border-fg bg-page px-5 text-field font-medium text-fg hover:bg-surface"
           >
             {t('common.reload')}
           </button>

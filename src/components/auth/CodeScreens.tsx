@@ -151,7 +151,7 @@ export function CodeEnter({ onOtherEmail }: { onOtherEmail: () => void }) {
     <form onSubmit={submit} className="flex flex-col gap-5" noValidate>
       <h1 className="m-0 text-h1 text-fg">{t('auth.signInWithCode')}</h1>
       <p className="m-0 text-body text-fg" role="status">
-        {t('auth.neutralSent')} <span className="font-semibold break-all">{sent.email}</span>
+        {t('auth.neutralSent')} <span className="font-medium break-all">{sent.email}</span>
       </p>
       <CodeField
         label={t('auth.code')}
@@ -222,7 +222,7 @@ export function InviteCode({ prefilledEmail, onSignedIn }: { prefilledEmail: str
       <h1 className="m-0 text-h1 text-fg">{t('auth.inviteTitle')}</h1>
       {fixedEmail ? (
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-field font-semibold text-fg">{maskEmail(fixedEmail)}</span>
+          <span className="text-field font-medium text-fg">{maskEmail(fixedEmail)}</span>
           <Button variant="ghost" onClick={() => setFixedEmail(null)}>{t('auth.otherEmail')}</Button>
         </div>
       ) : (

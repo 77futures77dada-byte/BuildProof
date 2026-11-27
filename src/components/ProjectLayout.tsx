@@ -69,10 +69,10 @@ export function ProjectLayout() {
           {project ? (
             <>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <h1 className="m-0 min-w-0 text-h1 font-bold [overflow-wrap:anywhere]">{project.name}</h1>
+                <h1 className="m-0 min-w-0 text-h1 font-semibold [overflow-wrap:anywhere]">{project.name}</h1>
                 {project.status !== 'active' ? <ProjectStatusBadge status={project.status} /> : null}
               </div>
-              {project.address ? <p className="m-0 text-body font-medium [overflow-wrap:anywhere]">{project.address}</p> : null}
+              {project.address ? <p className="m-0 text-body [overflow-wrap:anywhere]">{project.address}</p> : null}
             </>
           ) : loading ? (
             <Skeleton variant="header" />
@@ -85,7 +85,7 @@ export function ProjectLayout() {
       <main className="mx-auto max-w-[1120px] px-4 py-6">
         {!loading && error ? (
           <section role="alert" className="flex flex-col items-start gap-3 rounded-card border-2 border-stale bg-page p-5">
-            <p className="m-0 text-field font-semibold">{t('overview.loadFailed')}</p>
+            <p className="m-0 text-field font-medium">{t('overview.loadFailed')}</p>
             <Link to="/dashboard" className={buttonClass({ variant: 'secondary' })}>{t('tariff.toProjects')}</Link>
           </section>
         ) : (

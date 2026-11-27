@@ -62,7 +62,7 @@ function TasksView({ projectId, manager }: { projectId: string | undefined; mana
   return (
     <section className="flex flex-col gap-4">
       <NetBar />
-      <h2 className="m-0 text-h2 font-bold text-fg">{t('tasks.title')}</h2>
+      <h2 className="m-0 text-h2 font-semibold text-fg">{t('tasks.title')}</h2>
       {manager ? (
         <Button variant="primary" block onClick={() => setShowForm(true)} className="sm:w-auto sm:self-start">{t('tasks.create')}</Button>
       ) : null}
@@ -72,7 +72,7 @@ function TasksView({ projectId, manager }: { projectId: string | undefined; mana
       ) : error ? (
         <ErrorMessage message={error} onRetry={reload} />
       ) : tasks.length === 0 ? (
-        <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body font-medium text-fg">
+        <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body text-fg">
           {!manager ? t('tasks.noActive') : isEmailGateOpen() ? t('tasks.empty') : t('tasks.emptyClosed')}
         </p>
       ) : (
@@ -80,7 +80,7 @@ function TasksView({ projectId, manager }: { projectId: string | undefined; mana
           {active.length > 0 ? (
             <ul className="m-0 flex flex-col gap-3 p-0">{active.map(card)}</ul>
           ) : (
-            <p className="m-0 text-body font-medium text-fg">{t('tasks.noActive')}</p>
+            <p className="m-0 text-body text-fg">{t('tasks.noActive')}</p>
           )}
           {done.length > 0 ? (
             <Disclosure label={t('tasks.completed', { count: done.length })}>

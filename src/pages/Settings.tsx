@@ -76,7 +76,7 @@ export function Settings() {
   return (
     <section className="flex flex-col gap-6">
       <NetBar />
-      {notice ? <p role="status" className="m-0 text-body font-semibold text-fg">{notice}</p> : null}
+      {notice ? <p role="status" className="m-0 text-body font-medium text-fg">{notice}</p> : null}
 
       {loading ? (
         <SkeletonRows label={t('settings.loading')} />
@@ -85,9 +85,9 @@ export function Settings() {
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="flex flex-col gap-3">
-            <h2 className="m-0 text-h2 font-bold text-fg">{t('people.title')}</h2>
+            <h2 className="m-0 text-h2 font-semibold text-fg">{t('people.title')}</h2>
             {people.length === 0 ? (
-              <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body font-medium text-fg">
+              <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body text-fg">
                 {gateOpen ? t('people.emptyOpen') : hasLegalContact() ? t('people.emptyClosed') : t('people.emptyClosedNoContact')}
               </p>
             ) : (
@@ -110,8 +110,8 @@ export function Settings() {
           <div className="flex flex-col gap-6">
             {known.length > 0 ? (
               <div className="flex flex-col gap-3">
-                <h2 className="m-0 text-h2 font-bold text-fg">{t('known.title')}</h2>
-                <p className="m-0 text-body font-medium text-fg">{t('known.hint')}</p>
+                <h2 className="m-0 text-h2 font-semibold text-fg">{t('known.title')}</h2>
+                <p className="m-0 text-body text-fg">{t('known.hint')}</p>
                 <ul className="m-0 flex flex-col p-0">
                   {known.map((row) => (
                     <MemberAccessRow key={row.userId} row={row} variant="in-company" onAdd={add} />
@@ -125,7 +125,7 @@ export function Settings() {
                 <InviteForm projectId={id} known={known} onAddKnown={add} onInvited={reload} />
               ) : (
                 <div className="flex flex-col gap-2 rounded-card border-2 border-line bg-surface p-4">
-                  <p className="m-0 text-body font-semibold text-fg">{hasLegalContact() ? t('gate.inviteLater') : t('gate.inviteLaterNoContact')}</p>
+                  <p className="m-0 text-body font-medium text-fg">{hasLegalContact() ? t('gate.inviteLater') : t('gate.inviteLaterNoContact')}</p>
                   <ContactLines label={t('common.supportLabel')} />
                 </div>
               )}
@@ -252,7 +252,7 @@ function SendCodeSheet({ person, onClose }: { person: AccessRow | null; onClose:
           onChange={(e) => { setEmail(e.target.value); setInvalid(false); if (state.kind === 'notOurs' || state.kind === 'failed') setState({ kind: 'idle' }) }}
         />
         {message ? (
-          <p role={good ? 'status' : 'alert'} aria-live="polite" className="m-0 flex items-start gap-2 text-body font-semibold text-fg">
+          <p role={good ? 'status' : 'alert'} aria-live="polite" className="m-0 flex items-start gap-2 text-body font-medium text-fg">
             <StatusIcon kind={good ? 'sent' : 'error'} className="mt-0.5" />
             <span className="num-col">{message}</span>
           </p>
@@ -328,7 +328,7 @@ function InviteForm({ projectId, known, onAddKnown, onInvited }: {
 
   return (
     <form onSubmit={(e) => void submit(e)} noValidate className="flex flex-col gap-4">
-      <h2 id="invite-title" className="m-0 text-h2 font-bold text-fg">{role === 'foreman' ? t('invite.foreman') : t('invite.title')}</h2>
+      <h2 id="invite-title" className="m-0 text-h2 font-semibold text-fg">{role === 'foreman' ? t('invite.foreman') : t('invite.title')}</h2>
       <div
         role="radiogroup"
         aria-labelledby="invite-title"
@@ -353,7 +353,7 @@ function InviteForm({ projectId, known, onAddKnown, onInvited }: {
             disabled={busy}
             onClick={() => setRole(r)}
             className={cx(
-              'inline-flex min-h-12 flex-1 items-center justify-center rounded-control border-2 px-4 text-field font-semibold focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus',
+              'inline-flex min-h-12 flex-1 items-center justify-center rounded-control border-2 px-4 text-field font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus',
               role === r ? 'border-fg bg-fg text-page' : 'border-fg bg-page text-fg hover:bg-surface',
             )}
           >
@@ -361,7 +361,7 @@ function InviteForm({ projectId, known, onAddKnown, onInvited }: {
           </button>
         ))}
       </div>
-      <p className="m-0 text-body font-medium text-fg">{role === 'foreman' ? t('invite.hintForeman') : t('invite.hint')}</p>
+      <p className="m-0 text-body text-fg">{role === 'foreman' ? t('invite.hintForeman') : t('invite.hint')}</p>
       {rows.map((r, i) => {
         const err = problem(r, i)
         const twin = sameName(r)
@@ -371,7 +371,7 @@ function InviteForm({ projectId, known, onAddKnown, onInvited }: {
             <TextField label={t('invite.email')} type="email" inputMode="email" autoComplete="off" value={r.email} error={err ?? undefined} onChange={(e) => patch(r.key, { email: e.target.value, result: undefined })} />
             {twin ? (
               <div className="flex flex-col gap-2">
-                <p className="m-0 text-body font-semibold text-fg">{t('invite.sameName', { name: twin.name })}</p>
+                <p className="m-0 text-body font-medium text-fg">{t('invite.sameName', { name: twin.name })}</p>
                 <div className="flex flex-wrap gap-3">
                   <Button variant="secondary" onClick={() => void onAddKnown(twin).then(() => setRows((l) => (l.length > 1 ? l.filter((x) => x.key !== r.key) : [{ key: r.key + 1, name: '', email: '' }])))}>{t('invite.sameNameYes')}</Button>
                   <Button variant="secondary" onClick={() => patch(r.key, { sameNameOk: true })}>{t('invite.sameNameNo')}</Button>
@@ -379,7 +379,7 @@ function InviteForm({ projectId, known, onAddKnown, onInvited }: {
               </div>
             ) : null}
             {r.result ? (
-              <p role="status" className="m-0 flex items-start gap-2 text-body font-semibold text-fg">
+              <p role="status" className="m-0 flex items-start gap-2 text-body font-medium text-fg">
                 <StatusIcon kind={r.ok ? 'sent' : 'error'} className="mt-0.5" />{r.result}
               </p>
             ) : null}

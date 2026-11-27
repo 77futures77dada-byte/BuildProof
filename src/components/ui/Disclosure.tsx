@@ -25,7 +25,7 @@ export function Disclosure({ label, openLabel, children, defaultOpen = false, on
         aria-expanded={open}
         aria-controls={id}
         onClick={() => { setOpen(!open); onToggle?.(!open) }}
-        className="inline-flex min-h-12 items-center gap-2 self-start rounded-control px-3 text-field font-semibold text-fg hover:bg-surface focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        className="inline-flex min-h-12 items-center gap-2 self-start rounded-control px-3 text-field font-medium text-fg hover:bg-surface focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >
         <svg aria-hidden="true" viewBox="0 0 24 24" className={cx('size-5 shrink-0 transition-transform motion-reduce:transition-none', open && 'rotate-90')} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg>
         {open && openLabel ? openLabel : label}

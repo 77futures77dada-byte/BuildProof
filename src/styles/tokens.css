@@ -194,7 +194,7 @@
     background: var(--bg);
     color: var(--fg);
     font-size: 17px;
-    font-weight: 500;
+    font-weight: 400; /* owner zone; the worker zone keeps 500 below (owner feedback 2026-11-28: «слишком жирно») */
     line-height: 1.4;
   }
   input, button, select, textarea { font: inherit; color: inherit; letter-spacing: inherit; }

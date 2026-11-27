@@ -253,7 +253,7 @@ export function Today() {
                   {unsent.map((d) => (
                     <li key={d.draftId}>
                       {/* every row opens the sheet: fix, resend or delete from the phone (critic r1 HIGH-3) */}
-                      <button type="button" onClick={() => setSheetDraftId(d.draftId)} className="flex min-h-12 w-full items-center gap-3 text-left text-body font-semibold text-fg underline underline-offset-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus">
+                      <button type="button" onClick={() => setSheetDraftId(d.draftId)} className="flex min-h-12 w-full items-center gap-3 text-left text-body font-medium text-fg underline underline-offset-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus">
                         <DraftThumb photo={d.photo} />
                         <span className="min-w-0 [overflow-wrap:anywhere]">{t('send.itemReason', { stage: d.stageName, reason: itemReason(d) })}</span>
                       </button>
@@ -267,7 +267,7 @@ export function Today() {
       ) : null}
 
       {authStuck ? (
-        <p className="m-0 flex flex-wrap items-center gap-3 text-field font-semibold">
+        <p className="m-0 flex flex-wrap items-center gap-3 text-field font-medium">
           {t('errors.authRequiredDrafts', { count: authStuck })}
           <Link to="/login" className={buttonClass({ variant: 'secondary' })}>{t('common.signIn')}</Link>
         </p>
@@ -282,12 +282,12 @@ export function Today() {
       {editing ? (
         <section className="flex flex-wrap items-center gap-3 rounded-card border-2 border-line bg-surface p-3">
           {/* own row: with two buttons beside it the text broke one word per line at 360–390 px */}
-          <p className="m-0 min-w-0 basis-full text-field font-semibold">{t('report.unfinished')}</p>
+          <p className="m-0 min-w-0 basis-full text-field font-medium">{t('report.unfinished')}</p>
           <Button variant="secondary" onClick={() => setSheetDraftId(editing.draftId)}>{t('today.continue')}</Button>
           {/* an accidental shot can be thrown away here, off the send path (critic r3 LOW-1) */}
           {discard === editing.draftId ? (
             <div className="flex w-full flex-col gap-3 rounded-card border-2 border-stale bg-page p-3">
-              <p className="m-0 text-field font-semibold">{t('send.deleteConfirm')}</p>
+              <p className="m-0 text-field font-medium">{t('send.deleteConfirm')}</p>
               <div className="flex flex-wrap gap-3">
                 <Button variant="danger" onClick={() => { setDiscard(null); void removeDraft(editing.draftId) }}>{t('common.delete')}</Button>
                 <Button variant="secondary" onClick={() => setDiscard(null)}>{t('common.cancel')}</Button>
@@ -300,7 +300,7 @@ export function Today() {
       ) : null}
 
       {result ? (
-        <p aria-live="polite" data-send-state="sent" className="m-0 flex items-center gap-2 text-field font-semibold">
+        <p aria-live="polite" data-send-state="sent" className="m-0 flex items-center gap-2 text-field font-medium">
           <StatusIcon kind="sent" />{result}
         </p>
       ) : null}
@@ -311,11 +311,11 @@ export function Today() {
         ) : stages.error ? (
           <ErrorMessage message={stages.error} onRetry={stages.reload} />
         ) : stages.stages.length === 0 ? (
-          <p className="m-0 text-field font-semibold">{t('stages.emptyAsk')}</p>
+          <p className="m-0 text-field font-medium">{t('stages.emptyAsk')}</p>
         ) : (
           <>
-            {paused ? <p className="m-0 flex items-center gap-2 text-field font-semibold"><StatusIcon kind="paused" />{t('report.paused')}</p> : null}
-            <p className="m-0 line-clamp-2 text-field font-semibold [overflow-wrap:anywhere]" data-today-stage>{t('report.stage', { stage: defaultStage?.name ?? '' })}</p>
+            {paused ? <p className="m-0 flex items-center gap-2 text-field font-medium"><StatusIcon kind="paused" />{t('report.paused')}</p> : null}
+            <p className="m-0 line-clamp-2 text-field font-medium [overflow-wrap:anywhere]" data-today-stage>{t('report.stage', { stage: defaultStage?.name ?? '' })}</p>
             <Button variant={bannerHasMain ? 'secondary' : 'primary'} size="main" block onClick={() => openCamera()}>
               {t('today.report')}
             </Button>
@@ -323,7 +323,7 @@ export function Today() {
               <Button variant="secondary" onClick={() => openCamera(true)}>{t('today.fromGallery')}</Button>
               <Button variant="secondary" onClick={() => setPicker(true)}>{t('today.otherStage')}</Button>
             </div>
-            {notice ? <p role="alert" className="m-0 text-field font-semibold">{notice}</p> : null}
+            {notice ? <p role="alert" className="m-0 text-field font-medium">{notice}</p> : null}
           </>
         )}
         <input ref={camera} type="file" accept="image/*" capture="environment" hidden onChange={(e) => void onFile(e)} />
@@ -332,19 +332,19 @@ export function Today() {
 
       {!stages.loading && !stages.error && stages.stages.length ? (
         <section className="flex flex-col gap-2">
-          <p className="m-0 text-h3 font-bold">{t('today.objectPercent', { percent: overall })}</p>
+          <p className="m-0 text-h3 font-semibold">{t('today.objectPercent', { percent: overall })}</p>
           <ProgressBar value={overall} thickness="thick" label={t('today.objectPercent', { percent: overall })} />
         </section>
       ) : null}
 
       <section className="flex flex-col gap-3">
-        <h2 className="m-0 text-h2 font-bold">{t('today.myTasks')}</h2>
+        <h2 className="m-0 text-h2 font-semibold">{t('today.myTasks')}</h2>
         {loading ? (
           <Spinner label={t('tasks.loading')} />
         ) : error ? (
           <ErrorMessage message={error} onRetry={reload} />
         ) : active.length === 0 ? (
-          <p className="m-0 rounded-card border-2 border-line bg-surface p-4 text-field font-medium">
+          <p className="m-0 rounded-card border-2 border-line bg-surface p-4 text-field">
             {doneCount > 0 ? t('today.allDone') : t('today.noTasks')}
           </p>
         ) : (
@@ -363,13 +363,13 @@ export function Today() {
           </ul>
         )}
         {!loading && !error && doneCount > 0 ? (
-          <p className="m-0 text-body font-semibold">{t('today.doneCount', { count: doneCount })}</p>
+          <p className="m-0 text-body font-medium">{t('today.doneCount', { count: doneCount })}</p>
         ) : null}
       </section>
 
       {lastReport ? (
         <section className="flex flex-col items-start gap-2">
-          <p className="m-0 text-field font-semibold">
+          <p className="m-0 text-field font-medium">
             {t('today.lastReport', {
               stage: stages.stages.find((s) => s.id === lastReport.project_stage_id)?.name ?? '',
               date: formatDate(lastReport.created_at),
@@ -379,7 +379,7 @@ export function Today() {
         </section>
       ) : null}
 
-      {foreign ? <p className="m-0 text-field font-semibold">{t('send.others', { count: foreign })}</p> : null}
+      {foreign ? <p className="m-0 text-field font-medium">{t('send.others', { count: foreign })}</p> : null}
 
       <Sheet open={picker} onClose={() => setPicker(false)} title={t('stagePicker.title')} history name="stage-picker">
         <StagePicker

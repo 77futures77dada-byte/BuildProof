@@ -257,7 +257,7 @@ function ReviewQueue({ myId }: { myId: string | null }) {
       <main className="mx-auto flex max-w-[720px] flex-col gap-4 px-4 py-4">
         <UndoBar count={shownCount} label={t('review.undoN', { count: shownCount })} onUndo={undoAll} />
         <NetBar />
-        <h1 className="m-0 text-h1 font-bold">{t('review.title')}</h1>
+        <h1 className="m-0 text-h1 font-semibold">{t('review.title')}</h1>
 
         {projects.length > 1 ? (
           <FilterChips
@@ -274,7 +274,7 @@ function ReviewQueue({ myId }: { myId: string | null }) {
           <ErrorMessage message={error} onRetry={() => setNonce((n) => n + 1)} />
         ) : visible.length === 0 ? (
           <div className="flex flex-col items-start gap-3 rounded-card border-2 border-dashed border-line p-5">
-            <p className="m-0 text-field font-semibold">{t('review.empty')}</p>
+            <p className="m-0 text-field font-medium">{t('review.empty')}</p>
             <Link to="/dashboard" className={buttonClass({ variant: 'secondary' })}>{t('notFound.toProjects')}</Link>
           </div>
         ) : (
@@ -313,25 +313,25 @@ function ReviewQueue({ myId }: { myId: string | null }) {
                           ) : null}
                         </button>
                         <div className="flex min-w-0 flex-col gap-1">
-                          <p className="m-0 text-field font-semibold [overflow-wrap:anywhere]">
+                          <p className="m-0 text-field font-medium [overflow-wrap:anywhere]">
                             {[item.reporterName ?? t('common.noName'), stageLabel(item.stageName)].join(' · ')}
                           </p>
-                          <p className="m-0 text-field font-semibold num-col">{t('review.wasClaimed', { from: item.from, to: item.to })}</p>
-                          <p className="m-0 text-body font-semibold num-col">{t('review.waiting', { count: waitedHours(item.createdAt, now) })}</p>
+                          <p className="m-0 text-field font-medium num-col">{t('review.wasClaimed', { from: item.from, to: item.to })}</p>
+                          <p className="m-0 text-body font-medium num-col">{t('review.waiting', { count: waitedHours(item.createdAt, now) })}</p>
                         </div>
                       </div>
-                      {broken.has(item.id) ? <p className="m-0 text-body font-semibold">{t('photos.imageFailed')}</p> : null}
-                      {!ready && !own ? <p aria-live="polite" className="m-0 text-body font-semibold">{t('review.photoLoading')}</p> : null}
+                      {broken.has(item.id) ? <p className="m-0 text-body font-medium">{t('photos.imageFailed')}</p> : null}
+                      {!ready && !own ? <p aria-live="polite" className="m-0 text-body font-medium">{t('review.photoLoading')}</p> : null}
                       {closedEarly.has(item.id) && state.kind === 'ready' ? (
-                        <p className="m-0 text-body font-semibold">{t('review.closedEarly')}</p>
+                        <p className="m-0 text-body font-medium">{t('review.closedEarly')}</p>
                       ) : null}
                       {own ? (
-                        <p className="m-0 text-body font-semibold">{t('review.ownJump')}</p>
+                        <p className="m-0 text-body font-medium">{t('review.ownJump')}</p>
                       ) : state.kind === 'confirmed' || state.kind === 'sending' || state.kind === 'collapsing' ? (
                         <StatusChip kind="verified" className="self-start">{t('review.confirmedRow')}</StatusChip>
                       ) : (
                         <>
-                          {state.kind === 'failed' ? <p role="alert" className="m-0 text-body font-semibold">{t('common.unexpectedError')}</p> : null}
+                          {state.kind === 'failed' ? <p role="alert" className="m-0 text-body font-medium">{t('common.unexpectedError')}</p> : null}
                           <div className="flex justify-between gap-4">
                             <Button
                               variant={item.id === topId ? 'primary' : 'secondary'}
@@ -425,7 +425,7 @@ function ReturnSheet({ item, onClose, onSent, token }: {
             aria-checked={reason === r}
             onClick={() => setReason(r)}
             className={cx(
-              'inline-flex min-h-12 items-center rounded-control border-2 px-4 text-left text-field font-semibold',
+              'inline-flex min-h-12 items-center rounded-control border-2 px-4 text-left text-field font-medium',
               'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus',
               reason === r ? 'border-fg bg-fg text-page' : 'border-line bg-page text-fg',
             )}
@@ -433,7 +433,7 @@ function ReturnSheet({ item, onClose, onSent, token }: {
             {t(`review.returnReason.${r}`)}
           </button>
         ))}
-        {failed ? <p role="alert" className="m-0 text-body font-semibold">{t('common.unexpectedError')}</p> : null}
+        {failed ? <p role="alert" className="m-0 text-body font-medium">{t('common.unexpectedError')}</p> : null}
       </div>
     </Sheet>
   )

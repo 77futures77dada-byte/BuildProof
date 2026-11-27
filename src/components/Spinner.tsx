@@ -17,7 +17,7 @@ export function Spinner({ label, className = '' }: SpinnerProps) {
         aria-hidden="true"
         className="size-5 animate-spin rounded-full border-[3px] border-line border-t-fg motion-reduce:animate-none"
       />
-      {label ? <span className="text-body font-medium">{label}</span> : null}
+      {label ? <span className="text-body">{label}</span> : null}
       <span className="sr-only">{label ?? t('common.loading')}</span>
     </span>
   )

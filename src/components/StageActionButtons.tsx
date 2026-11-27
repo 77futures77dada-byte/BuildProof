@@ -40,7 +40,7 @@ export function StageActionButtons({ stageName, capabilities, onAction }: StageA
         onClick={() => setOpen(true)}
         aria-label={`${t('common.actions')}: ${stageName}`}
         aria-haspopup="dialog"
-        className="inline-flex size-12 shrink-0 items-center justify-center rounded-control border-2 border-fg bg-page text-h3 font-bold text-fg hover:bg-surface focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        className="inline-flex size-12 shrink-0 items-center justify-center rounded-control border-2 border-fg bg-page text-h3 font-semibold text-fg hover:bg-surface focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >
         <span aria-hidden="true">…</span>
       </button>

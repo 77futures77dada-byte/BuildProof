@@ -17,7 +17,7 @@ const BASE_STAGES = [
   { key: 'finish', name: 'Отделка', sortOrder: 7 },
 ]
 type TrackedContext = WebGLRenderingContext | WebGL2RenderingContext
-const button = 'min-h-12 rounded-control px-3 py-2 text-body font-semibold'
+const button = 'min-h-12 rounded-control px-3 py-2 text-body font-medium'
 
 export default function House3DDevPage() {
   const [percents, setPercents] = useState<number[]>([100, 60, 30, 50, 25, 50, 0])
@@ -55,7 +55,7 @@ export default function House3DDevPage() {
     setRunning(false)
   }
   return <main className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
-    <header><p className="text-body font-semibold uppercase tracking-wider text-fg">{d.badge}</p><h1 className="mt-2 text-h1 font-bold text-fg">{d.title}</h1><p className="mt-1 text-body text-fg">{d.note}</p></header>
+    <header><p className="text-body font-medium uppercase tracking-wider text-fg">{d.badge}</p><h1 className="mt-2 text-h1 font-semibold text-fg">{d.title}</h1><p className="mt-1 text-body text-fg">{d.note}</p></header>
     <section className="flex flex-wrap gap-2" aria-label={d.presets}>
       <button data-testid="preset-zero" className={`${button} bg-fg text-page`} onClick={() => setPercents(BASE_STAGES.map(() => 0))}>{d.zero}</button>
       <button data-testid="preset-mixed" className={`${button} bg-fg text-page`} onClick={() => setPercents([100, 60, 30, 50, 25, 50, 0])}>{d.mixed}</button>
@@ -70,9 +70,9 @@ export default function House3DDevPage() {
       {STAGE_PARTS.map((part, index) => <button key={part} data-testid={`select-${part}`} aria-pressed={selected === part} className={`${button} border border-fg aria-pressed:bg-fg aria-pressed:text-page`} style={{ borderLeft: `4px solid ${STAGE_COLORS[part]}` }}
         onClick={() => dispatch({ type: 'toggle', part })}>{BASE_STAGES[index].name}</button>)}
     </section>
-    <section className="space-y-3"><div className="flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">{d.preview}</h2><button data-testid="cycles" disabled={running} onClick={runCycles} className={`${button} border border-fg font-semibold text-fg disabled:opacity-50`}>{running ? d.cyclesRunning : d.cycles}</button></div>
+    <section className="space-y-3"><div className="flex flex-wrap items-center justify-between gap-2"><h2 className="font-medium">{d.preview}</h2><button data-testid="cycles" disabled={running} onClick={runCycles} className={`${button} border border-fg font-medium text-fg disabled:opacity-50`}>{running ? d.cyclesRunning : d.cycles}</button></div>
       <div className="mx-auto max-w-4xl">{mounted ? <HouseModel key="model" stages={stages} reducedMotion={reduced || undefined} selection={selection} onRendererDispose={snapshot} /> : <p className="rounded-xl bg-surface p-6 text-center text-body text-fg">{d.unmounted}</p>}</div>
     </section>
-    <details className="rounded-lg border border-line p-3"><summary className="cursor-pointer text-body font-semibold">{d.log}</summary><p className="mt-2 text-body text-fg">{d.contexts(contextMetrics.created, contextMetrics.live)}</p><ol className="mt-2 max-h-72 space-y-1 overflow-auto rounded-lg bg-inverse p-3 font-mono text-body text-on-inverse">{log.map((entry, index) => <li key={index}>{index + 1}. {entry}</li>)}</ol></details>
+    <details className="rounded-lg border border-line p-3"><summary className="cursor-pointer text-body font-medium">{d.log}</summary><p className="mt-2 text-body text-fg">{d.contexts(contextMetrics.created, contextMetrics.live)}</p><ol className="mt-2 max-h-72 space-y-1 overflow-auto rounded-lg bg-inverse p-3 font-mono text-body text-on-inverse">{log.map((entry, index) => <li key={index}>{index + 1}. {entry}</li>)}</ol></details>
   </main>
 }

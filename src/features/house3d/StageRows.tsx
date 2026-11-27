@@ -12,7 +12,7 @@ export function StageRows({ stages, selected = null, onSelect }: { stages: Mappe
       const body = <>
         <span className="flex items-baseline justify-between gap-3">
           <span className="truncate text-body text-on-inverse">{stage.name}</span>
-          <span className="text-body font-semibold tabular-nums text-on-inverse">{percent}%</span>
+          <span className="text-body font-medium tabular-nums text-on-inverse">{percent}%</span>
         </span>
         <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-inverse-line">
           <span className="block h-full rounded-full" style={{ width: `${percent}%`, background: color }} />

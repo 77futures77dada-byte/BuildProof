@@ -208,7 +208,7 @@ export function SiteLoop({ lang = 'en', className = '' }: SiteLoopProps) {
           type="button"
           onClick={() => setPausedByViewer(!paused)}
           aria-pressed={paused}
-          className="min-h-12 shrink-0 rounded-lg border-2 border-current px-4 font-medium"
+          className="min-h-12 shrink-0 rounded-lg border-2 border-current px-4"
         >
           {paused ? text.play : text.pause}
         </button>

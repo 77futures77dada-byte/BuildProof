@@ -33,7 +33,7 @@ export function PasswordField({ label, hint, error, value, onValue, ...rest }: B
             onClick={() => setShown((s) => !s)}
             aria-pressed={shown}
             aria-controls={control.id}
-            className="absolute top-1 right-1 inline-flex min-h-12 items-center rounded-control px-3 text-body font-semibold text-fg underline underline-offset-4 hover:bg-surface focus-visible:outline-3 focus-visible:outline-focus"
+            className="absolute top-1 right-1 inline-flex min-h-12 items-center rounded-control px-3 text-body font-medium text-fg underline underline-offset-4 hover:bg-surface focus-visible:outline-3 focus-visible:outline-focus"
           >
             {shown ? t('auth.hidePassword') : t('auth.showPassword')}
           </button>

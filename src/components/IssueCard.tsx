@@ -43,7 +43,7 @@ export function IssueCard({ issue, canManage, onUpdateStatus }: IssueCardProps) 
   return (
     <li className={cx('flex list-none flex-col gap-3 rounded-card border-2 border-l-4 border-line bg-page p-4', issueBorder(issue.priority))}>
       <div className="flex items-start justify-between gap-3">
-        <p className="m-0 min-w-0 text-field font-semibold text-fg [overflow-wrap:anywhere]">{issue.title}</p>
+        <p className="m-0 min-w-0 text-field font-medium text-fg [overflow-wrap:anywhere]">{issue.title}</p>
         <UrgentBadge priority={issue.priority} />
       </div>
 
@@ -58,14 +58,14 @@ export function IssueCard({ issue, canManage, onUpdateStatus }: IssueCardProps) 
         </button>
       ) : null}
 
-      {issue.description ? <p className="m-0 whitespace-pre-line text-body font-medium text-fg">{issue.description}</p> : null}
+      {issue.description ? <p className="m-0 whitespace-pre-line text-body text-fg">{issue.description}</p> : null}
 
-      <p className="m-0 text-body font-medium text-fg">
+      <p className="m-0 text-body text-fg">
         {t('issues.responsibleDue', { who: issue.responsibleParty ?? t('common.notSet'), date: formatDate(issue.dueDate) })}
       </p>
 
       <div className="flex flex-wrap items-center gap-3">
-        <span className="inline-flex min-h-8 items-center rounded-chip bg-surface px-3 text-body font-semibold text-fg">
+        <span className="inline-flex min-h-8 items-center rounded-chip bg-surface px-3 text-body font-medium text-fg">
           {t(`issueStatus.${issue.status}`)}
         </span>
         {canManage && next ? (

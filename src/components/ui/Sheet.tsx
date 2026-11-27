@@ -124,12 +124,12 @@ export function Sheet({ open, onClose, title, children, footer, busy, closeLabel
         )}
       >
         <header className="flex items-center justify-between gap-3 border-b-2 border-line py-1 pr-3 pl-4">
-          <h2 id={titleId} className="m-0 min-w-0 text-h3 font-bold">{title}</h2>
+          <h2 id={titleId} className="m-0 min-w-0 text-h3 font-semibold">{title}</h2>
           <button
             type="button"
             onClick={onClose}
             disabled={locked}
-            className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-control px-3 text-field font-semibold text-fg underline-offset-4 hover:underline focus-visible:outline-3 focus-visible:outline-focus disabled:opacity-60"
+            className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-control px-3 text-field font-medium text-fg underline-offset-4 hover:underline focus-visible:outline-3 focus-visible:outline-focus disabled:opacity-60"
           >
             {closeLabel ?? t('common.close')}
           </button>

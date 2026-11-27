@@ -42,10 +42,10 @@ export function Stages() {
   return (
     <section className="flex flex-col gap-4">
       <NetBar />
-      <h2 className="m-0 text-h2 font-bold text-fg">{t('stages.title')}</h2>
+      <h2 className="m-0 text-h2 font-semibold text-fg">{t('stages.title')}</h2>
 
       {stages.length === 0 ? (
-        <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body font-medium text-fg">
+        <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body text-fg">
           {role === 'gc' ? t('stages.emptyOwner') : t('stages.emptyAsk')}
         </p>
       ) : (
@@ -93,17 +93,17 @@ function StageHistory({ stageId, refreshToken }: { stageId: string; refreshToken
     <Disclosure label={t('stages.history')} onToggle={setOpen}>
       {open ? (
         loading ? (
-          <p className="m-0 text-body font-medium text-fg">{t('stages.historyLoading')}</p>
+          <p className="m-0 text-body text-fg">{t('stages.historyLoading')}</p>
         ) : error ? (
-          <p role="alert" className="m-0 flex items-center gap-2 text-body font-semibold text-fg"><StatusIcon kind="error" />{t('common.unexpectedError')}</p>
+          <p role="alert" className="m-0 flex items-center gap-2 text-body font-medium text-fg"><StatusIcon kind="error" />{t('common.unexpectedError')}</p>
         ) : entries.length === 0 ? (
-          <p className="m-0 text-body font-medium text-fg">{t('stages.historyEmpty')}</p>
+          <p className="m-0 text-body text-fg">{t('stages.historyEmpty')}</p>
         ) : (
           <ul className="m-0 flex flex-col gap-2 p-0">
             {entries.map((e) => (
               <li key={e.id} className="flex list-none flex-col rounded-control bg-surface px-3 py-2">
-                <span className="text-body font-semibold text-fg num-col">{t('stages.historyEntry', { from: e.oldPercent, to: e.newPercent })}</span>
-                <span className="text-body font-medium text-fg">
+                <span className="text-body font-medium text-fg num-col">{t('stages.historyEntry', { from: e.oldPercent, to: e.newPercent })}</span>
+                <span className="text-body text-fg">
                   <span className="num-col">{formatDateTimeSmart(e.changedAt)}</span>
                   {' · '}{e.changedByName ?? t('stages.unknownUser')}
                 </span>
