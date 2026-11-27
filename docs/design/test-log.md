@@ -277,6 +277,50 @@ OVERFLOW not-found signed in /no-such-page @390: scrollWidth 477 > 390; div.flex
 | check-ru-latin | PASS | offending=0 strings=824 (json=545, landing=279) (0s) |
 | check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (171s) |
 
+## 2026-11-27T13:58:55Z — C K15 and company email
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.39s, VITE_SUPABASE_URL=fixture (17s) |
+| test | PASS | 13 passed (13); 80 passed (80) (13s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=169 allowlisted=5 temporary=0 (1s) |
+| check-ru-latin | PASS | offending=0 strings=819 (json=540, landing=279) (0s) |
+| check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 send_checks=8 send_failures=0 landing_small_targets=8 landing_small_text=95 (a11y = warnings; --strict-a11y to fail) (151s) |
+
+## 2026-11-27T14:03:56Z — C final before commit
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.89s, VITE_SUPABASE_URL=fixture (26s) |
+| test | PASS | 13 passed (13); 80 passed (80) (14s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=169 allowlisted=5 temporary=0 (1s) |
+| check-ru-latin | PASS | offending=0 strings=819 (json=540, landing=279) (1s) |
+| check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 send_checks=8 send_failures=0 landing_small_targets=8 landing_small_text=95 (a11y = warnings; --strict-a11y to fail) (151s) |
+
+## 2026-11-27T14:14:37Z — C public-domain gate final
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.19s, VITE_SUPABASE_URL=fixture (16s) |
+| test | PASS | 13 passed (13); 80 passed (80) (10s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=169 allowlisted=5 temporary=0 (1s) |
+| check-ru-latin | PASS | offending=0 strings=819 (json=540, landing=279) (0s) |
+| check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 send_checks=8 send_failures=0 landing_small_targets=8 landing_small_text=95 (a11y = warnings; --strict-a11y to fail) (140s) |
+
+## 2026-11-27T14:41:50Z — C 006 backfill and sequential confirmation
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (4s) |
+| build | PASS | built in 2.37s, VITE_SUPABASE_URL=fixture (24s) |
+| test | PASS | 13 passed (13); 80 passed (80) (17s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 base=0 files=0 scanned=169 allowlisted=5 temporary=0 (1s) |
+| check-ru-latin | PASS | offending=0 strings=819 (json=540, landing=279) (0s) |
+| check-overflow | PASS | routes=32 loads=256 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 send_checks=8 send_failures=0 landing_small_targets=8 landing_small_text=95 (a11y = warnings; --strict-a11y to fail) (183s) |
+
 ## 2026-11-27T14:40:06Z — overview-b: панель 33% · 3D · этапы
 
 | check | result | key numbers |
