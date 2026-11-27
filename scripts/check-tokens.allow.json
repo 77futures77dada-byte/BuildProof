@@ -35,57 +35,7 @@
     "reason": "<meta name=\"theme-color\"> cannot read CSS variables; values mirror --bg (light #FFFFFF / dark #121417) of src/styles/tokens.css — change both together."
   },
   {
-    "file": "src/pages/Login.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "вход и системные экраны",
-    "reason": "migrated in step «вход и системные экраны» (05-ui.md §«Миграция»)"
-  },
-  {
-    "file": "src/pages/NotFound.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "вход и системные экраны",
-    "reason": "migrated in step «вход и системные экраны» (05-ui.md §«Миграция»)"
-  },
-  {
-    "file": "src/pages/ProfileNotConfigured.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "вход и системные экраны",
-    "reason": "migrated in step «вход и системные экраны» (05-ui.md §«Миграция»)"
-  },
-  {
-    "file": "src/components/LanguageSwitcher.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "вход и системные экраны",
-    "reason": "migrated in step «вход и системные экраны» (05-ui.md §«Миграция»)"
-  },
-  {
     "file": "src/pages/Dashboard.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "объекты и тариф",
-    "reason": "migrated in step «объекты и тариф» (05-ui.md §«Миграция»)"
-  },
-  {
-    "file": "src/pages/Tariff.tsx",
     "kinds": [
       "palette",
       "small",

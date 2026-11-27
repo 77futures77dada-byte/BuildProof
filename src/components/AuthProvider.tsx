@@ -13,6 +13,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [profileLoadedFor, setProfileLoadedFor] = useState<string | null>(null)
 
   // Tracks the latest user we started fetching a profile for, so out-of-order
   // responses (fast sign-out after sign-in) don't clobber newer state.
@@ -29,6 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (activeUserId.current !== userId) return
 
+    setProfileLoadedFor(userId)
     if (profileError) {
       setError(toErrorMessage(profileError))
       setProfile(null)
@@ -100,6 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user: session?.user ?? null,
     profile,
     loading,
+    profileLoadedFor,
     error,
     signOut,
     refreshProfile,

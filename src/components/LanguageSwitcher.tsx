@@ -27,7 +27,7 @@ export function LanguageSwitcher({ className = '' }: { className?: string }) {
     <div
       role="group"
       aria-label={t('language.label')}
-      className={`inline-flex shrink-0 rounded-lg border border-slate-200 bg-white p-0.5 ${className}`}
+      className={`inline-flex shrink-0 gap-2 rounded-control border-2 border-line bg-page p-0.5 ${className}`}
     >
       {LOCALES.map((locale) => (
         <button
@@ -37,10 +37,10 @@ export function LanguageSwitcher({ className = '' }: { className?: string }) {
           onClick={() => pick(locale)}
           aria-pressed={locale === active}
           title={t(`language.${locale}`)}
-          className={`min-h-8 min-w-9 rounded-md px-1.5 text-xs font-semibold uppercase transition-colors ${
+          className={`min-h-12 min-w-12 rounded-chip px-2 text-body font-semibold uppercase transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus ${
             locale === active
-              ? 'bg-sky-600 text-white'
-              : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'
+              ? 'bg-fg text-page'
+              : 'text-fg hover:bg-surface'
           }`}
         >
           {locale}
