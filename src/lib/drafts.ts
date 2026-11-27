@@ -89,6 +89,11 @@ export function isDecrease(d: Pick<Draft, 'seenPercent' | 'newPercent'>): boolea
   return d.newPercent < d.seenPercent
 }
 
+/** Draft made on a worker-link page (owner id `link:…`, src/lib/linkSession.ts), not by a signed-in person. */
+export function isLinkDraft(d: Pick<Draft, 'userId'>): boolean {
+  return d.userId.startsWith('link:')
+}
+
 /** Drafts that still need to leave this phone (not editing, not sent). */
 export function isUnsent(d: Draft): boolean {
   return d.state === 'queued' || d.state === 'unknown' || d.state === 'stale'

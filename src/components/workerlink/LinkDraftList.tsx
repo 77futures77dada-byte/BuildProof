@@ -40,7 +40,7 @@ export function LinkDraftList({ drafts, inFlight, stopped, onRetry, sendNow }: L
       <h2 id="link-drafts-title" className="m-0 flex items-center gap-2 text-h3 font-medium">
         <StatusIcon kind="queued" />{t('workerLink.queueTitle', { count: unsent.length })}
       </h2>
-      <p className="m-0 text-body">{stopped ? t('send.retryStopped') : t('workerLink.queuedHint')}</p>
+      <p className="m-0 text-body">{stopped ? t('workerLink.stopped') : t('workerLink.queuedHint')}</p>
       <ul className="m-0 flex list-none flex-col gap-3 p-0">
         {unsent.map((d) => {
           const sending = inFlight.includes(d.draftId)

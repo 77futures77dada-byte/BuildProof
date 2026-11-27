@@ -11,7 +11,7 @@ import { useProject } from '../hooks/useProject'
 import { supabase } from '../lib/supabaseClient'
 import { resizeImageToJpeg } from '../lib/image'
 import { formatDate, formatDateTimeSmart } from '../lib/format'
-import { draftStoragePath, effectiveSeenPercent, isUnsent, needsWorker, newDraftId, overLimit, shotTarget, DRAFT_LIMIT } from '../lib/drafts'
+import { draftStoragePath, effectiveSeenPercent, isLinkDraft, isUnsent, needsWorker, newDraftId, overLimit, shotTarget, DRAFT_LIMIT } from '../lib/drafts'
 import type { Draft, SendOutcome, ShotIntent } from '../lib/drafts'
 import { Spinner } from '../components/Spinner'
 import { ErrorMessage } from '../components/ErrorMessage'
@@ -136,7 +136,8 @@ export function Today() {
   const waiting = unsent.filter(needsWorker)
   const retryable = unsent.filter((d) => !needsWorker(d))
   const editing = mine.filter((d) => d.state === 'editing').sort((a, b) => b.createdAt - a.createdAt)[0]
-  const foreign = drafts.filter((d) => d.userId !== userId && isUnsent(d)).length
+  // link-page drafts are sent from /w, not by another account: not «чужие»
+  const foreign = drafts.filter((d) => d.userId !== userId && !isLinkDraft(d) && isUnsent(d)).length
   const authStuck = unsent.filter((d) => d.lastError === 'auth').length
   const sheetDraft = drafts.find((d) => d.draftId === sheetDraftId) ?? null
   const paused = project?.status === 'paused'

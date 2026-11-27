@@ -219,6 +219,12 @@ describe('second transport: one-shot submitDraft (worker link)', () => {
     expect(needsWorker(store.rows.get('wl2')!)).toBe(false)
   })
 
+  it('link-page drafts are told apart from other accounts', async () => {
+    const { isLinkDraft } = await import('./drafts')
+    expect(isLinkDraft(draft({ userId: 'link:abc' }))).toBe(true)
+    expect(isLinkDraft(draft({ userId: 'u2' }))).toBe(false)
+  })
+
   it('a rejected photo waits for the worker', () => {
     expect(needsWorker(draft({ lastError: 'photo_invalid' }))).toBe(true)
   })

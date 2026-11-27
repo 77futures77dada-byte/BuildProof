@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { hashWithoutToken, resolveLinkSession, tokenFromHash } from './linkSession'
+import { forgetLinkToken, hashWithoutToken, LINK_OWNER_PREFIX, resolveLinkSession, tokenFromHash } from './linkSession'
 
 const TOKEN = 'A'.repeat(43)
 const OTHER = 'b_-'.repeat(15)
@@ -31,12 +31,21 @@ describe('resolveLinkSession', () => {
     expect(resolveLinkSession('worker', '', s)).toEqual(first)
     expect(resolveLinkSession('worker', `#t=${TOKEN}`, s)).toEqual(first)
   })
-  it('a different link replaces the stored one with a new local id', () => {
+  it('a different link replaces the token but keeps the local id (drafts are not orphaned)', () => {
     const s = mem()
     const a = resolveLinkSession('worker', `#t=${TOKEN}`, s)!
+    expect(a.localId.startsWith(LINK_OWNER_PREFIX)).toBe(true)
     const b = resolveLinkSession('worker', `#t=${OTHER}`, s)!
     expect(b.token).toBe(OTHER)
-    expect(b.localId).not.toBe(a.localId)
+    expect(b.localId).toBe(a.localId)
+  })
+  it('forget drops the token only; the next link reuses the local id', () => {
+    const s = mem()
+    const a = resolveLinkSession('worker', `#t=${TOKEN}`, s)!
+    forgetLinkToken('worker', s)
+    expect(resolveLinkSession('worker', '', s)).toBeNull()
+    expect(s.m.get('bp-link-worker')).not.toContain(TOKEN)
+    expect(resolveLinkSession('worker', `#t=${OTHER}`, s)?.localId).toBe(a.localId)
   })
   it('worker and client links are kept apart; nothing stored → null', () => {
     const s = mem()

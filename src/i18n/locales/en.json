@@ -725,8 +725,7 @@
     "offline": "A connection is needed to create or revoke links and change what the client sees."
   },
   "workerLink": {
-    "title": "Site report",
-    "worker": "You: {{name}}",
+    "title": "Reports by link",
     "stagesTitle": "Stages",
     "noStages": "This site has no stages yet.",
     "noStagesWho": "The site owner adds stages.",
@@ -763,7 +762,10 @@
     "photoAlt": "Report photo: {{stage}}",
     "thumbFailed": "The photo did not load",
     "prevPhoto": "Previous photo",
-    "nextPhoto": "Next photo"
+    "nextPhoto": "Next photo",
+    "preparingN": "Preparing photo {{n}} of {{total}}…",
+    "compressFailed": "Could not open the photo. Take it again with the camera.",
+    "stopped": "We have stopped trying on our own. Tap “Send again” or open this page when you have a connection."
   },
   "linkPage": {
     "noLink": {
@@ -789,9 +791,12 @@
     "empty": "The owner has not opened any stages yet",
     "emptyWho": "The site owner decides which stages to show.",
     "confirmed": "Confirmed: {{percent}}%",
-    "updated": "updated {{date}}",
     "photoAlt": "Stage photo: {{stage}}",
-    "photoFailed": "The photo did not load"
+    "photoFailed": "The photo did not load",
+    "confirmedOn": "Confirmed · {{date}}",
+    "confirmedPlain": "Confirmed",
+    "photoUnavailable": "Some photos are temporarily unavailable. Refresh the page.",
+    "askContractor": "Ask your contractor about the progress of the work."
   },
   "client": {
     "disclaimer": {

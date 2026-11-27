@@ -51,6 +51,7 @@ export function LinkReportSheet({ open, stages, projectId, owner, drafts, initia
   const [view, setView] = useState<'main' | 'picker'>('main')
   const [phase, setPhase] = useState<'idle' | 'preparing' | 'sending'>('idle')
   const [error, setError] = useState<string | null>(null)
+  const [progress, setProgress] = useState<{ n: number; total: number } | null>(null)
   const [draftId, setDraftId] = useState(newDraftId)
   const busy = useRef(false)
   const camera = useRef<HTMLInputElement>(null)
@@ -99,12 +100,13 @@ export function LinkReportSheet({ open, stages, projectId, owner, drafts, initia
     busy.current = true
     setError(null)
     setPhase('preparing')
+    setProgress(null)
     try {
       let photos: Blob[]
       try {
-        photos = await compressPhotos(files)
+        photos = await compressPhotos(files, undefined, (n, total) => setProgress({ n, total }))
       } catch (err) {
-        setError(t(err instanceof PhotosTooLargeError ? 'workerLink.tooLarge' : 'image.compressFailed'))
+        setError(t(err instanceof PhotosTooLargeError ? 'workerLink.tooLarge' : 'workerLink.compressFailed'))
         return
       }
       const now = Date.now()
@@ -156,7 +158,7 @@ export function LinkReportSheet({ open, stages, projectId, owner, drafts, initia
     </div>
   )
 
-  const mainLabel = phase === 'preparing' ? t('workerLink.preparing')
+  const mainLabel = phase === 'preparing' ? (progress ? t('workerLink.preparingN', progress) : t('workerLink.preparing'))
     : phase === 'sending' ? t('workerLink.state.sending')
     : !stage ? t('workerLink.pickStage')
     : files.length === 0 ? t('workerLink.photoNeeded')
@@ -203,18 +205,19 @@ export function LinkReportSheet({ open, stages, projectId, owner, drafts, initia
           <div className="flex flex-col gap-2">
             <p className="m-0 text-field font-medium text-fg">{t('workerLink.photosCount', { count: files.length, max: MAX_PHOTOS })}</p>
             {files.length ? (
-              <ul className="m-0 flex list-none flex-wrap gap-2 p-0" data-link-photos>
+              <ul className="m-0 flex list-none flex-wrap gap-3 p-0" data-link-photos>
                 {urls.map((u, i) => (
-                  <li key={`${i}-${u}`} className="relative">
+                  // «×» sits under its own thumbnail (48 px, never over a neighbour; critic r1 2.2)
+                  <li key={`${i}-${u}`} className="flex w-[72px] flex-col items-center gap-1">
                     <img src={u} alt={t('workerLink.photoAlt', { stage: stage?.name ?? '' })} className="size-[72px] rounded-control border border-line object-cover" />
                     <button
                       type="button"
                       disabled={sending}
                       onClick={() => setFiles(files.filter((_, j) => j !== i))}
                       aria-label={t('workerLink.removePhoto', { n: i + 1 })}
-                      className="absolute -top-2 -right-2 inline-flex size-12 items-center justify-center rounded-full focus-visible:outline-3 focus-visible:outline-focus pointer-fine:size-9"
+                      className="inline-flex size-12 items-center justify-center rounded-control border border-line-strong bg-page text-h3 font-medium text-fg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:opacity-60 pointer-fine:size-10"
                     >
-                      <span aria-hidden="true" className="inline-flex size-7 items-center justify-center rounded-full border border-line-strong bg-page text-body font-medium text-fg">×</span>
+                      <span aria-hidden="true">×</span>
                     </button>
                   </li>
                 ))}

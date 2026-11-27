@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { formatDate } from '../../lib/format'
 import type { ClientViewData } from '../../lib/linkTransport'
 import { EmptyState, PhotoViewer, ProgressBar } from '../ui'
-
-const DISCLAIMER_FALLBACK = 'client.disclaimer.percentNotPayment'
+import { disclaimerKeyFor } from './disclaimer'
 
 interface ClientProjectViewProps {
   /** Response of GET /api/client-view (client link) or POST /api/client-view (owner preview). */
@@ -21,7 +20,7 @@ interface ClientProjectViewProps {
 export function ClientProjectView({ data, showTitle = false }: ClientProjectViewProps) {
   const { t, i18n } = useTranslation()
   const [open, setOpen] = useState<{ stage: number; photo: number } | null>(null)
-  const disclaimerKey = data.disclaimer && i18n.exists(data.disclaimer) ? data.disclaimer : DISCLAIMER_FALLBACK
+  const disclaimerKey = disclaimerKeyFor(data.disclaimer, (k) => i18n.exists(k))
   const stage = open ? data.stages[open.stage] : null
   const photo = stage && open ? stage.photos[open.photo] : null
 
@@ -37,6 +36,7 @@ export function ClientProjectView({ data, showTitle = false }: ClientProjectView
           {data.stages.map((s, si) => {
             const pct = Math.round(s.confirmed_percent)
             const shown = s.photos.filter((p) => p.url)
+            const missing = s.photos.length - shown.length
             return (
               <li key={s.stage_id} className="flex flex-col gap-2 border-b border-line py-3 last:border-b-0">
                 <div className="flex items-baseline justify-between gap-3">
@@ -44,9 +44,9 @@ export function ClientProjectView({ data, showTitle = false }: ClientProjectView
                   <span className="num-col shrink-0 text-field font-medium">{pct}%</span>
                 </div>
                 <ProgressBar value={pct} label={t('clientView.confirmed', { percent: pct })} />
+                {/* the figure is shown once (right); this line says what it is and when (critic r1 3.1) */}
                 <p className="m-0 text-body">
-                  {t('clientView.confirmed', { percent: pct })}
-                  {s.updated_at ? ` · ${t('clientView.updated', { date: formatDate(s.updated_at) })}` : null}
+                  {s.updated_at ? t('clientView.confirmedOn', { date: formatDate(s.updated_at) }) : t('clientView.confirmedPlain')}
                 </p>
                 {shown.length ? (
                   <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
@@ -63,6 +63,7 @@ export function ClientProjectView({ data, showTitle = false }: ClientProjectView
                     ) : null))}
                   </ul>
                 ) : null}
+                {missing > 0 ? <p className="m-0 text-body">{t('clientView.photoUnavailable')}</p> : null}
               </li>
             )
           })}

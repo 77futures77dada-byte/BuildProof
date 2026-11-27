@@ -35,20 +35,27 @@ export function hashWithoutToken(hash: string): string {
   return rest ? `#${rest}` : ''
 }
 
+/** Draft owners of link pages start with this, so the signed-in app can tell them apart. */
+export const LINK_OWNER_PREFIX = 'link:'
+
 function newLocalId(): string {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID()
-  return `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`
+  const id = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`
+  return `${LINK_OWNER_PREFIX}${id}`
 }
 
-function parse(raw: string | null): LinkSession | null {
-  if (!raw) return null
+/** Stored value: the token (absent after forget) and the device-local owner id (kept). */
+function parse(raw: string | null): { token: string | null; localId: string | null } {
+  if (!raw) return { token: null, localId: null }
   try {
-    const v = JSON.parse(raw) as Partial<LinkSession>
-    return typeof v.token === 'string' && TOKEN_RE.test(v.token) && typeof v.localId === 'string' && v.localId
-      ? { token: v.token, localId: v.localId }
-      : null
+    const v = JSON.parse(raw) as { token?: unknown; localId?: unknown }
+    return {
+      token: typeof v.token === 'string' && TOKEN_RE.test(v.token) ? v.token : null,
+      localId: typeof v.localId === 'string' && v.localId ? v.localId : null,
+    }
   } catch {
-    return null
+    return { token: null, localId: null }
   }
 }
 
@@ -60,16 +67,20 @@ export interface SessionStorageLike {
 
 /**
  * Resolve the session for a link page. A token in the fragment wins (a new
- * link replaces the old one on this device and gets a new localId); otherwise
- * the stored one is used. Pure apart from `storage`.
+ * link replaces the old token on this device); otherwise the stored one is
+ * used. The local id survives a new link and a forget, so unsent drafts of the
+ * previous link stay visible and are sent with the new one (critic r1 4.3; a
+ * stage from another object comes back `stage_not_found` and waits for the
+ * worker). Pure apart from `storage`.
  */
 export function resolveLinkSession(kind: LinkKind, hash: string, storage: SessionStorageLike | null): LinkSession | null {
   const fromHash = tokenFromHash(hash)
-  let stored: LinkSession | null = null
-  try { stored = parse(storage?.getItem(KEYS[kind]) ?? null) } catch { stored = null }
-  if (!fromHash) return stored
-  if (stored && stored.token === fromHash) return stored
-  const next = { token: fromHash, localId: newLocalId() }
+  let stored: ReturnType<typeof parse> = { token: null, localId: null }
+  try { stored = parse(storage?.getItem(KEYS[kind]) ?? null) } catch { /* keep empty */ }
+  const current = stored.token && stored.localId ? { token: stored.token, localId: stored.localId } : null
+  if (!fromHash) return current
+  if (current && current.token === fromHash) return current
+  const next = { token: fromHash, localId: stored.localId ?? newLocalId() }
   try { storage?.setItem(KEYS[kind], JSON.stringify(next)) } catch { /* private mode: works for this visit */ }
   return next
 }
@@ -89,7 +100,14 @@ export function takeLinkSession(kind: LinkKind): LinkSession | null {
   return session
 }
 
-/** Forget the stored link on this device. */
-export function forgetLinkSession(kind: LinkKind): void {
-  try { browserStorage()?.removeItem(KEYS[kind]) } catch { /* ignore */ }
+/**
+ * Forget the token on this device (revoked / expired link: never keep a dead
+ * credential). The local id stays so drafts on the phone are not orphaned.
+ */
+export function forgetLinkToken(kind: LinkKind, storage: SessionStorageLike | null = browserStorage()): void {
+  try {
+    const { localId } = parse(storage?.getItem(KEYS[kind]) ?? null)
+    if (localId) storage?.setItem(KEYS[kind], JSON.stringify({ localId }))
+    else storage?.removeItem(KEYS[kind])
+  } catch { /* ignore */ }
 }

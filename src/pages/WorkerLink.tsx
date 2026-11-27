@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { SendOutcome } from '../lib/drafts'
-import { takeLinkSession } from '../lib/linkSession'
+import { forgetLinkToken, takeLinkSession } from '../lib/linkSession'
 import { fetchWorkerReports, fetchWorkerStages, LinkApiError, linkLoadErrorKey } from '../lib/linkTransport'
 import type { WorkerLinkReport, WorkerLinkStages } from '../lib/linkTransport'
 import { applyRoleTheme } from '../lib/theme'
@@ -11,6 +11,7 @@ import { LinkPageShell, LinkProblem } from '../components/workerlink/LinkPageShe
 import { LinkRecentReports } from '../components/workerlink/LinkRecentReports'
 import { LinkReportSheet } from '../components/workerlink/LinkReportSheet'
 import { useLinkDrafts } from '../components/workerlink/useLinkDrafts'
+import { useLinkPageMeta } from '../components/workerlink/useLinkPageMeta'
 
 type Load = { state: 'loading' } | { state: 'ready'; data: WorkerLinkStages } | { state: 'error'; code: string }
 
@@ -24,6 +25,7 @@ const codeOf = (err: unknown) => (err instanceof LinkApiError ? err.code : 'netw
 export default function WorkerLinkPage() {
   const [session] = useState(() => takeLinkSession('worker'))
   useEffect(() => { applyRoleTheme('worker') }, [])
+  useLinkPageMeta()
   if (!session) {
     return <WorkerShell><LinkProblem kind="missing" /></WorkerShell>
   }
@@ -32,7 +34,7 @@ export default function WorkerLinkPage() {
 
 function WorkerShell({ name, children }: { name?: string; children: React.ReactNode }) {
   const { t } = useTranslation()
-  return <LinkPageShell title={t('workerLink.title')} subtitle={name ? t('workerLink.worker', { name }) : undefined}>{children}</LinkPageShell>
+  return <LinkPageShell title={name ?? t('workerLink.title')}>{children}</LinkPageShell>
 }
 
 function WorkerLinkBody({ token, owner }: { token: string; owner: string }) {
@@ -86,11 +88,12 @@ function WorkerLinkBody({ token, owner }: { token: string; owner: string }) {
     || q.drafts.some((d) => d.lastError === 'auth')
   const stageName = (id: string) => data?.stages.find((s) => s.id === id)?.name
     ?? q.drafts.find((d) => d.stageId === id)?.stageName ?? t('workerLink.stageUnknown')
-  const title = data && 'project_name' in data && typeof (data as { project_name?: unknown }).project_name === 'string'
-    ? (data as { project_name: string }).project_name : t('workerLink.title')
+  // A revoked / expired link: drop the dead token from this phone (drafts stay under the local id).
+  useEffect(() => { if (invalid) forgetLinkToken('worker') }, [invalid])
 
   return (
-    <LinkPageShell title={title} subtitle={data ? t('workerLink.worker', { name: data.worker_name }) : undefined}>
+    // The API does not return the object name yet: the worker's own name is the title.
+    <WorkerShell name={data?.worker_name}>
       <NetBar />
       {invalid ? <LinkProblem kind="invalid" /> : null}
 
@@ -154,7 +157,7 @@ function WorkerLinkBody({ token, owner }: { token: string; owner: string }) {
           onDone={(o) => { setSheet(null); setNotice(o) }}
         />
       ) : null}
-    </LinkPageShell>
+    </WorkerShell>
   )
 }
 

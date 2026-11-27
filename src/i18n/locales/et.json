@@ -725,8 +725,7 @@
     "offline": "Linkide loomiseks, tühistamiseks ja nähtavuse muutmiseks on vaja võrku."
   },
   "workerLink": {
-    "title": "Objekti aruanne",
-    "worker": "Sina: {{name}}",
+    "title": "Aruanded lingi kaudu",
     "stagesTitle": "Etapid",
     "noStages": "Objektil pole veel etappe.",
     "noStagesWho": "Etapid lisab objekti omanik.",
@@ -763,7 +762,10 @@
     "photoAlt": "Aruande foto: {{stage}}",
     "thumbFailed": "Foto ei laadinud",
     "prevPhoto": "Eelmine foto",
-    "nextPhoto": "Järgmine foto"
+    "nextPhoto": "Järgmine foto",
+    "preparingN": "Valmistame fotot {{n}} / {{total}}…",
+    "compressFailed": "Fotot ei õnnestunud avada. Pildista kaameraga uuesti.",
+    "stopped": "Ise enam ei proovi. Vajuta „Saada uuesti“ või ava see leht, kui võrk on olemas."
   },
   "linkPage": {
     "noLink": {
@@ -789,9 +791,12 @@
     "empty": "Omanik pole veel ühtegi etappi avanud",
     "emptyWho": "Milliseid etappe näidata, otsustab objekti omanik.",
     "confirmed": "Kinnitatud: {{percent}}%",
-    "updated": "uuendatud {{date}}",
     "photoAlt": "Etapi foto: {{stage}}",
-    "photoFailed": "Foto ei laadinud"
+    "photoFailed": "Foto ei laadinud",
+    "confirmedOn": "Kinnitatud · {{date}}",
+    "confirmedPlain": "Kinnitatud",
+    "photoUnavailable": "Osa fotosid pole ajutiselt saadaval. Värskenda lehte.",
+    "askContractor": "Tööde käigu kohta küsi oma töövõtjalt."
   },
   "client": {
     "disclaimer": {
