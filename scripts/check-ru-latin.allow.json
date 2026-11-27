@@ -1,7 +1,7 @@
 {
   "_comment": "Latin tokens allowed inside Russian UI strings (matched as whole words, case-insensitive). Units, brand and format names only.",
   "tokens": [
-    "€", "BuildProof", "OÜ", "KMKR", "PDF", "QR", "PWA", "GDPR", "DPA", "EXIF",
+    "€", "3D", "BuildProof", "OÜ", "KMKR", "PDF", "QR", "PWA", "GDPR", "DPA", "EXIF",
     "e-arve", "WhatsApp", "email", "e-mail", "iPhone", "Android", "Supabase", "ID", "OK",
     "ehituspäevik", "Telegram", "SMS", "km", "m²", "GB", "ГБ", "MB", "Eesti", "English"
   ]

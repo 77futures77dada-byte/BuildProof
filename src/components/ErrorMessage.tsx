@@ -14,7 +14,7 @@ export function ErrorMessage({ message, onRetry, className = '' }: ErrorMessageP
   return (
     <div
       role="alert"
-      className={`flex flex-wrap items-start justify-between gap-3 rounded-control border-2 border-stale bg-page px-3 py-2 text-body font-medium text-fg ${className}`}
+      className={`flex flex-wrap items-start justify-between gap-3 rounded-control border border-stale bg-page px-3 py-2 text-body font-medium text-fg ${className}`}
     >
       <span className="flex items-start gap-2"><StatusIcon kind="error" className="mt-0.5" /><span>{message}</span></span>
       {onRetry ? (

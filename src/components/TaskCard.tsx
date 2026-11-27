@@ -62,7 +62,7 @@ export function TaskCard({ task, variant, members, stages, onUpdate, onCompleted
   ].filter(Boolean).join(' · ')
 
   return (
-    <li className="flex list-none flex-col gap-3 rounded-card border-2 border-line bg-page p-4">
+    <li className="flex list-none flex-col gap-3 rounded-card border border-line bg-page p-4">
       <div className="flex items-start justify-between gap-3">
         <p className="m-0 min-w-0 text-field font-medium text-fg [overflow-wrap:anywhere]">{task.title}</p>
         <span className="inline-flex min-h-8 shrink-0 items-center rounded-chip bg-surface px-3 text-body font-medium text-fg">

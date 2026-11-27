@@ -24,7 +24,7 @@ export function UndoBar({ count, label, onUndo, note, className }: UndoBarProps)
       role="status"
       aria-live="polite"
       className={cx(
-        'sticky top-0 z-[var(--z-undo)] -mx-4 flex flex-wrap items-center justify-between gap-3 border-b-2 border-line bg-page px-4 py-3',
+        'sticky top-0 z-[var(--z-undo)] -mx-4 flex flex-wrap items-center justify-between gap-3 border-b border-line bg-page px-4 py-3',
         className,
       )}
     >

@@ -48,7 +48,7 @@ export function UnsentBanner({
     <section
       data-unsent={state}
       className={cx(
-        'flex flex-col gap-3 rounded-card border-2 border-warn-border bg-warn-bg text-field leading-[1.3] font-medium text-fg',
+        'flex flex-col gap-3 rounded-card border border-warn-border bg-warn-bg text-field leading-[1.3] font-medium text-fg',
         variant === 'full' ? 'p-4' : 'p-3',
         className,
       )}
@@ -60,7 +60,7 @@ export function UnsentBanner({
           {detail && variant === 'full' ? <p className="m-0 text-body">{detail}</p> : null}
         </div>
         <p className="m-0 flex shrink-0 flex-col items-end leading-none">
-          <span className="text-h2 font-semibold">{count}</span>
+          <span className="text-h2 font-medium">{count}</span>
           <span className="text-body">{countLabel}</span>
         </p>
       </div>

@@ -13,21 +13,23 @@ export interface ButtonStyle {
 
 const VARIANT: Record<ButtonVariant, string> = {
   // brand yellow; one per screen (03 Ж4), marked with data-main
-  primary: 'border-accent-border bg-accent font-semibold text-on-accent shadow-press hover:bg-accent-pressed',
-  secondary: 'border-fg font-medium bg-page text-fg hover:bg-surface',
-  ghost: 'border-transparent font-medium bg-transparent text-fg underline-offset-4 hover:bg-surface hover:underline',
+  primary: 'border-accent-border bg-accent font-medium text-on-accent shadow-press hover:bg-accent-pressed',
+  // second level («Все люди», «…», «Добавить на объект»): ghost-like — transparent, 1 px muted edge, lighter on hover
+  secondary: 'border-line bg-transparent text-fg hover:border-line-strong hover:bg-surface-2',
+  ghost: 'border-transparent bg-transparent text-fg underline-offset-4 hover:bg-surface hover:underline',
   // destructive: red edge + word in --fg (coloured text fails under glare)
-  danger: 'border-stale font-medium bg-page text-fg hover:bg-surface',
+  danger: 'border-stale bg-transparent text-fg hover:bg-surface-2',
 }
 const SIZE: Record<ButtonSize, string> = {
   main: 'min-h-14 px-6 text-btn',
-  md: 'min-h-12 px-5 text-field',
+  // mouse (pointer: fine) gets 40 px for density; touch keeps 48 px
+  md: 'min-h-12 px-5 text-field pointer-fine:min-h-10',
 }
 
 /** Class list for a button-looking element (use on <a>/<Link> for a link button). */
 export function buttonClass({ variant = 'primary', size, block }: ButtonStyle = {}, extra?: string): string {
   return cx(
-    'inline-flex items-center justify-center gap-2 rounded-control border-2 text-center no-underline transition-colors',
+    'inline-flex items-center justify-center gap-2 rounded-control border text-center no-underline transition-colors',
     'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus',
     'disabled:cursor-not-allowed disabled:opacity-60 aria-disabled:cursor-not-allowed aria-disabled:opacity-60',
     VARIANT[variant],

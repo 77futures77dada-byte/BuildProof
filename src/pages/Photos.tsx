@@ -42,7 +42,7 @@ export function Photos() {
   return (
     <section className="flex flex-col gap-4">
       <NetBar />
-      <h2 className="m-0 text-h2 font-semibold text-fg">{t('photos.title')}</h2>
+      <h2 className="m-0 text-h2 font-medium text-fg">{t('photos.title')}</h2>
 
       {canUpload ? (
         <div className="flex flex-col gap-3 sm:flex-row">
@@ -67,7 +67,7 @@ export function Photos() {
       ) : error ? (
         <ErrorMessage message={error} onRetry={reload} />
       ) : photos.length === 0 ? (
-        <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body text-fg">
+        <p className="m-0 rounded-card border border-dashed border-line p-5 text-body text-fg">
           {stageFilter !== 'all' ? t('photos.emptyStage') : canUpload ? t('photos.empty') : t('photos.emptyClient')}
         </p>
       ) : (

@@ -405,8 +405,8 @@ export function createSiteLoopScene(svg: SVGSVGElement, text: SiteLoopText): Sit
   mk('rect', { width: 350, height: 156, rx: 14, fill: '#0d2f50', stroke: '#7dd3fc', 'stroke-opacity': 0.55 }, card)
   mk('circle', { cx: 30, cy: 34, r: 12, fill: '#5eead4' }, card)
   mk('path', { d: 'M24 34 l5 5 l9 -10', stroke: '#0b2a4a', 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, card)
-  mk('text', { x: 52, y: 41, class: 't-sans', 'font-size': 21, 'font-weight': 600, fill: '#e8f4ff' }, card).textContent = text.cardTitle
-  const pct = mk('text', { x: 330, y: 46, 'text-anchor': 'end', class: 't-sans', 'font-size': 36, 'font-weight': 600, fill: '#5eead4' }, card)
+  mk('text', { x: 52, y: 41, class: 't-sans', 'font-size': 21, 'font-weight': 500, fill: '#e8f4ff' }, card).textContent = text.cardTitle
+  const pct = mk('text', { x: 330, y: 46, 'text-anchor': 'end', class: 't-sans', 'font-size': 36, 'font-weight': 500, fill: '#5eead4' }, card)
   mk('rect', { x: 20, y: 64, width: 310, height: 10, rx: 5, fill: '#1c476f' }, card)
   const barFill = mk('rect', { x: 20, y: 64, width: 0, height: 10, rx: 5, fill: '#5eead4' }, card)
   const cardThumbHolder = mk('g', { transform: 'translate(20 92)', opacity: 0 }, card)
@@ -420,7 +420,7 @@ export function createSiteLoopScene(svg: SVGSVGElement, text: SiteLoopText): Sit
   mk('text', { x: 18, y: 29, class: 't-sans', 'font-size': 15, fill: '#cfe3f5' }, chip).textContent = text.overall
   const gain = mk('text', { x: 256, y: 29, 'text-anchor': 'end', class: 't-mono', 'font-size': 13, fill: '#5eead4' }, chip)
   gain.textContent = '▲ +6'
-  const overall = mk('text', { x: 332, y: 31, 'text-anchor': 'end', class: 't-sans', 'font-size': 20, 'font-weight': 600, fill: '#e8f4ff' }, chip)
+  const overall = mk('text', { x: 332, y: 31, 'text-anchor': 'end', class: 't-sans', 'font-size': 20, 'font-weight': 500, fill: '#e8f4ff' }, chip)
 
   const flight = mk('g', { opacity: 0 }, uiG)
   thumbIcon(flight, 46, 34)
@@ -436,7 +436,7 @@ export function createSiteLoopScene(svg: SVGSVGElement, text: SiteLoopText): Sit
     const g = mk('g', { opacity: 0 }, uiG)
     const rect = mk('rect', { y: -28, height: 26, rx: 9, fill: '#f4f7fb' }, g)
     mk('polygon', { points: '-6,-3 6,-3 0,6', fill: '#f4f7fb' }, g)
-    const label = mk('text', { x: 0, y: -10, 'text-anchor': 'middle', class: 't-sans', 'font-size': 13, 'font-weight': 600, fill: '#0b2a4a' }, g)
+    const label = mk('text', { x: 0, y: -10, 'text-anchor': 'middle', class: 't-sans', 'font-size': 13, 'font-weight': 500, fill: '#0b2a4a' }, g)
     label.textContent = copy
     const w = Math.ceil(label.getComputedTextLength() || copy.length * 7.5) + 24
     rect.setAttribute('x', String(-w / 2))

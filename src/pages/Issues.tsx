@@ -81,7 +81,7 @@ export function IssuesView({
   return (
     <section className="flex flex-col gap-4">
       <NetBar />
-      <h2 className="m-0 text-h2 font-semibold text-fg">{t('issues.title')}</h2>
+      <h2 className="m-0 text-h2 font-medium text-fg">{t('issues.title')}</h2>
       {canCreate ? (
         <Button variant="primary" block onClick={() => setShowForm(true)} className="sm:w-auto sm:self-start">{t('issues.create')}</Button>
       ) : null}
@@ -91,7 +91,7 @@ export function IssuesView({
       ) : error ? (
         <ErrorMessage message={error} onRetry={reload} />
       ) : issues.length === 0 ? (
-        <p className="m-0 rounded-card border-2 border-dashed border-line p-5 text-body text-fg">
+        <p className="m-0 rounded-card border border-dashed border-line p-5 text-body text-fg">
           {canCreate ? t('issues.empty') : t('issues.noActive')}
         </p>
       ) : (

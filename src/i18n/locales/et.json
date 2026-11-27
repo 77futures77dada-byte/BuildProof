@@ -97,7 +97,8 @@
     "tasks": "Ülesanded",
     "issues": "Probleemid",
     "settings": "Seaded",
-    "people": "Inimesed"
+    "people": "Inimesed",
+    "links": "Lingid"
   },
   "auth": {
     "subtitle": "Logige sisse, et näha oma objekte",
@@ -567,7 +568,8 @@
     "confirmAllSmall": "Kinnita kõik väikesed ({{count}})",
     "closedEarly": "Kinnitamata: leht suleti liiga vara.",
     "ownJump": "Oma hüppe kinnitab omanik.",
-    "waiting": "ootab {{count}} h"
+    "waiting": "ootab {{count}} h",
+    "openQueue": "Kontrolli aruandeid"
   },
   "status": {
     "markedByOwner": "Omanik märkis",
@@ -607,5 +609,198 @@
     "title": "Mis on teie nimi?",
     "hint": "Nimi on muudatuste ajaloos näha e-posti asemel.",
     "name": "Teie nimi"
+  },
+  "house": {
+    "title": "Objekti mudel",
+    "ready": "Valmis",
+    "working": "Töös",
+    "notStarted": "Alustamata",
+    "readyHint": "ere",
+    "workingHint": "osaliselt",
+    "notStartedHint": "kummitus",
+    "stateLegend": "Osade olek",
+    "stageLegend": "Etappide värvid",
+    "fallback": "3D-mudel pole saadaval. Etappide edenemine:",
+    "loading": "Laadime 3D-mudelit…",
+    "empty": "Lisa ehitusetapid, et näha objekti mudelit.",
+    "stages": "Ehitusetapid",
+    "other": "Muu",
+    "hint": "Puuduta etappi või maja osa, et näha üksikasju.",
+    "doneStages": "Valmis etappe: {{done}} / {{total}}",
+    "updated": "Uuendatud",
+    "countOf": "{{done}} / {{total}}",
+    "clearSelection": "Tühista valik",
+    "play": "Mängi ehitus läbi",
+    "playing": "Ehitus",
+    "playInterrupt": "Peatamiseks puuduta ükskõik kus",
+    "modelLabel": "Maja 3D-mudel. {{rows}}",
+    "units": {
+      "windows": "akent ja ust",
+      "electric": "juhtmeliini",
+      "plumbing": "torulõiku"
+    }
+  },
+  "links": {
+    "loading": "Laadime linke…",
+    "state": {
+      "active": "Kehtib",
+      "expired": "Aegunud",
+      "revoked": "Tühistatud"
+    },
+    "expiresOn": "Kehtib kuni {{date}}",
+    "expiredOn": "Aegus {{date}}",
+    "revokedAt": "Tühistatud {{date}}",
+    "lastUsed": "Viimati avatud: {{when}}",
+    "neverUsed": "Pole veel avatud",
+    "revoke": "Tühista link",
+    "keep": "Jäta alles",
+    "createSubmit": "Loo link",
+    "daysLabel": "Kehtivus, päeva",
+    "daysHint": "1 kuni {{max}}. Tavaliselt {{def}}.",
+    "createdTitle": "Link on valmis",
+    "onceWarning": "Linki näidatakse üks kord. Kopeeri see kohe: hiljem seda enam ei näe, saab ainult uue luua.",
+    "linkLabel": "Link",
+    "copy": "Kopeeri link",
+    "share": "Jaga",
+    "done": "Valmis",
+    "copied": "Link kopeeritud.",
+    "copyFailed": "Kopeerimine ei õnnestunud. Vali link ja kopeeri käsitsi.",
+    "worker": {
+      "title": "Töötajate lingid",
+      "hint": "Töötaja avab lingi telefonis ja saadab fotodega aruande. E-posti ega parooli pole vaja. Aegunud linki pikendada ei saa: loo uus.",
+      "create": "Loo töötajale link",
+      "empty": "Töötajate linke veel pole.",
+      "nameLabel": "Töötaja nimi",
+      "nameHint": "See nimi on aruannetel näha.",
+      "createdFor": "Kellele: {{name}}. Kehtib kuni {{date}}.",
+      "shareTitle": "Aruande link",
+      "revokeConfirm": "Link „{{name}}” lakkab kohe töötamast. Juba saabunud aruanded jäävad alles."
+    },
+    "client": {
+      "title": "Tellija lingid",
+      "hint": "Tellija näeb ainult kinnitatud edenemist nende etappide kohta, mille allpool avad. Aegunud linki pikendada ei saa: loo uus.",
+      "create": "Loo tellijale link",
+      "empty": "Tellija linke veel pole.",
+      "nameLabel": "Tellija nimi",
+      "nameHint": "Et linke nimekirjas eristada.",
+      "createdFor": "Kellele: {{name}}. Kehtib kuni {{date}}.",
+      "shareTitle": "Objekti edenemine",
+      "revokeConfirm": "Link „{{name}}” lakkab kohe töötamast."
+    },
+    "visibility": {
+      "title": "Mida tellija näeb",
+      "hint": "Alguses ei näe tellija ühtegi etappi. Märgi, mida näidata. Fotode jaoks on eraldi märge.",
+      "showStage": "Näita tellijale",
+      "showPhotos": "Näita fotosid",
+      "noConfirmed": "Tellija näeb etappi pärast esimest kinnitatud aruannet.",
+      "saving": "Salvestame…",
+      "deviceNote": "Märked salvestatakse ka selles seadmes. Teises seadmes on etapp märgitud, kui sellel on kinnitatud aruanne."
+    },
+    "preview": {
+      "open": "Vaata tellijana",
+      "title": "Nii näeb tellija",
+      "empty": "Tellija ei näe veel midagi: pole avatud etappe kinnitatud aruannetega.",
+      "updated": "Uuendatud {{when}}",
+      "disclaimer": "% on töö edenemine, mitte maksmise alus"
+    },
+    "invite": {
+      "title": "Kutsu töötaja lingiga",
+      "hint": "Loo link ja saada see töötajale mis tahes sõnumirakenduses. E-posti pole vaja.",
+      "action": "Saada töötajale link"
+    },
+    "error": {
+      "unauthorized": "Seanss aegus. Logi uuesti sisse.",
+      "forbidden": "Linke haldab ainult omanik.",
+      "invalid_display_name": "Sisesta nimi, kuni 80 märki.",
+      "invalid_expiry": "Kehtivus 1 kuni 90 päeva.",
+      "project_not_found": "Objekti ei leitud.",
+      "worker_link_limit": "Objektil on juba 100 kehtivat töötaja linki. Tühista mittevajalikud.",
+      "client_link_limit": "Objektil on juba 50 kehtivat tellija linki. Tühista mittevajalikud.",
+      "link_not_found": "Linki ei leitud. Värskenda nimekirja.",
+      "invalid_visibility": "Salvestamine ei õnnestunud. Värskenda lehte.",
+      "stage_not_found": "Etappi ei leitud. Värskenda lehte.",
+      "network": "Ühendus puudub. Proovi uuesti.",
+      "generic": "Midagi läks valesti. Proovi uuesti."
+    },
+    "offline": "Linkide loomiseks, tühistamiseks ja nähtavuse muutmiseks on vaja võrku."
+  },
+  "workerLink": {
+    "title": "Aruanded lingi kaudu",
+    "stagesTitle": "Etapid",
+    "noStages": "Objektil pole veel etappe.",
+    "noStagesWho": "Etapid lisab objekti omanik.",
+    "newReport": "Tee aruanne",
+    "takePhoto": "Pildista",
+    "fromGallery": "Galeriist",
+    "photosCount": "Fotod: {{count}} / {{max}}",
+    "removePhoto": "Eemalda foto {{n}}",
+    "maxPhotos": "Ühes aruandes on kuni {{max}} fotot.",
+    "pickStage": "Vali etapp",
+    "photoNeeded": "Lisa vähemalt üks foto",
+    "preparing": "Valmistame fotosid ette…",
+    "tooLarge": "Fotod on liiga suured. Eemalda üks ja saada uuesti.",
+    "offlineSaved": "Aruanne salvestatakse telefoni. Kui võrk tuleb tagasi, ava see leht ja saadame.",
+    "state": {
+      "sending": "Saadame…",
+      "queued": "Salvestatud telefoni, saatmata",
+      "sent": "Saadetud ✓"
+    },
+    "queueTitle": "Telefonis: {{count}}",
+    "queuedHint": "Kuni see leht on avatud, proovime uuesti. Kui ei läinud, vajuta „Saada uuesti“.",
+    "sendWithCurrent": "Saada foto {{percent}}% juures",
+    "stageUnknown": "Etapp",
+    "recentTitle": "Minu viimased aruanded",
+    "recentEmpty": "Aruandeid veel pole.",
+    "recentEmptyWho": "Saadetud aruanne ilmub siia.",
+    "status": {
+      "accepted": "Vastu võetud",
+      "pending": "Ootab kontrolli",
+      "confirmed": "Kontrollitud",
+      "rejected": "Tagasi lükatud"
+    },
+    "photoTotal": "Fotod: {{count}}",
+    "photoAlt": "Aruande foto: {{stage}}",
+    "thumbFailed": "Foto ei laadinud",
+    "prevPhoto": "Eelmine foto",
+    "nextPhoto": "Järgmine foto",
+    "preparingN": "Valmistame fotot {{n}} / {{total}}…",
+    "compressFailed": "Fotot ei õnnestunud avada. Pildista kaameraga uuesti.",
+    "stopped": "Ise enam ei proovi. Vajuta „Saada uuesti“ või ava see leht, kui võrk on olemas."
+  },
+  "linkPage": {
+    "noLink": {
+      "title": "Linki ei leitud",
+      "text": "Ava omaniku saadetud link tervikuna.",
+      "who": "Uue lingi annab objekti omanik."
+    },
+    "error": {
+      "invalidLink": "Link ei kehti enam, küsi omanikult uus",
+      "rateLimit": "Selle tunni jooksul on liiga palju aruandeid. Aruanne on telefonis, vajuta hiljem „Saada uuesti“.",
+      "photo": "Foto ei sobinud. Pildista uuesti ja saada.",
+      "stageNotFound": "Seda etappi objektil enam pole. Vali teine etapp.",
+      "reasonRequired": "Vähendamiseks on vaja põhjust.",
+      "percent": "Protsenti ei võetud vastu. Vali see uuesti.",
+      "network": "Võrku pole. Aruanne on telefonis.",
+      "loadNetwork": "Ei laadinud. Kontrolli võrku.",
+      "timeout": "Vastust pole. Aruanne on telefonis, kontrollime uuesti.",
+      "generic": "Ei õnnestunud. Proovi uuesti."
+    }
+  },
+  "clientView": {
+    "title": "Tööde käik",
+    "empty": "Omanik pole veel ühtegi etappi avanud",
+    "emptyWho": "Milliseid etappe näidata, otsustab objekti omanik.",
+    "confirmed": "Kinnitatud: {{percent}}%",
+    "photoAlt": "Etapi foto: {{stage}}",
+    "photoFailed": "Foto ei laadinud",
+    "confirmedOn": "Kinnitatud · {{date}}",
+    "confirmedPlain": "Kinnitatud",
+    "photoUnavailable": "Osa fotosid pole ajutiselt saadaval. Värskenda lehte.",
+    "askContractor": "Tööde käigu kohta küsi oma töövõtjalt."
+  },
+  "client": {
+    "disclaimer": {
+      "percentNotPayment": "% näitab tööde käiku, see ei ole maksmise alus"
+    }
   }
 }

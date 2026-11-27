@@ -15,6 +15,10 @@
 //
 //   node scripts/check-overflow.mjs [--strict-a11y] [--only <substring>] [--verbose]
 // Env: CHROME_PATH (else the first local Chrome/Edge), CHECK_CONCURRENCY (default 4).
+// FAIL also on visible text heavier than 500 (any route, landing included) and when the
+// overview at 1440x900 / 1366x768 needs scrolling to show panel, model, stages and the card row.
+// Below 1024 px the browser runs as touch (pointer: coarse, 48 px targets); from 1024 px as mouse
+// (36 px targets, 16 px secondary text).
 // FAIL also when the report sheet «Отправить» is not fully visible at 360×553 /
 // 390×553 (growth and decrease). The landing `/` is outside --strict-a11y.
 // Last line: `check-overflow: routes=… loads=… overflow_failures=… render_failures=… page_errors=… a11y_small_targets=… a11y_small_text=… send_checks=… send_failures=… landing_small_*=…`.
@@ -24,6 +28,8 @@ import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright-core'
 import { preview } from 'vite'
 import { installFixtures, findChrome, SUPA } from './lib/fixtures.mjs'
+import { installLinksOwnerMocks } from './lib/fixtures-links-owner.mjs'
+import { installLinksPublicMocks, WORKER_TOKEN, CLIENT_TOKEN } from './lib/fixtures-links-public.mjs'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
 const argv = process.argv.slice(2)
@@ -72,6 +78,12 @@ const ROUTES = [
   ['client stages', `${P}/stages`, 'client'],
   ['client photos', `${P}/photos`, 'client'],
   ['client issues', `${P}/issues`, 'client'],
+  // links (contracts worker-links.md / client-links.md; /api answered by scripts/lib/fixtures-links-*.mjs)
+  ['project links', `${P}/links`, 'gc'],
+  ['review queue (gc)', '/review', 'gc'],
+  ['worker link', `/w#t=${WORKER_TOKEN}`, null, '/w'],
+  ['client link', `/c#t=${CLIENT_TOKEN}`, null, '/c'],
+  ['link missing', '/w', null],
 ].filter(([name, path]) => !ONLY || name.includes(ONLY) || path.includes(ONLY))
 
 // ---------- preflight ----------
@@ -135,7 +147,10 @@ function measure() {
     return { sel: describe(el), width: Math.round(r.width), left: Math.round(r.left), right: Math.round(r.right) }
   }).sort((a, b) => b.right - a.right).slice(0, 5)
 
-  // a11y: touch targets
+  // a11y: touch targets — 48 px on touch screens (pointer: coarse), 36 px with a mouse
+  // (pointer: fine, desktop density, owner 2026-11-28). Phones/tablets below 1024 px run as touch.
+  const fine = window.matchMedia('(pointer: fine)').matches
+  const minTarget = fine ? 36 : 48
   const smallTargets = []
   const targets = document.querySelectorAll('button, a[href], input:not([type=hidden]), select, textarea, summary, [role=button], label')
   for (const el of targets) {
@@ -146,10 +161,18 @@ function measure() {
     const r = el.getBoundingClientRect()
     if (r.width <= 2 || r.height <= 2) continue // visually hidden
     if (tag === 'a' && getComputedStyle(el).display === 'inline' && el.closest('p, li')) continue // inline link in text
-    if (r.height < 48 || r.width < 48) smallTargets.push(`${tag} «${(el.textContent || el.getAttribute('aria-label') || '').trim().replace(/\s+/g, ' ').slice(0, 24)}» ${Math.round(r.width)}×${Math.round(r.height)}`)
+    if (r.height < minTarget || r.width < minTarget) smallTargets.push(`${tag} «${(el.textContent || el.getAttribute('aria-label') || '').trim().replace(/\s+/g, ' ').slice(0, 24)}» ${Math.round(r.width)}×${Math.round(r.height)}`)
   }
-  // a11y: visible text under 17 px (one hit per element)
+  // a11y: visible text under 17 px (16 px from 1024 px: desktop secondary captions), one hit per element.
+  // Weight: no visible text above 500 anywhere (owner 2026-11-28), SVG text included.
+  const minText = vw >= 1024 ? 16 : 17
   const smallText = []
+  const heavyText = []
+  for (const el of document.querySelectorAll('svg text')) {
+    if (!el.textContent.trim() || !visible(el)) continue
+    const w = Number(getComputedStyle(el).fontWeight)
+    if (w > 500) heavyText.push(`svg text ${w} «${el.textContent.trim().slice(0, 24)}»`)
+  }
   const seen = new Set()
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
   for (let n = walker.nextNode(); n; n = walker.nextNode()) {
@@ -160,8 +183,10 @@ function measure() {
     if (!visible(el)) continue
     const r = el.getBoundingClientRect()
     if (r.width <= 2 || r.height <= 2) continue
-    const size = parseFloat(getComputedStyle(el).fontSize)
-    if (size < 17) smallText.push(`${el.tagName.toLowerCase()} ${size}px «${n.textContent.trim().slice(0, 24)}»`)
+    const cs = getComputedStyle(el)
+    const size = parseFloat(cs.fontSize)
+    if (Number(cs.fontWeight) > 500) heavyText.push(`${el.tagName.toLowerCase()} ${cs.fontWeight} «${n.textContent.trim().slice(0, 24)}»`)
+    if (size < minText) smallText.push(`${el.tagName.toLowerCase()} ${size}px «${n.textContent.trim().slice(0, 24)}»`)
   }
   const rootEl = document.getElementById('root')
   return {
@@ -171,6 +196,7 @@ function measure() {
     offenders,
     smallTargets,
     smallText,
+    heavyText,
     rootText: (rootEl?.innerText ?? '').trim().length,
     h1: [...document.querySelectorAll('h1')].map((h) => h.innerText.trim()).filter(Boolean).join(' | ').slice(0, 60),
     // what makes this screen this screen: active tab + first heading inside <main>
@@ -180,15 +206,18 @@ function measure() {
 }
 
 // ---------- run ----------
-const NOISE = /Failed to load resource|net::ERR_|favicon|ERR_ABORTED|status of 40[0-9]/i
+const NOISE = /Failed to load resource|net::ERR_|favicon|ERR_ABORTED|status of 40[0-9]|\b401\b/i
 const results = [] // one per load
 const themeSeen = [] // data-theme and #bp-root background per load (one theme on every screen)
 const jobs = []
 for (const scheme of SCHEMES) for (const width of WIDTHS) for (const role of new Set(ROUTES.map((r) => r[2]))) jobs.push({ scheme, width, role })
 
 async function runJob({ scheme, width, role }) {
-  const ctx = await browser.newContext({ viewport: { width, height: HEIGHT }, colorScheme: scheme, locale: 'ru-RU' })
+  const touch = width < 1024 // phones and small tablets: pointer: coarse, 48 px targets
+  const ctx = await browser.newContext({ viewport: { width, height: HEIGHT }, colorScheme: scheme, locale: 'ru-RU', hasTouch: touch, isMobile: touch })
   await installFixtures(ctx, { as: role, extended: true })
+  await installLinksOwnerMocks(ctx)
+  await installLinksPublicMocks(ctx)
   await ctx.addInitScript((t) => { try { localStorage.setItem('bp-theme', t) } catch { /* no storage */ } }, scheme) // theme is data-theme (src/lib/theme.ts), not only the media query
   const page = await ctx.newPage()
   let current = null
@@ -217,7 +246,7 @@ async function runJob({ scheme, width, role }) {
       const rendered = m.rootText > 0 && m.finalPath === (expected ?? path)
       results.push({ ...current, ...m, rendered, overflow: m.scrollWidth > m.innerWidth || m.offenders.length > 0 })
     } catch (e) {
-      results.push({ ...current, rendered: false, overflow: false, error: e.message.split('\n')[0], offenders: [], smallTargets: [], smallText: [] })
+      results.push({ ...current, rendered: false, overflow: false, error: e.message.split('\n')[0], offenders: [], smallTargets: [], smallText: [], heavyText: [] })
     }
   }
   await ctx.close()
@@ -374,6 +403,45 @@ if (!ONLY || 'sticky-top'.includes(ONLY)) {
   console.log(`sticky-top: checks=${stickyChecks} failures=${stickyFailures.length}${stickyFailures.length ? `\n  ${stickyFailures.join('\n  ')}` : ''}`)
 }
 
+// Overview, variant B: at 1440x900 and 1366x768 (mouse) everything fits without scrolling — panel with
+// its main button, 3D model, stage list, and the row of issues / people / feed (owner 2026-11-28).
+const FIT_VIEWPORTS = [[1440, 900], [1366, 768]]
+const FIT_BLOCKS = [
+  ['main button', '[data-main]'],
+  ['3D model', '.house3d-canvas, [role="status"]'],
+  ['stage list', 'main section ul li:last-child'],
+  ['issues / people / feed', '[data-fit="cards"]'],
+]
+const fitFailures = []
+let fitBlocks = ''
+if (!ONLY || 'overview-fit'.includes(ONLY) || 'project overview'.includes(ONLY)) {
+  const counts = []
+  for (const [width, height] of FIT_VIEWPORTS) {
+    const ctx = await browser.newContext({ viewport: { width, height }, locale: 'ru-RU' })
+    await installFixtures(ctx, { as: 'gc', extended: true })
+    const page = await ctx.newPage()
+    try {
+      await page.goto(`${base}${P}`, { waitUntil: 'networkidle' })
+      await page.waitForTimeout(600)
+      const res = await page.evaluate((blocks) => blocks.map(([label, sel]) => {
+        const el = document.querySelector(sel)
+        if (!el) return { label, ok: false, why: 'not found' }
+        const r = el.getBoundingClientRect()
+        return { label, ok: r.top >= 0 && r.bottom <= window.innerHeight + 0.5 && r.height > 0, why: `bottom ${Math.round(r.bottom)} / ${window.innerHeight}` }
+      }), FIT_BLOCKS)
+      const cards = await page.evaluate(() => [...document.querySelectorAll('[data-fit="cards"] > section')].map((c) => Math.round(c.getBoundingClientRect().bottom)))
+      const ok = res.filter((x) => x.ok).length
+      counts.push(`${width}x${height}:${ok + (res.at(-1).ok ? cards.length - 1 : 0)}/${FIT_BLOCKS.length - 1 + Math.max(cards.length, 1)}`)
+      for (const x of res.filter((y) => !y.ok)) fitFailures.push(`FIT overview @${width}x${height}: ${x.label} ${x.why}`)
+    } catch (e) {
+      fitFailures.push(`FIT overview @${width}x${height}: ${String(e.message ?? e).split('\n')[0]}`)
+    }
+    await ctx.close()
+  }
+  fitBlocks = counts.join(',')
+  console.log(`overview-fit: ${fitBlocks} failures=${fitFailures.length}${fitFailures.length ? `\n  ${fitFailures.join('\n  ')}` : ''}`)
+}
+
 
 
 const queue = [...jobs]
@@ -393,9 +461,10 @@ let renderFailures = 0
 let pageErrors = 0
 let a11yTargets = 0
 let a11yText = 0
+let heavyText = 0
 let landingTargets = 0
 let landingText = 0
-const failLines = [...sendFailures, ...defaultFailures, ...stickyFailures]
+const failLines = [...sendFailures, ...defaultFailures, ...stickyFailures, ...fitFailures]
 // One theme on every screen: data-theme = the chosen one, and the same #bp-root background on all routes.
 let themeFailures = 0
 for (const scheme of SCHEMES) {
@@ -412,6 +481,9 @@ for (const [k, list] of byRoute) {
   const errs = [...new Set(list.flatMap((r) => r.errors))]
   const maxT = Math.max(...list.map((r) => r.smallTargets.length))
   const maxX = Math.max(...list.map((r) => r.smallText.length))
+  const heavy = [...new Set(list.flatMap((r) => r.heavyText ?? []))]
+  heavyText += heavy.length
+  for (const h of heavy.slice(0, 5)) failLines.push(`WEIGHT ${name} ${path}: ${h} > 500`)
   overflowFailures += over.length
   renderFailures += notRendered.length
   pageErrors += errs.length
@@ -436,6 +508,6 @@ for (const [k, list] of byRoute) {
 }
 if (failLines.length) console.log(`\nFAILURES:\n${failLines.join('\n')}`)
 const a11yNote = STRICT_A11Y ? '' : ' (a11y = warnings; --strict-a11y to fail)'
-console.log(`\ncheck-overflow: routes=${byRoute.size} loads=${results.length} overflow_failures=${overflowFailures} render_failures=${renderFailures} page_errors=${pageErrors} a11y_small_targets=${a11yTargets} a11y_small_text=${a11yText} theme_failures=${themeFailures + defaultFailures.length} send_checks=${sendChecks} send_failures=${sendFailures.length} sticky_failures=${stickyFailures.length} landing_small_targets=${landingTargets} landing_small_text=${landingText}${a11yNote}`)
-const failed = overflowFailures || renderFailures || pageErrors || themeFailures || defaultFailures.length || stickyFailures.length || sendFailures.length || (STRICT_A11Y && (a11yTargets || a11yText))
+console.log(`\ncheck-overflow: routes=${byRoute.size} loads=${results.length} overflow_failures=${overflowFailures} render_failures=${renderFailures} page_errors=${pageErrors} a11y_small_targets=${a11yTargets} a11y_small_text=${a11yText} heavy_text=${heavyText} fit_failures=${fitFailures.length} fit_blocks=${fitBlocks} theme_failures=${themeFailures + defaultFailures.length} send_checks=${sendChecks} send_failures=${sendFailures.length} sticky_failures=${stickyFailures.length} landing_small_targets=${landingTargets} landing_small_text=${landingText}${a11yNote}`)
+const failed = overflowFailures || renderFailures || pageErrors || heavyText || fitFailures.length || themeFailures || defaultFailures.length || stickyFailures.length || sendFailures.length || (STRICT_A11Y && (a11yTargets || a11yText))
 process.exit(failed ? 1 : 0)

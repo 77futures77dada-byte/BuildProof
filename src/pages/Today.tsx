@@ -11,7 +11,7 @@ import { useProject } from '../hooks/useProject'
 import { supabase } from '../lib/supabaseClient'
 import { resizeImageToJpeg } from '../lib/image'
 import { formatDate, formatDateTimeSmart } from '../lib/format'
-import { draftStoragePath, effectiveSeenPercent, isUnsent, needsWorker, newDraftId, overLimit, shotTarget, DRAFT_LIMIT } from '../lib/drafts'
+import { draftStoragePath, effectiveSeenPercent, isLinkDraft, isUnsent, needsWorker, newDraftId, overLimit, shotTarget, DRAFT_LIMIT } from '../lib/drafts'
 import type { Draft, SendOutcome, ShotIntent } from '../lib/drafts'
 import { Spinner } from '../components/Spinner'
 import { ErrorMessage } from '../components/ErrorMessage'
@@ -136,7 +136,8 @@ export function Today() {
   const waiting = unsent.filter(needsWorker)
   const retryable = unsent.filter((d) => !needsWorker(d))
   const editing = mine.filter((d) => d.state === 'editing').sort((a, b) => b.createdAt - a.createdAt)[0]
-  const foreign = drafts.filter((d) => d.userId !== userId && isUnsent(d)).length
+  // link-page drafts are sent from /w, not by another account: not «чужие»
+  const foreign = drafts.filter((d) => d.userId !== userId && !isLinkDraft(d) && isUnsent(d)).length
   const authStuck = unsent.filter((d) => d.lastError === 'auth').length
   const sheetDraft = drafts.find((d) => d.draftId === sheetDraftId) ?? null
   const paused = project?.status === 'paused'
@@ -280,13 +281,13 @@ export function Today() {
       ) : null}
 
       {editing ? (
-        <section className="flex flex-wrap items-center gap-3 rounded-card border-2 border-line bg-surface p-3">
+        <section className="flex flex-wrap items-center gap-3 rounded-card border border-line bg-surface p-3">
           {/* own row: with two buttons beside it the text broke one word per line at 360–390 px */}
           <p className="m-0 min-w-0 basis-full text-field font-medium">{t('report.unfinished')}</p>
           <Button variant="secondary" onClick={() => setSheetDraftId(editing.draftId)}>{t('today.continue')}</Button>
           {/* an accidental shot can be thrown away here, off the send path (critic r3 LOW-1) */}
           {discard === editing.draftId ? (
-            <div className="flex w-full flex-col gap-3 rounded-card border-2 border-stale bg-page p-3">
+            <div className="flex w-full flex-col gap-3 rounded-card border border-stale bg-page p-3">
               <p className="m-0 text-field font-medium">{t('send.deleteConfirm')}</p>
               <div className="flex flex-wrap gap-3">
                 <Button variant="danger" onClick={() => { setDiscard(null); void removeDraft(editing.draftId) }}>{t('common.delete')}</Button>
@@ -332,19 +333,19 @@ export function Today() {
 
       {!stages.loading && !stages.error && stages.stages.length ? (
         <section className="flex flex-col gap-2">
-          <p className="m-0 text-h3 font-semibold">{t('today.objectPercent', { percent: overall })}</p>
+          <p className="m-0 text-h3 font-medium">{t('today.objectPercent', { percent: overall })}</p>
           <ProgressBar value={overall} thickness="thick" label={t('today.objectPercent', { percent: overall })} />
         </section>
       ) : null}
 
       <section className="flex flex-col gap-3">
-        <h2 className="m-0 text-h2 font-semibold">{t('today.myTasks')}</h2>
+        <h2 className="m-0 text-h2 font-medium">{t('today.myTasks')}</h2>
         {loading ? (
           <Spinner label={t('tasks.loading')} />
         ) : error ? (
           <ErrorMessage message={error} onRetry={reload} />
         ) : active.length === 0 ? (
-          <p className="m-0 rounded-card border-2 border-line bg-surface p-4 text-field">
+          <p className="m-0 rounded-card border border-line bg-surface p-4 text-field">
             {doneCount > 0 ? t('today.allDone') : t('today.noTasks')}
           </p>
         ) : (

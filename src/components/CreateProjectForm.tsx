@@ -45,9 +45,9 @@ export function CreateProjectForm({ companyId, onCreated, onCancel }: CreateProj
     <form
       onSubmit={handleSubmit}
       noValidate
-      className="flex flex-col gap-4 rounded-card border-2 border-line bg-surface p-4 shadow-card"
+      className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 shadow-card"
     >
-      <h2 className="m-0 text-h2 font-semibold text-fg">{t('createProject.heading')}</h2>
+      <h2 className="m-0 text-h2 font-medium text-fg">{t('createProject.heading')}</h2>
 
       <TextField
         label={t('createProject.name')}

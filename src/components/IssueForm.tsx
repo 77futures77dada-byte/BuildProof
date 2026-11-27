@@ -67,7 +67,7 @@ export function IssueForm({ projectId, onCreated, onCancel }: IssueFormProps) {
   }
 
   const choice = (on: boolean) => cx(
-    'inline-flex min-h-12 flex-1 items-center justify-center rounded-control border-2 px-3 text-field font-medium',
+    'inline-flex min-h-12 flex-1 items-center justify-center rounded-control border px-3 text-field font-medium',
     'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:opacity-60',
     on ? 'border-fg bg-fg text-page' : 'border-line bg-page text-fg hover:border-fg',
   )

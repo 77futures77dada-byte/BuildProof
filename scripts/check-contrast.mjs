@@ -69,7 +69,7 @@ const PAIRS = [
   ['--inverse-fg', '--inverse-bg', WORKER, 'dark band text'], ['--inverse-muted', '--inverse-bg', TEXT, 'dark band secondary'],
   ...['--ok-ink', '--pending-ink', '--stale-ink'].flatMap((ink) => ['--bg', '--surface', '--surface-2'].map((bg) => [ink, bg, NONTEXT, 'status icon / chip edge'])),
   ...['--bg', '--surface', '--surface-2', '--warn-bg'].map((bg) => ['--focus', bg, NONTEXT, 'focus ring']),
-  ['--fg', '--bg', NONTEXT, 'field / secondary-button border'],
+  ...['--bg', '--surface'].map((bg) => ['--line-strong', bg, NONTEXT, 'form-field edge (1 px)']),
   ['--accent-border', '--bg', NONTEXT, 'main button edge'],
   ['--warn-border', '--warn-bg', NONTEXT, 'banner edge'],
   ...['--house-foundation', '--house-frame', '--house-roof', '--house-windows', '--house-electric', '--house-plumbing', '--house-finish', '--house-contour', '--house-other']

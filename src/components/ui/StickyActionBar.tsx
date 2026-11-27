@@ -10,7 +10,7 @@ export function StickyActionBar({ children, className }: { children: ReactNode; 
     <div
       data-action-bar=""
       className={cx(
-        'action-bar sticky bottom-0 z-[var(--z-sticky)] -mx-4 flex flex-col gap-3 border-t-2 border-line bg-page px-4 pt-3',
+        'action-bar sticky bottom-0 z-[var(--z-sticky)] -mx-4 flex flex-col gap-3 border-t border-line bg-page px-4 pt-3',
         'pb-[calc(12px+env(safe-area-inset-bottom,0px))]',
         className,
       )}

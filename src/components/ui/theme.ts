@@ -1,6 +1,6 @@
 export type Zone = 'landing' | 'app' | 'field'
 
-const FIELD_ROUTES = [/^\/project\/[^/]+\/today\/?$/, /^\/review(\/|$)/]
+const FIELD_ROUTES = [/^\/project\/[^/]+\/today\/?$/, /^\/review(\/|$)/, /^\/w\/?$/]
 
 /** Worker and foreman routes get the field zone (18 px / 500 base, 02-type §7.3). */
 export function zoneForPath(pathname: string): Zone {
