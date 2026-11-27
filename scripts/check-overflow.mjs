@@ -20,7 +20,7 @@
 // Below 1024 px the browser runs as touch (pointer: coarse, 48 px targets); from 1024 px as mouse
 // (36 px targets, 16 px secondary text).
 // FAIL also when the report sheet «Отправить» is not fully visible at 360×553 /
-// 390×553 (growth and decrease). The landing `/` is outside --strict-a11y.
+// 390×553 (growth and decrease). Landing controls and text must also meet a11y minimums.
 // Last line: `check-overflow: routes=… loads=… overflow_failures=… render_failures=… page_errors=… a11y_small_targets=… a11y_small_text=… send_checks=… send_failures=… landing_small_*=…`.
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -487,8 +487,8 @@ for (const [k, list] of byRoute) {
   overflowFailures += over.length
   renderFailures += notRendered.length
   pageErrors += errs.length
-  // The landing (`/`) is outside the a11y rule until its own PR (claude/landing-v2,
-  // 05-ui.md §6): counted separately, never fails --strict-a11y.
+  // Keep landing counts separate for acceptance reporting, and fail this check unless
+  // all landing controls are at least 48 px and all landing text is at least 17 px.
   if (path === '/') { landingTargets += maxT; landingText += maxX } else { a11yTargets += maxT; a11yText += maxX }
   const sample = list.find((r) => r.rendered) ?? list[0]
   const h1 = [sample.h1 || '—', sample.tab && `tab «${sample.tab}»`, sample.mainHeading && `main «${sample.mainHeading}»`].filter(Boolean).join(' · ')
@@ -509,5 +509,5 @@ for (const [k, list] of byRoute) {
 if (failLines.length) console.log(`\nFAILURES:\n${failLines.join('\n')}`)
 const a11yNote = STRICT_A11Y ? '' : ' (a11y = warnings; --strict-a11y to fail)'
 console.log(`\ncheck-overflow: routes=${byRoute.size} loads=${results.length} overflow_failures=${overflowFailures} render_failures=${renderFailures} page_errors=${pageErrors} a11y_small_targets=${a11yTargets} a11y_small_text=${a11yText} heavy_text=${heavyText} fit_failures=${fitFailures.length} fit_blocks=${fitBlocks} theme_failures=${themeFailures + defaultFailures.length} send_checks=${sendChecks} send_failures=${sendFailures.length} sticky_failures=${stickyFailures.length} landing_small_targets=${landingTargets} landing_small_text=${landingText}${a11yNote}`)
-const failed = overflowFailures || renderFailures || pageErrors || heavyText || fitFailures.length || themeFailures || defaultFailures.length || stickyFailures.length || sendFailures.length || (STRICT_A11Y && (a11yTargets || a11yText))
+const failed = overflowFailures || renderFailures || pageErrors || heavyText || fitFailures.length || themeFailures || defaultFailures.length || stickyFailures.length || sendFailures.length || landingTargets || landingText || (STRICT_A11Y && (a11yTargets || a11yText))
 process.exit(failed ? 1 : 0)

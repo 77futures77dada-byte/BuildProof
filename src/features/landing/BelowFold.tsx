@@ -4,6 +4,7 @@ import { DemoObjectSection } from './DemoObjectSection'
 import { HowItWorks } from './HowItWorks'
 import { FaqSection, PricingSection, TrustSection } from './InfoSections'
 import { SignupSection } from './SignupSection'
+import { ComparisonSection, FirstDaySection } from './DecisionSections'
 
 export { Footer } from './InfoSections'
 
@@ -12,9 +13,11 @@ export function BelowFold({ copy, locale }: { copy: LandingCopy; locale: Locale 
   return (
     <>
       <HowItWorks copy={copy} locale={locale} />
+      <FirstDaySection copy={copy} />
       <DemoObjectSection copy={copy} />
       <TrustSection copy={copy} />
       <PricingSection copy={copy} />
+      <ComparisonSection copy={copy} />
       <FaqSection copy={copy} />
       <SignupSection copy={copy} />
     </>

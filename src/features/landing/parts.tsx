@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import { LOCALES, changeLocale } from '../../i18n'
 import type { Locale } from '../../i18n'
-import { isPlaceholder } from '../../config/legal'
 
 /** House-with-check mark used in the header logo. */
 export function LogoMark() {
@@ -55,11 +54,6 @@ export function Pill({ tone, children }: { tone: PillTone; children: ReactNode }
       {children}
     </span>
   )
-}
-
-/** A value from config/legal.ts; unfilled [placeholders] are highlighted. */
-export function Legal({ value }: { value: string }) {
-  return isPlaceholder(value) ? <mark>{value}</mark> : <>{value}</>
 }
 
 export function LandingLanguageSwitcher({ locale, label }: { locale: Locale; label: string }) {

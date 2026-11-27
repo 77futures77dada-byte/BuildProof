@@ -1,17 +1,6 @@
-import { LEGAL } from '../../config/legal'
 import type { LandingCopy } from './copy'
 import { DEMO_OBJECTS, HERO_STALE_OBJECT, isPending, objectTotals } from './demoObjects'
-import { Legal, Pill } from './parts'
-
-/** "Made by …" line; on phones it sits below the dashboard, on desktop under the CTAs. */
-function HumanLine({ copy, className }: { copy: LandingCopy; className: string }) {
-  const h = copy.hero
-  return (
-    <p className={`human ${className}`}>
-      {h.humanLead} <Legal value={LEGAL.founderName} />, {h.humanCountry} · <Legal value={LEGAL.phone} />. {h.humanTail}
-    </p>
-  )
-}
+import { Pill } from './parts'
 
 function OwnerDashboard({ copy }: { copy: LandingCopy }) {
   const d = copy.dashboard
@@ -24,7 +13,7 @@ function OwnerDashboard({ copy }: { copy: LandingCopy }) {
   return (
     <div className="app" role="img" aria-label={d.aria}>
       <div className="app-top">
-        <b>{d.title(3)}</b>
+            <b>{d.title()}</b>
         <span>{d.now}</span>
       </div>
       <ul className="objs">
@@ -128,14 +117,12 @@ export function Hero({ copy }: { copy: LandingCopy }) {
             <b>{h.trustStrong}</b>
             {h.trust}
           </p>
-          <HumanLine copy={copy} className="d-only" />
         </div>
 
         <div className="stagewrap">
           <OwnerDashboard copy={copy} />
           <WorkerPhone copy={copy} />
         </div>
-        <HumanLine copy={copy} className="m-only" />
       </div>
     </section>
   )

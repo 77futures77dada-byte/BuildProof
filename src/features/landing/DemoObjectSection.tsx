@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { KeyboardEvent, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import type { LandingCopy } from './copy'
 import { DEMO_OBJECTS, initialStageIndex, isPending, objectTotals } from './demoObjects'
 import type { DemoObjectKey, DemoStage, StageState } from './demoObjects'
@@ -9,7 +9,6 @@ import { Pill } from './parts'
 const FILL: Record<StageState, string> = { ok: 'var(--illu-ok)', part: 'var(--illu-part)', bad: 'var(--illu-bad)', none: 'var(--illu-none-fill)' }
 const LINE: Record<StageState, string> = { ok: 'var(--illu-ok)', part: 'var(--illu-part-line)', bad: 'var(--illu-bad)', none: 'var(--illu-blueprint)' }
 const OUTLINE: Record<StageState, string> = { ok: 'var(--illu-plan)', part: 'var(--illu-plan)', bad: 'var(--illu-bad-edge)', none: 'var(--illu-blueprint)' }
-const LABEL: Record<StageState, string> = { ok: 'var(--illu-label-ok)', part: 'var(--illu-label-part)', bad: 'var(--illu-label-bad)', none: 'var(--illu-label-none)' }
 
 type Rect = { x: number; y: number; w: number; h: number; rx?: number }
 type Shape =
@@ -97,13 +96,6 @@ export function DemoObjectSection({ copy }: { copy: LandingCopy }) {
     setSelected(initialStageIndex(DEMO_OBJECTS[key]))
   }
 
-  function onPartKey(e: KeyboardEvent, index: number) {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      setSelected(index)
-    }
-  }
-
   return (
     <section className="sec" id="object" aria-labelledby="object-title">
       <div className="in">
@@ -154,37 +146,13 @@ export function DemoObjectSection({ copy }: { copy: LandingCopy }) {
               )}
               {object.stages.map((stage, i) => {
                 const shape = PLAN[objectKey][stage.id]
-                const t = texts[stage.id]
-                const label = shape.kind === 'rects' && objectKey === 'flat' ? shape.rects[0] : null
                 return (
                   <g
                     key={stage.id}
                     className={`part${i === selected ? ' sel' : ''}`}
-                    role="button"
-                    tabIndex={0}
-                    aria-pressed={i === selected}
-                    aria-label={`${t.name}, ${stage.confirmed}%, ${isPending(stage) ? d.pending : d.state[stage.state]}`}
-                    onClick={() => setSelected(i)}
-                    onKeyDown={(e) => onPartKey(e, i)}
+                    aria-hidden="true"
                   >
                     <StageShape shape={shape} state={stage.state} />
-                    {label && (
-                      <text
-                        x={label.x + label.w / 2}
-                        y={label.y + label.h / 2 + 5}
-                        textAnchor="middle"
-                        fontFamily="var(--sans)"
-                        fontSize={stage.id === 'i' ? 12 : 14}
-                        fontWeight="500"
-                        fill={LABEL[stage.state]}
-                        stroke={stage.state === 'part' ? 'var(--illu-label-part-edge)' : 'none'}
-                        strokeWidth="3"
-                        paintOrder="stroke"
-                        aria-hidden="true"
-                      >
-                        {t.name} {stage.confirmed}%
-                      </text>
-                    )}
                   </g>
                 )
               })}

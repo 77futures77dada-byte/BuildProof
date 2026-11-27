@@ -484,3 +484,28 @@ check-overflow: routes=37 loads=370 overflow_failures=0 render_failures=0 page_e
 | check-contrast | PASS | pairs=116 failures=0 drift=0 (0s) |
 | check-ru-latin | PASS | offending=0 strings=981 (json=702, landing=279) (0s) |
 | check-overflow | PASS | routes=37 loads=370 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=0 fit_blocks=1440x900:6/6,1366x768:6/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (223s) |
+
+## 2026-11-27 - landing-v2
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | oxlint clean; token scan total=0 |
+| build | PASS | `ALLOW_PLACEHOLDERS=1`, fixture Supabase; 2,077 modules; one existing large-chunk advisory |
+| test | PASS | 19 files; 137 passed |
+| check-tokens | PASS | total=0; hex=0; colorfn=0; font=0; small=0; weight=0; heavy=0 |
+| check-contrast | PASS | pairs=116; failures=0; drift=0 |
+| check-ru-latin | PASS | offending=0; strings=993 |
+| check-overflow (full) | PASS | routes=37; loads=370; overflow/render/page errors=0; small targets/text=0; heavy text=0; fit failures=0; themes=0; send failures=0; sticky failures=0; landing small targets/text=0 |
+| check-overflow (landing after final copy/build) | PASS | loads=10; overflow/render/page errors=0; landing small targets/text=0; heavy text=0 |
+| landing bundle placeholder scan | PASS | 0 hits for founder, phone, company, provider, or requisites placeholders |
+| landing stroke/weight scan | PASS | 0 borders/outlines wider than 1px; 0 weights above 500 |
+
+### Independent critic passes
+
+Three separate role reads were performed in each pass: owner of a construction firm (Mart), foreman using gloves, and skeptical investor.
+
+| pass | owner | foreman | investor | disposition |
+|---|---|---|---|---|
+| 1 | no HIGH/MED | no HIGH/MED | MED: the dashboard mock's timestamp and stale-report count could look like live customer data | Replaced the fake clock with a visible "Screen example" label and clarified the accessible description as illustrative; example metrics remain labeled as a mock. |
+| 2 | no HIGH/MED | no HIGH/MED | no HIGH/MED | No further changes. |
+| 3 | no HIGH/MED | no HIGH/MED | no HIGH/MED | No further changes; second consecutive clean pass. |
