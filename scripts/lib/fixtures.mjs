@@ -86,9 +86,21 @@ const tasks = [
 const accessRow = ([project_id, user_id]) => ({ project_id, user_id, project: projects.find((p) => p.id === project_id) })
 const access = [['p1', 'u-w1'], ['p1', 'u-w2'], ['p2', 'u-w1'], ['p3', 'u-w3'], ['p4', 'u-w2'], ['p5', 'u-w1']].map(accessRow)
 
+// K15 review queue (/review, only with VITE_REPORT_REVIEW=true): pending big jumps.
+const report = (id, stageId, by, from, to, when, photoId) => ({
+  id, project_stage_id: stageId, project_id: stageOf(stageId).project_id, reporter_id: by, previous_confirmed_percent: from, claimed_percent: to,
+  status: 'pending', created_at: ago(when), projects: { name: projects.find((p) => p.id === stageOf(stageId).project_id).name },
+  project_stages: { stage_templates: { name: stageOf(stageId).stage_templates.name } },
+  photos: photoId ? [{ storage_path: photos.find((f) => f.id === photoId).storage_path }] : [],
+})
+const stageReports = [
+  report('r1', 'p1-s2', 'u-w1', 30, 60, 3 * H, 'f1'), report('r2', 'p1-s3', 'u-w2', 0, 40, 26 * H, 'f2'),
+  report('r3', 'p2-s6', 'u-w1', 0, 50, 5 * H, 'f3'),
+]
+
 export const TABLES = {
   profiles: Object.values(users), projects, project_stages: projectStages, stage_history: stageHistory,
-  photos, issues, tasks, project_access: access, companies: [{ id: 'c1', name: 'Тамм Эхитус OÜ' }, { id: 'c2', name: 'Каск OÜ' }],
+  photos, issues, tasks, project_access: access, stage_reports: stageReports, companies: [{ id: 'c1', name: 'Тамм Эхитус OÜ' }, { id: 'c2', name: 'Каск OÜ' }],
 }
 const EXTENDED_TABLES = {
   ...TABLES,

@@ -553,7 +553,8 @@
     "confirmedRow": "Confirmed",
     "confirmAllSmall": "Confirm all small ({{count}})",
     "closedEarly": "Not confirmed: the page closed too early.",
-    "ownJump": "Your own jump is confirmed by the owner."
+    "ownJump": "Your own jump is confirmed by the owner.",
+    "waiting": "waiting {{count}} h"
   },
   "status": {
     "markedByOwner": "Marked by the owner",

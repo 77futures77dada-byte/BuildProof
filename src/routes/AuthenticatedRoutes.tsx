@@ -12,6 +12,8 @@ import { Issues } from '../pages/Issues'
 import { Settings } from '../pages/Settings'
 import { NotFound } from '../pages/NotFound'
 import { Tariff } from '../pages/Tariff'
+import { Review } from '../pages/Review'
+import { isReportReviewOn } from '../lib/reportReview'
 import { Route, Routes } from 'react-router-dom'
 
 export default function AuthenticatedRoutes() {
@@ -20,6 +22,7 @@ export default function AuthenticatedRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/tariff" element={<ProtectedRoute><Tariff /></ProtectedRoute>} />
+      {isReportReviewOn() ? <Route path="/review" element={<ProtectedRoute><Review /></ProtectedRoute>} /> : null}
       <Route path="/project/:id" element={<ProtectedRoute><ProjectLayout /></ProtectedRoute>}>
         <Route index element={<ProjectHome />} />
         <Route path="today" element={<Today />} />

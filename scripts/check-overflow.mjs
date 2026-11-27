@@ -64,6 +64,7 @@ const ROUTES = [
   ['worker issues', `${P}/issues`, 'w1'],
   ['foreman project', P, 'foreman'],
   ['foreman tasks', `${P}/tasks`, 'foreman'],
+  ['review (k15 off: not routed)', '/review', 'foreman'],
   ['client dashboard', '/dashboard', 'client'],
   ['client project', P, 'client'],
   ['client stages', `${P}/stages`, 'client'],

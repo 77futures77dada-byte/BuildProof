@@ -553,7 +553,8 @@
     "confirmedRow": "Kinnitatud",
     "confirmAllSmall": "Kinnita kõik väikesed ({{count}})",
     "closedEarly": "Kinnitamata: leht suleti liiga vara.",
-    "ownJump": "Oma hüppe kinnitab omanik."
+    "ownJump": "Oma hüppe kinnitab omanik.",
+    "waiting": "ootab {{count}} h"
   },
   "status": {
     "markedByOwner": "Omanik märkis",
