@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { ThemeRoot } from './components/ui/ThemeRoot'
+import { AppLoading } from './components/AppLoading'
 
 // The public landing and the signed-in app are separate chunks: visitors on `/`
 // never download Supabase or the app screens.
@@ -10,7 +11,7 @@ const AuthenticatedRoutes = lazy(() => import('./routes/AuthenticatedRoutes'))
 export default function App() {
   return <BrowserRouter>
     <ThemeRoot>
-      <Suspense fallback={null}>
+      <Suspense fallback={<AppLoading />}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="*" element={<AuthenticatedRoutes />} />

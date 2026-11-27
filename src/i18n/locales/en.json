@@ -143,11 +143,14 @@
     "setPasswordTitle": "Set a password",
     "newPassword": "New password (at least {{min}} characters)",
     "savePassword": "Save password",
-    "passwordTooShort": "The password is shorter than {{min}} characters."
+    "passwordTooShort": "The password is shorter than {{min}} characters.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "notFound": {
     "text": "This page does not exist.",
-    "home": "Go to home page"
+    "home": "Go to home page",
+    "toProjects": "To sites"
   },
   "dashboard": {
     "title": "Projects",
@@ -383,7 +386,8 @@
     "invoice": "Invoice by agreement, write to us.",
     "noBilling": "There is no payment in the app yet: this page shows the terms only.",
     "contact": "Write about continuing",
-    "toProjects": "To sites"
+    "toProjects": "To sites",
+    "capNote": "cap {{eur}} €"
   },
   "onboarding": {
     "title": "Your company was not set up",

@@ -143,11 +143,14 @@
     "setPasswordTitle": "Määrake parool",
     "newPassword": "Uus parool (vähemalt {{min}} märki)",
     "savePassword": "Salvesta parool",
-    "passwordTooShort": "Parool on lühem kui {{min}} märki."
+    "passwordTooShort": "Parool on lühem kui {{min}} märki.",
+    "showPassword": "Näita parooli",
+    "hidePassword": "Peida parool"
   },
   "notFound": {
     "text": "Sellist lehte pole.",
-    "home": "Avalehele"
+    "home": "Avalehele",
+    "toProjects": "Objektide juurde"
   },
   "dashboard": {
     "title": "Objektid",
@@ -383,7 +386,8 @@
     "invoice": "Arve kokkuleppel, kirjutage meile.",
     "noBilling": "Rakenduses makset veel pole: siin on ainult tingimused.",
     "contact": "Kirjuta jätkamisest",
-    "toProjects": "Objektide juurde"
+    "toProjects": "Objektide juurde",
+    "capNote": "ülempiir {{eur}} €"
   },
   "onboarding": {
     "title": "Ettevõtet ei seadistatud",
