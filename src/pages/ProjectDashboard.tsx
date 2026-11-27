@@ -94,7 +94,8 @@ function Section({ title, children, more, dense = false }: { title: string; chil
           <h2 className="m-0 text-field font-medium text-fg">{title}</h2>
           {more}
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+        {/* scrolls inside: focusable region so the keyboard can scroll it too */}
+        <div role="region" aria-label={title} tabIndex={0} className="min-h-0 flex-1 overflow-y-auto rounded-control focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus">{children}</div>
       </section>
     )
   }
@@ -306,6 +307,7 @@ export function ProjectDashboardView({
             state={{
               label: stage.progressPercent >= 100 ? t('house.ready') : stage.progressPercent > 0 ? t('house.working') : t('house.notStarted'),
               title: stage.lastChangeAt ? formatDateTimeSmart(stage.lastChangeAt) : undefined,
+              fullName: stageLabel(stage.name),
             }}
             onPress={isManager && status === 'active' ? () => setMarkStageId(stage.id) : undefined}
             actions={stageActions(stage)}
@@ -500,7 +502,7 @@ function KnownPeople({ rows, onAdd, allTo, take = 3, dense = false }: { rows: Ac
       <ul className={dense ? 'm-0 flex list-none flex-col gap-1 p-0' : 'm-0 flex list-none flex-col gap-3 p-0'}>
         {(dense ? rows : rows.slice(0, take)).map((row) => (
           <li key={row.userId} className={dense ? 'flex items-center justify-between gap-2' : 'flex flex-wrap items-center justify-between gap-3 rounded-control border border-line p-3'}>
-            <span className={dense ? 'min-w-0 truncate text-body' : 'min-w-0 text-field [overflow-wrap:anywhere]'}>
+            <span title={dense ? `${row.name} · ${t(`roles.${row.role}`)}` : undefined} className={dense ? 'min-w-0 truncate text-body' : 'min-w-0 text-field [overflow-wrap:anywhere]'}>
               {row.name} · {t(`roles.${row.role}`)}
             </span>
             <Button
@@ -561,7 +563,7 @@ function IssueRow({ issue, dense = false }: { issue: ActiveIssue; dense?: boolea
         className={`flex min-h-12 items-start justify-between gap-3 rounded-control border border-l-4 border-line bg-page ${dense ? 'px-3 py-2 pointer-fine:min-h-10' : 'p-3'} text-fg no-underline hover:bg-surface focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus ${issueBorder(issue.priority)}`}
       >
         <span className="flex min-w-0 flex-col gap-1">
-          <span className={dense ? 'truncate text-body' : 'text-field [overflow-wrap:anywhere]'}>{issue.title}</span>
+          <span title={dense ? issue.title : undefined} className={dense ? 'truncate text-body' : 'text-field [overflow-wrap:anywhere]'}>{issue.title}</span>
           {issue.dueDate ? <span className="text-body text-muted-strong lg:text-meta">{t('common.due', { date: formatDate(issue.dueDate) })}</span> : null}
         </span>
         <UrgentBadge priority={issue.priority} />

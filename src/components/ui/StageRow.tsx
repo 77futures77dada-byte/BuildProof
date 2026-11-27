@@ -20,7 +20,7 @@ interface StageRowProps {
   /** `dense`: overview desktop — one 40 px line (name · % · actions) with a thin bar; no meta, status or children. */
   variant?: 'overview' | 'stages' | 'readonly' | 'dense'
   /** `dense` only: state by shape (✓ done · ◐ in progress · ○ not started) with its word for screen readers, and a tooltip (date, who marked). */
-  state?: { label: string; title?: string }
+  state?: { label: string; title?: string; fullName?: string }
   className?: string
 }
 
@@ -31,7 +31,7 @@ export function StageRow({ name, percent, status, meta, onPress, actions, childr
     const line = (
       <span className="flex min-w-0 flex-1 flex-col justify-center gap-1">
         <span className="flex items-baseline justify-between gap-2">
-          <span className="min-w-0 truncate text-body">{name}</span>
+          <span className="min-w-0 truncate text-body" title={typeof name === 'string' ? name : state?.fullName}>{name}</span>
           <span className="flex shrink-0 items-baseline gap-1.5 text-body font-medium" title={state?.title}>
             {pct}%
             <span aria-hidden="true" className="inline-block w-4 text-center">{pct >= 100 ? '✓' : pct > 0 ? '◐' : '○'}</span>
