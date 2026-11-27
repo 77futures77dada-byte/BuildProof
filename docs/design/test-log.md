@@ -439,3 +439,36 @@ check-overflow: routes=32 loads=320 overflow_failures=0 render_failures=0 page_e
 | ссылки рабочих | HIGH 0 / MED 0 — проверены хэш токена, срок, отзыв, лимиты и ограничение project_id | HIGH 0 / MED 0 — повтор запроса идемпотентен, фото и последние отчёты привязаны к конкретной ссылке |
 | ссылки заказчиков | HIGH 0 / MED 0 — фильтр status=confirmed и видимость этапа проверены; фото требуют отдельного согласия | HIGH 0 / MED 0 — preview использует ту же RPC-фильтрацию; данные комментариев и соседних фирм не возвращаются |
 Ограничение проверки: из-за отсутствия pgTAP runtime выводы по SQL основаны на чтении миграций и тестового сценария, а не на выполнении в PostgreSQL.
+
+## 2026-11-27T18:45:28Z — links-ui: владелец + страницы по ссылке
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.33s, VITE_SUPABASE_URL=fixture (16s) |
+| test | PASS | 18 passed (18); 133 passed (133) (10s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 heavy=0 base=0 files=0 scanned=189 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=116 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=975 (json=696, landing=279) (0s) |
+| check-overflow | FAIL | routes=37 loads=370 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=2 fit_blocks=1440x900:3/6,1366x768:3/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (228s) |
+
+<details><summary>check-overflow: first lines of the failure</summary>
+
+```
+FIT overview @1440x900: issues / people / feed bottom 908 / 900
+FIT overview @1366x768: issues / people / feed bottom 776 / 768
+check-overflow: routes=37 loads=370 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=2 fit_blocks=1440x900:3/6,1366x768:3/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95
+```
+</details>
+
+## 2026-11-27T18:50:12Z — links-ui: интеграция, 3D −10 px
+
+| check | result | key numbers |
+|---|---|---|
+| lint | PASS | warnings=0 errors=0 (2s) |
+| build | PASS | built in 1.28s, VITE_SUPABASE_URL=fixture (18s) |
+| test | PASS | 18 passed (18); 133 passed (133) (10s) |
+| check-tokens | PASS | total=0 hex=0 colorfn=0 font=0 palette=0 small=0 weight=0 heavy=0 base=0 files=0 scanned=189 allowlisted=3 temporary=0 (1s) |
+| check-contrast | PASS | pairs=116 failures=0 drift=0 (0s) |
+| check-ru-latin | PASS | offending=0 strings=975 (json=696, landing=279) (0s) |
+| check-overflow | PASS | routes=37 loads=370 overflow_failures=0 render_failures=0 page_errors=0 a11y_small_targets=0 a11y_small_text=0 heavy_text=0 fit_failures=0 fit_blocks=1440x900:6/6,1366x768:6/6 theme_failures=0 send_checks=8 send_failures=0 sticky_failures=0 landing_small_targets=8 landing_small_text=95 (234s) |

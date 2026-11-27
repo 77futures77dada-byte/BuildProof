@@ -28,6 +28,8 @@ import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright-core'
 import { preview } from 'vite'
 import { installFixtures, findChrome, SUPA } from './lib/fixtures.mjs'
+import { installLinksOwnerMocks } from './lib/fixtures-links-owner.mjs'
+import { installLinksPublicMocks, WORKER_TOKEN, CLIENT_TOKEN } from './lib/fixtures-links-public.mjs'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
 const argv = process.argv.slice(2)
@@ -76,6 +78,12 @@ const ROUTES = [
   ['client stages', `${P}/stages`, 'client'],
   ['client photos', `${P}/photos`, 'client'],
   ['client issues', `${P}/issues`, 'client'],
+  // links (contracts worker-links.md / client-links.md; /api answered by scripts/lib/fixtures-links-*.mjs)
+  ['project links', `${P}/links`, 'gc'],
+  ['review queue (gc)', '/review', 'gc'],
+  ['worker link', `/w#t=${WORKER_TOKEN}`, null, '/w'],
+  ['client link', `/c#t=${CLIENT_TOKEN}`, null, '/c'],
+  ['link missing', '/w', null],
 ].filter(([name, path]) => !ONLY || name.includes(ONLY) || path.includes(ONLY))
 
 // ---------- preflight ----------
@@ -198,7 +206,7 @@ function measure() {
 }
 
 // ---------- run ----------
-const NOISE = /Failed to load resource|net::ERR_|favicon|ERR_ABORTED|status of 40[0-9]/i
+const NOISE = /Failed to load resource|net::ERR_|favicon|ERR_ABORTED|status of 40[0-9]|\b401\b/i
 const results = [] // one per load
 const themeSeen = [] // data-theme and #bp-root background per load (one theme on every screen)
 const jobs = []
@@ -208,6 +216,8 @@ async function runJob({ scheme, width, role }) {
   const touch = width < 1024 // phones and small tablets: pointer: coarse, 48 px targets
   const ctx = await browser.newContext({ viewport: { width, height: HEIGHT }, colorScheme: scheme, locale: 'ru-RU', hasTouch: touch, isMobile: touch })
   await installFixtures(ctx, { as: role, extended: true })
+  await installLinksOwnerMocks(ctx)
+  await installLinksPublicMocks(ctx)
   await ctx.addInitScript((t) => { try { localStorage.setItem('bp-theme', t) } catch { /* no storage */ } }, scheme) // theme is data-theme (src/lib/theme.ts), not only the media query
   const page = await ctx.newPage()
   let current = null

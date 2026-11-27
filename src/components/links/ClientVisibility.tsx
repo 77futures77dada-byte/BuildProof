@@ -8,7 +8,8 @@ import {
 import type { ClientViewData, VisibilityMap } from '../../lib/linksApi'
 import { Button, Sheet, SkeletonRows, cx, useOnline } from '../ui'
 import { ErrorMessage } from '../ErrorMessage'
-import { ClientPreview } from './ClientPreview'
+// the owner preview renders exactly the client page component (same API, same filters)
+import { ClientProjectView } from '../client/ClientProjectView'
 
 const codeOf = (err: unknown) => (err instanceof LinksApiError ? err.code : 'generic')
 
@@ -116,7 +117,7 @@ export function ClientVisibility({ projectId }: { projectId: string }) {
       <p className="m-0 text-body text-fg">{t('links.visibility.deviceNote')}</p>
 
       <Sheet open={showPreview} onClose={() => setShowPreview(false)} title={t('links.preview.title')} history name="client-preview">
-        {preview ? <ClientPreview data={preview} /> : null}
+        {preview ? <ClientProjectView data={preview} /> : null}
       </Sheet>
     </section>
   )
