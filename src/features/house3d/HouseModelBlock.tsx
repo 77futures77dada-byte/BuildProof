@@ -26,9 +26,9 @@ function StageListFallback({ stages, loading }: { stages: MappedStage[]; loading
 }
 
 export function HouseModelBlock({ stages }: { stages: HouseStage[] }) {
-  if (!stages.length) return <section className="space-y-3"><h2 className="text-body font-semibold text-fg">{t.title}</h2><p className="rounded-xl border border-line bg-on-inverse p-4 text-body text-fg">{t.empty}</p></section>
+  if (!stages.length) return <section className="space-y-3"><h2 className="text-body font-medium text-fg">{t.title}</h2><p className="rounded-xl border border-line bg-on-inverse p-4 text-body text-fg">{t.empty}</p></section>
   const mapped = stagesToParts(stages)
-  return <section className="space-y-3"><h2 className="text-body font-semibold text-fg">{t.title}</h2>
+  return <section className="space-y-3"><h2 className="text-body font-medium text-fg">{t.title}</h2>
     <ModelBoundary fallback={<StageListFallback stages={mapped} loading={false} />}>
       <Suspense fallback={<StageListFallback stages={mapped} loading />}><LazyHouse stages={mapped} /></Suspense>
     </ModelBoundary>

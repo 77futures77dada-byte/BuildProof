@@ -18,12 +18,12 @@ export function WorkerProjectCard({ project }: { project: DashboardProject }) {
     >
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <span className="flex items-baseline justify-between gap-3">
-          <span className="min-w-0 text-h3 font-bold [overflow-wrap:anywhere]">{project.name}</span>
-          <span className="shrink-0 text-h2 font-bold">{project.overallPercent}%</span>
+          <span className="min-w-0 text-h3 font-semibold [overflow-wrap:anywhere]">{project.name}</span>
+          <span className="shrink-0 text-h2 font-semibold">{project.overallPercent}%</span>
         </span>
-        {project.address ? <span className="text-body font-medium [overflow-wrap:anywhere]">{project.address}</span> : null}
+        {project.address ? <span className="text-body [overflow-wrap:anywhere]">{project.address}</span> : null}
         <ProgressBar value={project.overallPercent} />
-        <span className="text-body font-semibold">
+        <span className="text-body font-medium">
           {project.myLastReportAt
             ? t('dashboard.workerLastReport', { date: formatDate(project.myLastReportAt) })
             : t('dashboard.workerNoReport')}

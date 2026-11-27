@@ -64,18 +64,18 @@ export function TaskCard({ task, variant, members, stages, onUpdate, onCompleted
   return (
     <li className="flex list-none flex-col gap-3 rounded-card border-2 border-line bg-page p-4">
       <div className="flex items-start justify-between gap-3">
-        <p className="m-0 min-w-0 text-field font-semibold text-fg [overflow-wrap:anywhere]">{task.title}</p>
-        <span className="inline-flex min-h-8 shrink-0 items-center rounded-chip bg-surface px-3 text-body font-semibold text-fg">
+        <p className="m-0 min-w-0 text-field font-medium text-fg [overflow-wrap:anywhere]">{task.title}</p>
+        <span className="inline-flex min-h-8 shrink-0 items-center rounded-chip bg-surface px-3 text-body font-medium text-fg">
           {t(`taskStatus.${task.status}`)}
         </span>
       </div>
 
-      <p className="m-0 flex flex-wrap items-center gap-x-2 text-body font-semibold text-fg">
+      <p className="m-0 flex flex-wrap items-center gap-x-2 text-body font-medium text-fg">
         {overdue ? <StatusIcon kind="stale" /> : null}
         <span className="num-col">{t('common.due', { date: formatDate(task.deadline) })}</span>
         {overdue ? <span>{t('tasks.overdue')}</span> : null}
       </p>
-      {meta ? <p className="m-0 text-body font-medium text-fg">{meta}</p> : null}
+      {meta ? <p className="m-0 text-body text-fg">{meta}</p> : null}
 
       {variant === 'worker' && task.status !== 'done' ? (
         <Button

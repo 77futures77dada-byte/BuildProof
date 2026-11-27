@@ -25,8 +25,8 @@ const tabClass = ({ isActive }: { isActive: boolean }) =>
     'focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-focus',
     // active: 600 + 4 px --fg bar (02-type §6.1); others 500
     isActive
-      ? 'font-semibold after:absolute after:inset-x-2 after:bottom-0 after:h-1 after:rounded-full after:bg-fg'
-      : 'font-medium hover:bg-surface',
+      ? 'font-medium after:absolute after:inset-x-2 after:bottom-0 after:h-1 after:rounded-full after:bg-fg'
+      : ' hover:bg-surface',
   )
 
 /** Section navigation (links with aria-current, not ARIA tabs: each tab is a route). */

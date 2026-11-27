@@ -96,7 +96,7 @@ export function StageProgressControl({ value, label, onCommit }: StageProgressCo
           onClick={() => handleChange(shown - PROGRESS_STEP)}
           disabled={shown <= PROGRESS_MIN}
           aria-label={t('stages.decrease', { stage: label })}
-          className="inline-flex size-12 shrink-0 items-center justify-center rounded-control border-2 border-fg bg-page text-h3 font-bold text-fg hover:bg-surface disabled:opacity-60 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          className="inline-flex size-12 shrink-0 items-center justify-center rounded-control border-2 border-fg bg-page text-h3 font-semibold text-fg hover:bg-surface disabled:opacity-60 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           <span aria-hidden="true">−</span>
         </button>
@@ -120,12 +120,12 @@ export function StageProgressControl({ value, label, onCommit }: StageProgressCo
           onClick={() => handleChange(shown + PROGRESS_STEP)}
           disabled={shown >= PROGRESS_MAX}
           aria-label={t('stages.increase', { stage: label })}
-          className="inline-flex size-12 shrink-0 items-center justify-center rounded-control border-2 border-fg bg-page text-h3 font-bold text-fg hover:bg-surface disabled:opacity-60 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          className="inline-flex size-12 shrink-0 items-center justify-center rounded-control border-2 border-fg bg-page text-h3 font-semibold text-fg hover:bg-surface disabled:opacity-60 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           <span aria-hidden="true">+</span>
         </button>
 
-        <span aria-live="polite" className="num-col w-16 shrink-0 text-right text-h3 font-bold text-fg">
+        <span aria-live="polite" className="num-col w-16 shrink-0 text-right text-h3 font-semibold text-fg">
           {saving ? '…' : `${shown}%`}
         </span>
       </div>

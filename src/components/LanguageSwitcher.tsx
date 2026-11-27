@@ -37,7 +37,7 @@ export function LanguageSwitcher({ className = '' }: { className?: string }) {
           onClick={() => pick(locale)}
           aria-pressed={locale === active}
           title={t(`language.${locale}`)}
-          className={`min-h-12 min-w-12 rounded-chip px-2 text-body font-semibold uppercase transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus ${
+          className={`min-h-12 min-w-12 rounded-chip px-2 text-body font-medium uppercase transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus ${
             locale === active
               ? 'bg-fg text-page'
               : 'text-fg hover:bg-surface'

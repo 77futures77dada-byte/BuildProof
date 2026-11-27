@@ -20,13 +20,13 @@ export function AppHeader({ logoTo = '/dashboard', children }: { logoTo?: string
         <div className="flex min-w-0 items-center gap-4">
           <Link
             to={logoTo}
-            className="inline-flex min-h-12 items-center rounded-control text-h3 font-bold text-fg no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            className="inline-flex min-h-12 items-center rounded-control text-h3 font-semibold text-fg no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             BuildProof
             <span className="sr-only"> · {t('tariff.toProjects')}</span>
           </Link>
           {profile ? (
-            <span className="hidden text-body font-medium text-muted-strong lg:inline">
+            <span className="hidden text-body text-muted-strong lg:inline">
               {profile.full_name ?? user?.email} · {t(`roles.${profile.role}`)}
             </span>
           ) : null}

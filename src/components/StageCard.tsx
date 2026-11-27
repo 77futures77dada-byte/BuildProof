@@ -15,9 +15,9 @@ export function StageCard({ stage, canEdit, onCommit, historyToken }: StageCardP
   return (
     <li className="flex list-none flex-col gap-3 rounded-card border-2 border-line bg-surface p-4 text-fg shadow-card">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="m-0 min-w-0 text-h3 font-bold [overflow-wrap:anywhere]">{stageLabel(stage.name)}</h3>
+        <h3 className="m-0 min-w-0 text-h3 font-semibold [overflow-wrap:anywhere]">{stageLabel(stage.name)}</h3>
         {!canEdit ? (
-          <span className="shrink-0 text-h3 font-bold">
+          <span className="shrink-0 text-h3 font-semibold">
             {Math.round(stage.progressPercent)}%
           </span>
         ) : null}

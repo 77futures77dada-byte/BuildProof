@@ -21,7 +21,7 @@ export function NetBar() {
   }, [back])
   if (online && !back) return null
   return (
-    <p role="status" data-netbar={online ? 'back-online' : 'offline'} className="m-0 flex min-h-12 items-center gap-2 rounded-control border-2 border-fg bg-surface px-3 text-body font-semibold text-fg">
+    <p role="status" data-netbar={online ? 'back-online' : 'offline'} className="m-0 flex min-h-12 items-center gap-2 rounded-control border-2 border-fg bg-surface px-3 text-body font-medium text-fg">
       {online ? null : <StatusIcon kind="error" />}
       {online ? t('common.backOnline') : t('common.offline')}
     </p>
