@@ -3,6 +3,10 @@ import { lazy, StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import './i18n'
+import { applyTheme } from './lib/theme'
+
+// Same theme as the inline script in index.html set; also syncs theme-color with --bg.
+applyTheme()
 
 const App = lazy(() => import('./App.tsx'))
 

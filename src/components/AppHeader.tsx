@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { ThemeSwitcher } from './ThemeSwitcher'
 import { Button, buttonClass } from './ui'
 import { useSignOutGuard } from './report/SignOutDraftsConfirm'
 
@@ -38,6 +39,7 @@ export function AppHeader({ logoTo = '/dashboard', children }: { logoTo?: string
               {t('tariff.link')}
             </NavLink>
           ) : null}
+          <ThemeSwitcher />
           <LanguageSwitcher />
           <Button variant="ghost" size="md" className="px-3" onClick={guard.request}>
             {t('common.signOut')}

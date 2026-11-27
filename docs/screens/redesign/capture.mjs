@@ -47,6 +47,7 @@ for (const [name, path, as, opts = {}] of SHOTS) {
   for (const [scheme, width, height] of variants) {
     const ctx = await browser.newContext({ viewport: { width, height }, colorScheme: scheme, locale: 'ru-RU', deviceScaleFactor: width < 500 ? 2 : 1 })
     await installFixtures(ctx, { as, extended: true })
+    await ctx.addInitScript((t) => { try { localStorage.setItem('bp-theme', t) } catch { /* no storage */ } }, scheme) // theme is data-theme (src/lib/theme.ts), not only the media query
     const page = await ctx.newPage()
     await page.goto(`${base}${path}`, { waitUntil: 'networkidle' })
     if (opts.sheet) {

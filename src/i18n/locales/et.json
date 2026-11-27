@@ -38,6 +38,12 @@
     "ru": "Русский",
     "en": "English"
   },
+  "theme": {
+    "label": "Teema",
+    "light": "Hele",
+    "dark": "Tume",
+    "system": "Nagu seadmes"
+  },
   "roles": {
     "client": "Tellija",
     "gc": "Omanik",

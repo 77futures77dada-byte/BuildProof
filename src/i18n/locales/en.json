@@ -38,6 +38,12 @@
     "ru": "Русский",
     "en": "English"
   },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "As on device"
+  },
   "roles": {
     "client": "Client",
     "gc": "Owner",

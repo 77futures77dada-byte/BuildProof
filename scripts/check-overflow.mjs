@@ -182,12 +182,14 @@ function measure() {
 // ---------- run ----------
 const NOISE = /Failed to load resource|net::ERR_|favicon|ERR_ABORTED|status of 40[0-9]/i
 const results = [] // one per load
+const themeSeen = [] // data-theme and #bp-root background per load (one theme on every screen)
 const jobs = []
 for (const scheme of SCHEMES) for (const width of WIDTHS) for (const role of new Set(ROUTES.map((r) => r[2]))) jobs.push({ scheme, width, role })
 
 async function runJob({ scheme, width, role }) {
   const ctx = await browser.newContext({ viewport: { width, height: HEIGHT }, colorScheme: scheme, locale: 'ru-RU' })
   await installFixtures(ctx, { as: role, extended: true })
+  await ctx.addInitScript((t) => { try { localStorage.setItem('bp-theme', t) } catch { /* no storage */ } }, scheme) // theme is data-theme (src/lib/theme.ts), not only the media query
   const page = await ctx.newPage()
   let current = null
   page.on('pageerror', (e) => current?.errors.push(`pageerror: ${e.message}`))
@@ -210,6 +212,8 @@ async function runJob({ scheme, width, role }) {
       await page.waitForLoadState('networkidle')
       await page.waitForTimeout(250)
       const m = await page.evaluate(measure)
+      const theme = await page.evaluate(() => ({ attr: document.documentElement.dataset.theme ?? '', rootBg: getComputedStyle(document.getElementById('bp-root') ?? document.body).backgroundColor }))
+      themeSeen.push({ name, path, scheme, width, ...theme })
       const rendered = m.rootText > 0 && m.finalPath === (expected ?? path)
       results.push({ ...current, ...m, rendered, overflow: m.scrollWidth > m.innerWidth || m.offenders.length > 0 })
     } catch (e) {
@@ -270,7 +274,12 @@ async function sendVisible(page) {
     const inView = r.top >= 0 && r.left >= 0 && r.bottom <= window.innerHeight && r.right <= window.innerWidth && r.height > 0
     const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)
     const onTop = !!hit && (hit === btn || btn.contains(hit))
-    return { ok: inView && onTop, why: `top ${Math.round(r.top)} bottom ${Math.round(r.bottom)} / ${window.innerHeight}${onTop ? '' : ', covered'}` }
+    // the sheet (portal into #bp-root) must carry the same theme as the page behind it
+    const sheet = document.querySelector('[data-sheet="report"]')
+    const sheetBg = sheet ? getComputedStyle(sheet).backgroundColor : ''
+    const pageBg = getComputedStyle(document.getElementById('bp-root') ?? document.body).backgroundColor
+    const sameTheme = sheetBg === pageBg
+    return { ok: inView && onTop && sameTheme, why: `top ${Math.round(r.top)} bottom ${Math.round(r.bottom)} / ${window.innerHeight}${onTop ? '' : ', covered'}${sameTheme ? '' : `, sheet bg ${sheetBg} ≠ page ${pageBg}`}` }
   })
 }
 if (!ONLY || 'report-send'.includes(ONLY) || 'worker today'.includes(ONLY)) {
@@ -278,6 +287,7 @@ if (!ONLY || 'report-send'.includes(ONLY) || 'worker today'.includes(ONLY)) {
     for (const scheme of SCHEMES) {
       const ctx = await browser.newContext({ viewport: { width, height }, colorScheme: scheme, locale: 'ru-RU' })
       await installFixtures(ctx, { as: 'w1', extended: true })
+      await ctx.addInitScript((t) => { try { localStorage.setItem('bp-theme', t) } catch { /* no storage */ } }, scheme) // theme is data-theme (src/lib/theme.ts), not only the media query
       const page = await ctx.newPage()
       const tag = `${width}×${height} ${scheme}`
       try {
@@ -324,6 +334,14 @@ let a11yText = 0
 let landingTargets = 0
 let landingText = 0
 const failLines = [...sendFailures]
+// One theme on every screen: data-theme = the chosen one, and the same #bp-root background on all routes.
+let themeFailures = 0
+for (const scheme of SCHEMES) {
+  const seen = themeSeen.filter((x) => x.scheme === scheme)
+  for (const x of seen.filter((y) => y.attr !== scheme)) { themeFailures++; failLines.push(`THEME ${x.name} ${x.path} @${x.width} ${scheme}: data-theme="${x.attr}"`) }
+  const bgs = [...new Set(seen.map((x) => x.rootBg))]
+  if (bgs.length > 1) { themeFailures++; failLines.push(`THEME ${scheme}: #bp-root backgrounds differ between screens: ${bgs.map((b) => `${b} (${seen.filter((x) => x.rootBg === b).map((x) => x.name).slice(0, 3).join(', ')})`).join('; ')}`) }
+}
 console.log('route | as | screen (h1 · active tab · main heading) | overflow (width/scheme: px) | targets<48 | text<17px')
 for (const [k, list] of byRoute) {
   const [name, path, as] = k.split('\t')
@@ -356,6 +374,6 @@ for (const [k, list] of byRoute) {
 }
 if (failLines.length) console.log(`\nFAILURES:\n${failLines.join('\n')}`)
 const a11yNote = STRICT_A11Y ? '' : ' (a11y = warnings; --strict-a11y to fail)'
-console.log(`\ncheck-overflow: routes=${byRoute.size} loads=${results.length} overflow_failures=${overflowFailures} render_failures=${renderFailures} page_errors=${pageErrors} a11y_small_targets=${a11yTargets} a11y_small_text=${a11yText} send_checks=${sendChecks} send_failures=${sendFailures.length} landing_small_targets=${landingTargets} landing_small_text=${landingText}${a11yNote}`)
-const failed = overflowFailures || renderFailures || pageErrors || sendFailures.length || (STRICT_A11Y && (a11yTargets || a11yText))
+console.log(`\ncheck-overflow: routes=${byRoute.size} loads=${results.length} overflow_failures=${overflowFailures} render_failures=${renderFailures} page_errors=${pageErrors} a11y_small_targets=${a11yTargets} a11y_small_text=${a11yText} theme_failures=${themeFailures} send_checks=${sendChecks} send_failures=${sendFailures.length} landing_small_targets=${landingTargets} landing_small_text=${landingText}${a11yNote}`)
+const failed = overflowFailures || renderFailures || pageErrors || themeFailures || sendFailures.length || (STRICT_A11Y && (a11yTargets || a11yText))
 process.exit(failed ? 1 : 0)
