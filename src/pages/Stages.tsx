@@ -10,10 +10,9 @@ import { useStageHistory } from '../hooks/useStageHistory'
 import { useLastMarks } from '../hooks/useLastMarks'
 import type { LastMark } from '../hooks/useLastMarks'
 import { formatDate, formatDateTimeSmart } from '../lib/format'
-import { Button, Disclosure, NetBar, StageRow, StatusIcon } from '../components/ui'
+import { Button, Disclosure, NetBar, SkeletonRows, StageRow, StatusIcon } from '../components/ui'
 import type { ChipSpec } from '../components/ui'
 import { StageMarkSheet } from '../components/report/StageMarkSheet'
-import { Spinner } from '../components/Spinner'
 import { ErrorMessage } from '../components/ErrorMessage'
 
 /** Who marked it — only what the current code knows (residual И4-М2; K15 statuses later). */
@@ -37,7 +36,7 @@ export function Stages() {
   const manager = role === 'gc' || role === 'foreman'
   const worker = role === 'worker'
 
-  if (loading) return <Spinner label={t('stages.loading')} />
+  if (loading) return <SkeletonRows label={t('stages.loading')} rows={5} />
   if (error) return <ErrorMessage message={error} onRetry={reload} />
 
   return (
@@ -59,7 +58,7 @@ export function Stages() {
               <Button
                 variant="secondary"
                 aria-label={t('stages.markFor', { stage: name })}
-                onClick={() => (manager ? setMarking(stage) : navigate(`/project/${id}/today`))}
+                onClick={() => (manager ? setMarking(stage) : navigate(`/project/${id}/today?stage=${stage.id}`))}
               >
                 {t('stages.mark')}
               </Button>

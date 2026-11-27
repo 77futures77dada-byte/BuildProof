@@ -165,10 +165,8 @@
       "title": "Set up your first site",
       "step1": "Create a site: 7 standard stages are added for you.",
       "step2": "Mark how far the first stage is.",
-      "step3": "Here you will see where work moves and where it stalls.",
       "action": "Create the first site",
-      "step2Open": "Invite a worker by email. They sign in with a code from the email, no password.",
-      "step3Open": "The worker sends a photo and a percentage. You see where work stalls."
+      "step2Open": "Invite a worker by email. They sign in with a code from the email, no password."
     },
     "groupActive": "Active",
     "groupPaused": "Paused",
@@ -429,8 +427,6 @@
     "email": "Email",
     "addRow": "One more person",
     "removeRow": "Remove row",
-    "submit": "Invite ({{count}})",
-    "submitOne": "Invite",
     "submitWorker": "Invite worker",
     "submitWorkers": "Invite workers ({{count}})",
     "submitForeman": "Invite foreman",
@@ -460,6 +456,9 @@
     "unknownHint": "Open “Today” when you have signal and we will check.",
     "unknownHintOwner": "Open “Project overview” when you have signal and we will check.",
     "unknownAction": "Check again",
+    "queuedToday": "Saved on this phone, not sent. When you have a connection, tap «Send again».",
+    "unknownHintToday": "When you have a connection, tap «Check again».",
+    "retryStopped": "No longer sending by itself. Tap «Send again».",
     "stale": "Not accepted: the stage is already {{percent}}%",
     "staleResend": "Send with new %",
     "stageAhead": "The stage is already {{percent}}%. Your photo was added.",
@@ -536,7 +535,8 @@
     "closeSending": "Close. The report is saved on the phone.",
     "retake": "Retake",
     "photoAlt": "Report photo: {{stage}}",
-    "backToGrowth": "Back to increase"
+    "backToGrowth": "Back to increase",
+    "offlineSaved": "The report will be saved on this phone. Send it again when you have a connection."
   },
   "stagePicker": {
     "title": "Choose a stage",

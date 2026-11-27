@@ -11,3 +11,12 @@ const SHAPE = {
 export function Skeleton({ variant = 'row', className }: { variant?: keyof typeof SHAPE; className?: string }) {
   return <div aria-hidden="true" className={cx('animate-pulse bg-surface motion-reduce:animate-none', SHAPE[variant], className)} />
 }
+
+/** A list loading: `rows` row skeletons in a `role="status"` with a spoken label. */
+export function SkeletonRows({ label, rows = 3 }: { label: string; rows?: number }) {
+  return (
+    <div role="status" aria-label={label} className="flex flex-col gap-3">
+      {Array.from({ length: rows }, (_, i) => <Skeleton key={i} />)}
+    </div>
+  )
+}

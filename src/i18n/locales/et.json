@@ -165,10 +165,8 @@
       "title": "Looge esimene objekt",
       "step1": "Looge objekt: 7 tüüpetappi lisatakse ise.",
       "step2": "Märkige, kui kaugel on esimene etapp.",
-      "step3": "Siin näete, kus töö käib ja kus seisab.",
       "action": "Loo esimene objekt",
-      "step2Open": "Kutsuge tööline e-posti teel. Ta logib sisse e-kirja koodiga, ilma paroolita.",
-      "step3Open": "Tööline saadab foto ja protsendi. Näete, kus töö seisab."
+      "step2Open": "Kutsuge tööline e-posti teel. Ta logib sisse e-kirja koodiga, ilma paroolita."
     },
     "groupActive": "Käimas",
     "groupPaused": "Pausil",
@@ -429,8 +427,6 @@
     "email": "E-post",
     "addRow": "Veel üks inimene",
     "removeRow": "Eemalda rida",
-    "submit": "Kutsu ({{count}})",
-    "submitOne": "Kutsu",
     "submitWorker": "Kutsu tööline",
     "submitWorkers": "Kutsu töölised ({{count}})",
     "submitForeman": "Kutsu brigadir",
@@ -460,6 +456,9 @@
     "unknownHint": "Avage „Täna“, kui levi on olemas, — kontrollime.",
     "unknownHintOwner": "Avage „Objekti ülevaade“, kui levi on olemas, — kontrollime.",
     "unknownAction": "Kontrolli uuesti",
+    "queuedToday": "Salvestatud telefoni, saatmata. Kui ühendus tekib, vajutage «Saada uuesti».",
+    "unknownHintToday": "Kui ühendus tekib, vajutage «Kontrolli uuesti».",
+    "retryStopped": "Ise enam ei saadeta. Vajutage «Saada uuesti».",
     "stale": "Ei võetud vastu: etapp on juba {{percent}}%",
     "staleResend": "Saada uue %-ga",
     "stageAhead": "Etapp on juba {{percent}}%. Teie foto lisati.",
@@ -536,7 +535,8 @@
     "closeSending": "Sulge. Aruanne on telefoni salvestatud.",
     "retake": "Pildista uuesti",
     "photoAlt": "Aruande foto: {{stage}}",
-    "backToGrowth": "Tagasi kasvu juurde"
+    "backToGrowth": "Tagasi kasvu juurde",
+    "offlineSaved": "Aruanne salvestatakse telefoni. Saatke see uuesti, kui ühendus tekib."
   },
   "stagePicker": {
     "title": "Valige etapp",

@@ -131,7 +131,7 @@ export function ProjectDashboardView({
     lastMarkAt: data.lastMarkAt,
     lastMarkRole: data.lastMarkRole,
     peopleNames: onProject.map((p) => p.name),
-    createdAt: null,
+    createdAt: (project as typeof project & { created_at?: string | null }).created_at ?? null,
   }
   const fresh = freshnessView(freshInput, t, { gateOpen, fmt: formatDate })
   const lastAt = lastActivityAt(freshInput)
@@ -155,7 +155,8 @@ export function ProjectDashboardView({
     }
     if (stale && gateOpen && hasPeople) {
       if (isGc) return { main: { kind: 'link', label: t('overview.openPeople'), to: `/project/${projectId}/settings?focus=silent` } }
-      return { main: { kind: 'none' }, line: t('overview.staleForeman', { names: onProject.map((p) => p.name).join(', ') }) }
+      // Foreman: the reproach line plus something to do (stage 5 critic «Март» MED 5).
+      return { main: mark, line: t('overview.staleForeman', { names: onProject.map((p) => p.name).join(', ') }) }
     }
     if (stale && !gateOpen && isGc && known.length + onProject.length > 0) {
       return {
@@ -296,7 +297,9 @@ export function ProjectDashboardView({
     </Section>
   )
 
+  // Desktop only: on a phone the stage list already answers «where is the work» (critic «Март» MED 8).
   const houseBlock = stagesExist ? (
+    <div className="hidden lg:block">
     <Disclosure label={t('overview.showHouse')}>
       <HouseModelBlock
         stages={stages.map((stage) => ({
@@ -307,6 +310,7 @@ export function ProjectDashboardView({
         }))}
       />
     </Disclosure>
+    </div>
   ) : null
 
   return (
@@ -472,13 +476,19 @@ function PhotoTile({ photo }: { photo: OverviewPhoto }) {
 
 function IssueRow({ issue }: { issue: ActiveIssue }) {
   const { t } = useTranslation()
+  const { id } = useParams<{ id: string }>()
   return (
-    <li className={`flex items-start justify-between gap-3 rounded-control border-2 border-l-4 border-line bg-page p-3 ${issueBorder(issue.priority)}`}>
-      <div className="flex min-w-0 flex-col gap-1">
-        <p className="m-0 text-field font-semibold [overflow-wrap:anywhere]">{issue.title}</p>
-        {issue.dueDate ? <p className="m-0 text-body font-medium">{t('common.due', { date: formatDate(issue.dueDate) })}</p> : null}
-      </div>
-      <UrgentBadge priority={issue.priority} />
+    <li>
+      <Link
+        to={`/project/${id}/issues`}
+        className={`flex min-h-12 items-start justify-between gap-3 rounded-control border-2 border-l-4 border-line bg-page p-3 text-fg no-underline hover:bg-surface focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus ${issueBorder(issue.priority)}`}
+      >
+        <span className="flex min-w-0 flex-col gap-1">
+          <span className="text-field font-semibold [overflow-wrap:anywhere]">{issue.title}</span>
+          {issue.dueDate ? <span className="text-body font-medium">{t('common.due', { date: formatDate(issue.dueDate) })}</span> : null}
+        </span>
+        <UrgentBadge priority={issue.priority} />
+      </Link>
     </li>
   )
 }

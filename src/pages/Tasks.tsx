@@ -8,8 +8,7 @@ import { useProjectMembers } from '../hooks/useProjectMembers'
 import { useStageOptions } from '../hooks/useStageOptions'
 import { useProjectStages } from '../hooks/useProjectStages'
 import { isEmailGateOpen } from '../lib/emailGate'
-import { Button, Disclosure, NetBar, Sheet } from '../components/ui'
-import { Spinner } from '../components/Spinner'
+import { Button, Disclosure, NetBar, Sheet, SkeletonRows } from '../components/ui'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { TaskForm } from '../components/TaskForm'
 import { TaskCard } from '../components/TaskCard'
@@ -69,7 +68,7 @@ function TasksView({ projectId, manager }: { projectId: string | undefined; mana
       ) : null}
 
       {loading ? (
-        <Spinner label={t('tasks.loading')} />
+        <SkeletonRows label={t('tasks.loading')} />
       ) : error ? (
         <ErrorMessage message={error} onRetry={reload} />
       ) : tasks.length === 0 ? (

@@ -5,8 +5,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useIssues } from '../hooks/useIssues'
 import type { IssueItem } from '../hooks/useIssues'
 import type { IssuePriority, IssueStatus } from '../types'
-import { Button, Disclosure, NetBar, Sheet } from '../components/ui'
-import { Spinner } from '../components/Spinner'
+import { Button, Disclosure, NetBar, Sheet, SkeletonRows } from '../components/ui'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { IssueForm } from '../components/IssueForm'
 import { IssueCard } from '../components/IssueCard'
@@ -88,7 +87,7 @@ export function IssuesView({
       ) : null}
 
       {loading ? (
-        <Spinner label={t('issues.loading')} />
+        <SkeletonRows label={t('issues.loading')} />
       ) : error ? (
         <ErrorMessage message={error} onRetry={reload} />
       ) : issues.length === 0 ? (

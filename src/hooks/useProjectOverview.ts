@@ -140,7 +140,7 @@ export function useProjectOverview(projectId: string | undefined): UseProjectOve
       const [projectRes, stagesRes, photosRes, issuesRes, historyRes] = await Promise.all([
         supabase
           .from('projects')
-          .select('id, company_id, name, address, deadline, budget, status')
+          .select('id, company_id, name, address, deadline, budget, status, created_at')
           .eq('id', projectId)
           .single(),
         supabase

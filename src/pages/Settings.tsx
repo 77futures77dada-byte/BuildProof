@@ -8,8 +8,7 @@ import type { AccessRow } from '../hooks/useProjectAccessSettings'
 import { supabase } from '../lib/supabaseClient'
 import { isEmailGateOpen } from '../lib/emailGate'
 import { RESEND_SECONDS, codeSendError, isValidEmail, secondsLeft } from '../lib/authCode'
-import { Button, ConfirmDialog, NetBar, Sheet, StatusIcon, TextField, useOnline } from '../components/ui'
-import { Spinner } from '../components/Spinner'
+import { Button, ConfirmDialog, NetBar, Sheet, SkeletonRows, StatusIcon, TextField, cx, useOnline } from '../components/ui'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { MemberAccessRow } from '../components/MemberAccessRow'
 
@@ -79,7 +78,7 @@ export function Settings() {
       {notice ? <p role="status" className="m-0 text-body font-semibold text-fg">{notice}</p> : null}
 
       {loading ? (
-        <Spinner label={t('settings.loading')} />
+        <SkeletonRows label={t('settings.loading')} />
       ) : error ? (
         <ErrorMessage message={error} onRetry={reload} />
       ) : (
@@ -325,7 +324,25 @@ function InviteForm({ projectId, known, onAddKnown, onInvited }: {
 
   return (
     <form onSubmit={(e) => void submit(e)} noValidate className="flex flex-col gap-4">
-      <h2 className="m-0 text-h2 font-bold text-fg">{role === 'foreman' ? t('invite.foreman') : t('invite.title')}</h2>
+      <h2 id="invite-title" className="m-0 text-h2 font-bold text-fg">{role === 'foreman' ? t('invite.foreman') : t('invite.title')}</h2>
+      <div role="radiogroup" aria-labelledby="invite-title" className="flex gap-2">
+        {(['worker', 'foreman'] as const).map((r) => (
+          <button
+            key={r}
+            type="button"
+            role="radio"
+            aria-checked={role === r}
+            disabled={busy}
+            onClick={() => setRole(r)}
+            className={cx(
+              'inline-flex min-h-12 flex-1 items-center justify-center rounded-control border-2 px-4 text-field font-semibold focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus',
+              role === r ? 'border-fg bg-fg text-page' : 'border-fg bg-page text-fg hover:bg-surface',
+            )}
+          >
+            {t(`roles.${r}`)}
+          </button>
+        ))}
+      </div>
       <p className="m-0 text-body font-medium text-fg">{t('invite.hint')}</p>
       {rows.map((r, i) => {
         const err = problem(r, i)
@@ -360,10 +377,9 @@ function InviteForm({ projectId, known, onAddKnown, onInvited }: {
         </Button>
       ) : null}
       <Button type="submit" variant="primary" block loading={busy} disabled={!online || !filled.length || blocked}>
-        {t('invite.submit', { count: filled.length })}
-      </Button>
-      <Button variant="ghost" disabled={busy} onClick={() => setRole(role === 'worker' ? 'foreman' : 'worker')} className="self-start px-3">
-        {role === 'worker' ? t('invite.foreman') : t('invite.title')}
+        {filled.length > 1
+          ? t(role === 'foreman' ? 'invite.submitForemen' : 'invite.submitWorkers', { count: filled.length })
+          : t(role === 'foreman' ? 'invite.submitForeman' : 'invite.submitWorker')}
       </Button>
     </form>
   )
