@@ -21,6 +21,8 @@ interface ProjectCardProps {
   percentLabel?: ReactNode
   /** Freshness / project status chips (paused, stale, noreports…). */
   chips?: ChipSpec[]
+  /** Ready-made chips (e.g. `FreshnessChip`), after `chips`. */
+  badges?: ReactNode
   /** One extra line (next step, who is silent…). */
   note?: ReactNode
   /** `row` = table-like line on desktop ≥ 1024 px. */
@@ -31,7 +33,7 @@ interface ProjectCardProps {
 }
 
 /** Project in the /dashboard list; the whole card is one link (≥ 48 px). */
-export function ProjectCard({ to, name, subtitle, percent, percentLabel, chips, note, layout = 'card', loading, className }: ProjectCardProps) {
+export function ProjectCard({ to, name, subtitle, percent, percentLabel, chips, badges, note, layout = 'card', loading, className }: ProjectCardProps) {
   if (loading) {
     return <div aria-hidden="true" className={cx('h-40 animate-pulse rounded-card bg-surface motion-reduce:animate-none', className)} />
   }
@@ -58,9 +60,10 @@ export function ProjectCard({ to, name, subtitle, percent, percentLabel, chips, 
           <ProgressBar value={percent} />
         </div>
       ) : null}
-      {chips?.length || note ? (
+      {chips?.length || badges || note ? (
         <div className="flex flex-col items-start gap-2">
           {chips?.map((c, i) => <StatusChip key={i} kind={c.kind}>{c.label}</StatusChip>)}
+          {badges}
           {note ? <p className="m-0 text-body font-semibold">{note}</p> : null}
         </div>
       ) : null}

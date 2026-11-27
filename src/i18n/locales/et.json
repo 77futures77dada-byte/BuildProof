@@ -88,7 +88,8 @@
     "photos": "Fotod",
     "tasks": "Ülesanded",
     "issues": "Probleemid",
-    "settings": "Seaded"
+    "settings": "Seaded",
+    "people": "Inimesed"
   },
   "auth": {
     "subtitle": "Logige sisse, et näha oma objekte",
@@ -158,7 +159,6 @@
     "pickProject": "Valige objekt",
     "createProject": "Loo objekt",
     "loading": "Objektide laadimine…",
-    "emptyOther": "Teile pole veel ühelegi objektile ligipääsu antud.",
     "empty": {
       "title": "Looge esimene objekt",
       "step1": "Looge objekt: 7 tüüpetappi lisatakse ise.",
@@ -208,7 +208,6 @@
     "issuesOpen_other": "avatud",
     "updated": "Uuendatud",
     "goToStages": "Ava etapid",
-    "noStages": "Objektil pole veel etappe.",
     "recentPhotos": "Viimased fotod",
     "activeIssues": "Avatud probleemid",
     "noActiveIssues": "Avatud probleeme pole.",
@@ -225,7 +224,6 @@
       "title": "Mis edasi",
       "step1": "Märkige, kui kaugel on esimene etapp.",
       "step2": "Aruanded, fotod ja probleemid ilmuvad sellele lehele.",
-      "step3": "Aruanded, fotod ja probleemid ilmuvad sellele lehele.",
       "action": "Märgi esimene etapp",
       "inviteOpen": "Kutsu tööline"
     },

@@ -35,7 +35,7 @@ export const extraUsers = {
 // Two projects each, so /dashboard shows a list instead of auto-opening the only project.
 const extraAccess = [['p1', 'u-client'], ['p2', 'u-client'], ['p1', 'u-foreman'], ['p2', 'u-foreman']]
 
-const project = (id, name, address, status = 'active', company_id = 'c1') => ({ id, company_id, name, address, deadline: day(60), budget: null, status })
+const project = (id, name, address, status = 'active', company_id = 'c1') => ({ id, company_id, name, address, deadline: day(60), budget: null, status, created_at: ago(20 * D) })
 export const projects = [
   project('p1', 'Частный дом, Виймси', 'Виймси, Рандвере теэ 12'),
   project('p2', 'Квартира, Каламая', 'Таллин, Вана-Каламая 8-4'),

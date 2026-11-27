@@ -18,14 +18,16 @@ export function StageHistoryPanel({ projectStageId, refreshToken }: StageHistory
   const { entries, loading, error } = useStageHistory(projectStageId, open, refreshToken)
 
   return (
-    <div className="text-sm">
+    <div className="text-body font-medium text-fg">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-700"
+        className="inline-flex min-h-12 items-center gap-2 rounded-control px-1 text-field font-semibold text-fg underline underline-offset-4 hover:no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >
-        <span aria-hidden="true">{open ? '▾' : '▸'}</span>
+        <svg aria-hidden="true" viewBox="0 0 20 20" width="20" height="20" className={open ? 'rotate-90' : undefined}>
+          <path d="M7 4l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
         {t('stages.history')}
       </button>
 
@@ -36,18 +38,22 @@ export function StageHistoryPanel({ projectStageId, refreshToken }: StageHistory
           ) : error ? (
             <ErrorMessage message={error} />
           ) : entries.length === 0 ? (
-            <p className="text-xs text-slate-400">{t('stages.historyEmpty')}</p>
+            <p className="m-0">{t('stages.historyEmpty')}</p>
           ) : (
-            <ul className="space-y-1.5">
+            <ul className="m-0 flex list-none flex-col gap-2 p-0">
               {entries.map((entry) => (
-                <li key={entry.id} className="flex flex-wrap items-baseline gap-x-2 text-xs">
-                  <span className="tabular-nums text-slate-700">
-                    {entry.oldPercent}% → {entry.newPercent}%
+                <li key={entry.id} className="flex flex-wrap items-baseline gap-x-3">
+                  <span className="num-col inline-flex items-center gap-1 font-semibold">
+                    {entry.oldPercent}%
+                    <svg aria-hidden="true" viewBox="0 0 20 20" width="18" height="18">
+                      <path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {entry.newPercent}%
                   </span>
-                  <span className="text-slate-500">
+                  <span>
                     {entry.changedByName ?? t('stages.unknownUser')}
                   </span>
-                  <span className="text-slate-400">
+                  <span className="num-col">
                     {formatDateTimeSmart(entry.changedAt)}
                   </span>
                 </li>

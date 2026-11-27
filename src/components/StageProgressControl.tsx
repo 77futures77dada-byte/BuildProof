@@ -89,16 +89,16 @@ export function StageProgressControl({ value, label, onCommit }: StageProgressCo
   }
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={() => handleChange(shown - PROGRESS_STEP)}
           disabled={shown <= PROGRESS_MIN}
           aria-label={t('stages.decrease', { stage: label })}
-          className="size-8 shrink-0 rounded-lg border border-slate-300 bg-white text-slate-700 disabled:opacity-40"
+          className="inline-flex size-12 shrink-0 items-center justify-center rounded-control border-2 border-fg bg-page text-h3 font-bold text-fg hover:bg-surface disabled:opacity-60 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
-          −
+          <span aria-hidden="true">−</span>
         </button>
 
         <input
@@ -112,7 +112,7 @@ export function StageProgressControl({ value, label, onCommit }: StageProgressCo
           onKeyUp={flush}
           onBlur={flush}
           aria-label={t('stages.progress', { stage: label })}
-          className="h-2 w-full cursor-pointer accent-sky-600"
+          className="h-12 w-full cursor-pointer accent-[var(--fg)]"
         />
 
         <button
@@ -120,12 +120,12 @@ export function StageProgressControl({ value, label, onCommit }: StageProgressCo
           onClick={() => handleChange(shown + PROGRESS_STEP)}
           disabled={shown >= PROGRESS_MAX}
           aria-label={t('stages.increase', { stage: label })}
-          className="size-8 shrink-0 rounded-lg border border-slate-300 bg-white text-slate-700 disabled:opacity-40"
+          className="inline-flex size-12 shrink-0 items-center justify-center rounded-control border-2 border-fg bg-page text-h3 font-bold text-fg hover:bg-surface disabled:opacity-60 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
-          +
+          <span aria-hidden="true">+</span>
         </button>
 
-        <span className="w-12 shrink-0 text-right text-sm tabular-nums text-slate-600">
+        <span aria-live="polite" className="num-col w-16 shrink-0 text-right text-h3 font-bold text-fg">
           {saving ? '…' : `${shown}%`}
         </span>
       </div>
