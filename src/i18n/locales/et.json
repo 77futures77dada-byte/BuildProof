@@ -309,7 +309,10 @@
     "uploadFailed": "Fotot ei õnnestunud saata. Kontrollige ühendust ja proovige uuesti.",
     "saveFailed": "Fotot ei õnnestunud salvestada. Proovige uuesti.",
     "takePhoto": "Pildista",
-    "emptyClient": "Fotosid veel pole."
+    "emptyClient": "Fotosid veel pole.",
+    "prev": "Eelmine",
+    "next": "Järgmine",
+    "sentAt": "saadetud {{date}}"
   },
   "image": {
     "notImage": "Valitud fail ei ole pilt.",

@@ -309,7 +309,10 @@
     "uploadFailed": "Could not send the photo. Check the connection and try again.",
     "saveFailed": "Could not save the photo. Please try again.",
     "takePhoto": "Take a photo",
-    "emptyClient": "No photos yet."
+    "emptyClient": "No photos yet.",
+    "prev": "Previous",
+    "next": "Next",
+    "sentAt": "sent {{date}}"
   },
   "image": {
     "notImage": "The selected file is not an image.",

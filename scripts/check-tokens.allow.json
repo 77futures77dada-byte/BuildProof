@@ -195,16 +195,6 @@
     "reason": "migrated in step «обзор объекта и оболочка» (05-ui.md §«Миграция»)"
   },
   {
-    "file": "src/pages/Photos.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "вкладки объекта",
-    "reason": "migrated in step «вкладки объекта» (05-ui.md §«Миграция»)"
-  },
-  {
     "file": "src/pages/Tasks.tsx",
     "kinds": [
       "palette",
@@ -266,26 +256,6 @@
   },
   {
     "file": "src/components/IssueForm.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "вкладки объекта",
-    "reason": "migrated in step «вкладки объекта» (05-ui.md §«Миграция»)"
-  },
-  {
-    "file": "src/components/PhotoUploadForm.tsx",
-    "kinds": [
-      "palette",
-      "small",
-      "weight"
-    ],
-    "temporary": "вкладки объекта",
-    "reason": "migrated in step «вкладки объекта» (05-ui.md §«Миграция»)"
-  },
-  {
-    "file": "src/components/ImagePicker.tsx",
     "kinds": [
       "palette",
       "small",
